@@ -96,13 +96,13 @@ class page():
         self.save_data()
 
     def save_data(self):
-        with open("LUT.json", "w") as fp:
+        with open("data/LUT.json", "w") as fp:
             json.dump(self.lookupTable, fp)
 
-        with open("PathsL.json", "w") as fp:
+        with open("data/PathsL.json", "w") as fp:
             json.dump(self.paths_lst, fp)
 
-        nx.write_graphml_lxml(self.G, "graph.graphml")
+        nx.write_graphml_lxml(self.G, "data/graph.graphml")
         # G = nx.read_graphml
 
 
