@@ -14,43 +14,20 @@ from bezier import bezier
 import cv2
 
 
-print(fitz.__doc__)
 
-pdfpath = '../DBYD_4NT_0813680_000_00_TOTALDOC (3).pdf'
+
+
 # file = open(pdfpath, 'rb')
 
-# pdfReader = PyPDF2.PdfReader(pdfpath)
-# totalPages = len(pdfReader.pages)
-# page21 = pdfReader.pages[21]
-#
-# print(totalPages)
-#
-# textPage1 = page21.extract_text()
-#
-# print(textPage1)
 
 
-doc = fitz.open(pdfpath)
 
-# print(doc.page_count)
-print(doc.metadata)
-
-
-page = doc.load_page(61) #61
-
-# print(page)
-# print(page.rect.width, page.rect.height)
-pw, ph = page.rect.width, page.rect.height
-print(np.ceil(pw).astype(int), np.ceil(ph).astype(int))
-
-im = np.zeros((np.ceil(ph).astype(int), np.ceil(pw).astype(int)))
 
 # plt.figure(figsize=(np.ceil(pw//2).astype(int), np.ceil(ph//2).astype(int)), dpi=80)
 
 # fig, ax = plt.subplots()
 
-import networkx as nx
-G = nx.Graph()
+
 
 # print(page.get_drawings())
 for d in page.get_drawings()[1000:1010]:
