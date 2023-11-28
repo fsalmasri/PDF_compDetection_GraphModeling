@@ -22,6 +22,8 @@ class page():
 
         self.G = nx.Graph()
 
+        self.generate_empty_canvas()
+
     def extract_text(self):
         # //TODO later
         text = self.single_page.get_text(delimiters='\n')  # .encode("utf8")
@@ -31,7 +33,7 @@ class page():
         #     print(t)
 
     def generate_empty_canvas(self):
-        print(np.ceil(self.pw).astype(int), np.ceil(self.ph).astype(int))
+        # print(np.ceil(self.pw).astype(int), np.ceil(self.ph).astype(int))
 
         self.e_canvas = np.zeros((np.ceil(self.ph).astype(int), np.ceil(self.pw).astype(int)))
         self.cv_canvas = np.zeros((np.ceil(self.ph).astype(int), np.ceil(self.pw).astype(int)))
@@ -96,14 +98,29 @@ class page():
         self.save_data()
 
     def save_data(self):
-        with open("data/LUT.json", "w") as fp:
-            json.dump(self.lookupTable, fp)
+        with open("data/LUT.json", "w") as jf:
+            json.dump(self.lookupTable, jf)
 
-        with open("data/PathsL.json", "w") as fp:
-            json.dump(self.paths_lst, fp)
+        with open("data/PathsL.json", "w") as jf:
+            json.dump(self.paths_lst, jf)
 
         nx.write_graphml_lxml(self.G, "data/graph.graphml")
         # G = nx.read_graphml
+
+    def load_data(self):
+        self.G = nx.read_graphml("data/graph.graphml")
+        nodes_list = [int(x) for x in self.G.nodes]
+        self.G.nodes = nodes_list
+        edges_list = [(int(x), int(y)) for x, y in self.G.edges]
+
+        self.G.remove_edges_from(list(self.G.edges()))
+        self.G.add_edges_from(edges_list)
+
+        with open('data/LUT.json') as jf:
+            self.lookupTable = json.load(jf, object_hook=utils.keystoint)
+
+        with open('data/PathsL.json') as jf:
+            self.paths_lst = json.load(jf, object_hook=utils.keystoint)
 
 
     def plot_canvas(self):
@@ -135,6 +152,8 @@ class page():
 
 
     def build_connected_components(self):
+        # /TODO check function name and behavior.
+
         connected_components = list(nx.connected_components(self.G))
 
         fig = plt.subplots()
@@ -175,17 +194,16 @@ class page():
     def find_connectedComp_inRegion(self, x, y):
 
         idx = utils.find_index_by_valueRange(self.lookupTable, rng=[x, y])
-        H = nx.subgraph(self.G, idx)
+        H = self.G.subgraph(idx)
         self.plot_graph_nx(H)
 
-
-        pos = utils.return_values_by_Idx(self.lookupTable, H.nodes)
-        pos = np.array(list(pos.values()))
-        pos = np.vstack([pos, pos[0]])
-
-        plt.figure()
-        plt.plot(pos[:,0], pos[:,1])
-        plt.gca().invert_yaxis()
+        # pos = utils.return_values_by_Idx(self.lookupTable, H.nodes)
+        # pos = np.array(list(pos.values()))
+        # pos = np.vstack([pos, pos[0]])
+        #
+        # plt.figure()
+        # plt.plot(pos[:,0], pos[:,1])
+        # plt.gca().invert_yaxis()
 
         plt.show()
         exit()

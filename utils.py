@@ -19,3 +19,6 @@ def return_values_by_Idx(LUT, nodes):
 
     return pos
 
+
+def keystoint(x):
+    return {int(k): v for k, v in x.items()}
