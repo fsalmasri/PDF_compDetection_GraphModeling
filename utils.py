@@ -22,3 +22,17 @@ def return_values_by_Idx(LUT, nodes):
 
 def keystoint(x):
     return {int(k): v for k, v in x.items()}
+
+def return_path_given_nodes(nodes, path_lst):
+    '''
+    This function return path index (key value) in the path_list dictionary given a list of nodes.
+    :param nodes: list of nodes to look for in the paths list
+    :param path_lst: list of all paths to check.
+    :return:
+    '''
+    paths_idx = []
+    for n in nodes:
+        for k, v in path_lst.items():
+            if n in v:
+                paths_idx.append(k)
+    return paths_idx

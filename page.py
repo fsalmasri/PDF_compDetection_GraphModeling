@@ -94,8 +94,9 @@ class page():
                     self.store_structued_data([list(ep1), list(ep2)])
 
 
-        # //TODO save LUTT, Graph, Paths.
+        self.build_connected_components()
         self.save_data()
+
 
     def save_data(self):
         with open("data/LUT.json", "w") as jf:
@@ -105,7 +106,6 @@ class page():
             json.dump(self.paths_lst, jf)
 
         nx.write_graphml_lxml(self.G, "data/graph.graphml")
-        # G = nx.read_graphml
 
     def load_data(self):
         self.G = nx.read_graphml("data/graph.graphml")
@@ -115,6 +115,9 @@ class page():
 
         self.G.remove_edges_from(list(self.G.edges()))
         self.G.add_edges_from(edges_list)
+
+        self.build_connected_components()
+
 
         with open('data/LUT.json') as jf:
             self.lookupTable = json.load(jf, object_hook=utils.keystoint)
@@ -137,12 +140,23 @@ class page():
 
         fig, ax = plt.subplots()
         nx.draw(G, pos, with_labels=True, node_size=200, node_color='lightblue',
-                font_size=10, font_color='black', font_weight='bold', width=2, ax=ax)
+                font_size=7, font_color='black', font_weight='bold', width=2, ax=ax)
 
         plt.gca().invert_yaxis()
         plt.axis('on')
         ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         # plt.show()
+
+    def plot_paths_by_pathsIDs(self, paths_idx):
+        paths_lst = {k: v for k, v in self.paths_lst.items() if k in paths_idx}
+
+        plt.figure()
+        for k, v in paths_lst.items():
+            _, p1, _, p2 = v
+
+            plt.plot([p1[0], p2[0]], [p1[1], p2[1]], color='black')
+
+        plt.gca().invert_yaxis()
 
 
     def plot_two_full_figures(self):
@@ -151,7 +165,7 @@ class page():
         plt.show()
 
 
-    def build_connected_components(self):
+    def plot_connected_components(self):
         # /TODO check function name and behavior.
 
         connected_components = list(nx.connected_components(self.G))
@@ -191,21 +205,53 @@ class page():
         plt.show()
 
 
+    def build_connected_components(self):
+        self.connected_components = list(nx.connected_components(self.G))
+
+
+    def study_connected_components(self):
+
+        ccomp_byLength = {}
+        for idx, con_x in enumerate(self.connected_components):
+            if len(con_x) not in ccomp_byLength:
+                ccomp_byLength[len(con_x)] = [idx]
+            else:
+                ccomp_byLength[len(con_x)].append(idx)
+
+        ccomp_byLength = dict(sorted(ccomp_byLength.items()))
+
+        s = [[k, len(v)] for k, v in ccomp_byLength.items()]
+
+        print(s)
+        subFig_idx = self.connected_components[ccomp_byLength[28][0]]
+
+        H = self.G.subgraph(subFig_idx)
+        self.plot_graph_nx(H)
+
+        paths_idx = utils.return_path_given_nodes(subFig_idx, self.paths_lst)
+        self.plot_paths_by_pathsIDs(paths_idx)
+
+
+        plt.show()
+
+        # from collections import Counter
+        #
+        # print(Counter(g_len).keys())
+        # print(Counter(g_len).values())
+
+        # print(np.unique(g_len))
+
     def find_connectedComp_inRegion(self, x, y):
 
         idx = utils.find_index_by_valueRange(self.lookupTable, rng=[x, y])
+
         H = self.G.subgraph(idx)
         self.plot_graph_nx(H)
 
-        # pos = utils.return_values_by_Idx(self.lookupTable, H.nodes)
-        # pos = np.array(list(pos.values()))
-        # pos = np.vstack([pos, pos[0]])
-        #
-        # plt.figure()
-        # plt.plot(pos[:,0], pos[:,1])
-        # plt.gca().invert_yaxis()
+        paths_idx = utils.return_path_given_nodes(idx, self.paths_lst)
+        self.plot_paths_by_pathsIDs(paths_idx)
 
         plt.show()
-        exit()
+
 
 
