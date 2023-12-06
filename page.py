@@ -223,16 +223,18 @@ class page():
         s = [[k, len(v)] for k, v in ccomp_byLength.items()]
 
         print(s)
-        subFig_idx = self.connected_components[ccomp_byLength[28][0]]
 
-        H = self.G.subgraph(subFig_idx)
-        self.plot_graph_nx(H)
+        for k in ccomp_byLength[28]:
+            subFig_idx = self.connected_components[k]
 
-        paths_idx = utils.return_path_given_nodes(subFig_idx, self.paths_lst)
-        self.plot_paths_by_pathsIDs(paths_idx)
+            H = self.G.subgraph(subFig_idx)
+            self.plot_graph_nx(H)
+
+            paths_idx = utils.return_path_given_nodes(subFig_idx, self.paths_lst)
+            self.plot_paths_by_pathsIDs(paths_idx)
 
 
-        plt.show()
+            plt.show()
 
         # from collections import Counter
         #
