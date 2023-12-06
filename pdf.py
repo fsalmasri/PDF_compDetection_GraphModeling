@@ -37,6 +37,9 @@ class pdf():
         print(f'page counts : {self.pages_count}')
         # print(self.doc.metadata)
 
-    def get_current_page(self):
-        return self.pages[self.current_page]
+    def get_current_page(self, page_number=None):
+        if not page_number:
+            return self.pages[self.current_page]
+        else:
+            return self.pages[page_number]
 
