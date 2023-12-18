@@ -19,18 +19,25 @@ class page():
         # self.line_nodes = []
         self.lookupTable = {}
         self.paths_lst = {}
+        self.text_lst = {}
 
         self.G = nx.Graph()
 
         self.generate_empty_canvas()
 
     def extract_text(self):
-        # //TODO later
-        text = self.single_page.get_text(delimiters='\n')  # .encode("utf8")
-        print(type(text))
-        print(text)
-        # for t in text:
-        #     print(t)
+
+        # text = self.single_page.get_text(delimiters='\n')  # .encode("utf8")
+        for word in self.single_page.get_text('words', sort=False):
+
+            if word[5] not in self.text_lst:
+                self.text_lst[word[5]] = []
+            self.text_lst[word[5]].append(word)
+
+        # print(len(self.text_lst))
+        # for t in self.text_lst:
+        #     print(t, self.text_lst[t])
+        # exit()
 
     def generate_empty_canvas(self):
         # print(np.ceil(self.pw).astype(int), np.ceil(self.ph).astype(int))
@@ -79,7 +86,7 @@ class page():
         drawings = self.single_page.get_drawings()
         print(f'found {len(drawings)} pathes')
         # exit()
-        for d in drawings[:2000]:
+        for d in drawings: #[:2000]:
             for idx, ld in enumerate(d['items']):
                 # print(ld)
 

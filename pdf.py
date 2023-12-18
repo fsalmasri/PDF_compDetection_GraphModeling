@@ -13,7 +13,7 @@ class pdf():
         self.current_page = 0 #61
 
         self.load_pdf()
-        self.extract_pages()
+        self.extract_pages(save=False)
 
 
     def load_pdf(self):
@@ -22,11 +22,18 @@ class pdf():
     def extract_singlePage(self, pn):
         return self.doc.load_page(pn)
 
-    def extract_pages(self):
-        for p in self.doc:
-            self.pages.append(page(p))
+    def extract_pages(self, save=False):
 
+        for i, p in enumerate(self.doc):
+            if save:
+                with fitz.open() as doc_tmp:
+                    doc_tmp.insert_pdf(self.doc, from_page=i, to_page=i, rotate=-1, show_progress=False)
+                    doc_tmp.save(f'../data/{i}.pdf')
+
+            self.pages.append(page(p))
         self.pages_count = len(self.pages)
+
+        print(f'{self.pages_count} pages found')
 
 
     def print_pdfMData(self):
