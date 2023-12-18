@@ -71,13 +71,15 @@ class page():
 
         self.paths_lst[path_id] = [nids[0], eps[0], nids[1], eps[1]]
 
-    def extract_paths(self):
+    def extract_paths(self, fname):
 
         # plt.figure()
         # plt.imshow(self.e_canvas)
 
         drawings = self.single_page.get_drawings()
-        for d in drawings: #[:2000]:
+        print(f'found {len(drawings)} pathes')
+        # exit()
+        for d in drawings[:2000]:
             for idx, ld in enumerate(d['items']):
                 # print(ld)
 
@@ -95,20 +97,20 @@ class page():
 
 
         self.build_connected_components()
-        self.save_data()
+        self.save_data(fname)
 
 
-    def save_data(self):
-        with open("data/LUT.json", "w") as jf:
+    def save_data(self, fname):
+        with open(f"data/LUT_{fname}.json", "w") as jf:
             json.dump(self.lookupTable, jf)
 
-        with open("data/PathsL.json", "w") as jf:
+        with open(f"data/PathsL_{fname}.json", "w") as jf:
             json.dump(self.paths_lst, jf)
 
-        nx.write_graphml_lxml(self.G, "data/graph.graphml")
+        nx.write_graphml_lxml(self.G, f"data/graph_{fname}.graphml")
 
-    def load_data(self):
-        self.G = nx.read_graphml("data/graph.graphml")
+    def load_data(self, fname):
+        self.G = nx.read_graphml(f"data/graph_{fname}.graphml")
         nodes_list = [int(x) for x in self.G.nodes]
         self.G.nodes = nodes_list
         edges_list = [(int(x), int(y)) for x, y in self.G.edges]
@@ -128,7 +130,7 @@ class page():
 
     def plot_canvas(self):
         plt.figure()
-        plt.imshow(self.e_canvas)
+        plt.imshow(self.cv_canvas)
 
     def plot_graph_nx(self, G):
         # pos = nx.spring_layout(self.G)
@@ -223,6 +225,7 @@ class page():
         s = [[k, len(v)] for k, v in ccomp_byLength.items()]
 
         print(s)
+        # exit()
 
         for k in ccomp_byLength[28]:
             subFig_idx = self.connected_components[k]

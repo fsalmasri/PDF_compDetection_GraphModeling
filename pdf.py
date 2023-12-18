@@ -10,7 +10,7 @@ class pdf():
         self.pdfpath = pdfpath
         self.pages = []
         self.pages_count = 0
-        self.current_page = 61
+        self.current_page = 0 #61
 
         self.load_pdf()
         self.extract_pages()
