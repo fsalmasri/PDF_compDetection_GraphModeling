@@ -14,5 +14,8 @@ class graph:
     def add_path(self):
         #//TODO add nodes to path. assign an ID to each node.
         # //TODO I think we still need to add node class
+        pass
+
+
 
 

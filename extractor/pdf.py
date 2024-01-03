@@ -1,23 +1,24 @@
 import fitz
-from page import page
+from . import save_load_path
 
+from .page import page
 
 class pdf():
-    def __init__(self, pdfpath):
+    def __init__(self):
 
         print(fitz.__doc__)
 
-        self.pdfpath = pdfpath
+        self.pdfpath = None
         self.pages = []
         self.pages_count = 0
         self.current_page = 0 #61
 
-        self.load_pdf()
+
+    def load_pdf(self, pdfpath):
+        self.pdfpath = pdfpath
+        self.doc = fitz.open(self.pdfpath)
         self.extract_pages(save=False)
 
-
-    def load_pdf(self):
-        self.doc = fitz.open(self.pdfpath)
 
     def extract_singlePage(self, pn):
         return self.doc.load_page(pn)
@@ -28,7 +29,7 @@ class pdf():
             if save:
                 with fitz.open() as doc_tmp:
                     doc_tmp.insert_pdf(self.doc, from_page=i, to_page=i, rotate=-1, show_progress=False)
-                    doc_tmp.save(f'../data/{i}.pdf')
+                    doc_tmp.save(f'{save_load_path}/{i}.pdf')
 
             self.pages.append(page(p))
         self.pages_count = len(self.pages)
