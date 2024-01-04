@@ -8,4 +8,5 @@ from .pdf import pdf
 doc = pdf()
 
 from .test import study_pathes
+from .test import study_paths_extended
 

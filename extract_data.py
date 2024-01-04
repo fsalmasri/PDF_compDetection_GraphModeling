@@ -1,10 +1,11 @@
-from extractor import doc, study_pathes
+from extractor import doc, study_pathes, study_paths_extended
 
 
 
 doc.load_pdf(pdfpath = '../data/pid/61.pdf')
 
-study_pathes()
+# study_pathes()
+study_paths_extended()
 exit()
 # doc.print_pdfMData()
 
