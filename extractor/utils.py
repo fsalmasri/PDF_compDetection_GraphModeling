@@ -2,7 +2,8 @@ import numpy
 import networkx as nx
 import json
 from pathlib import Path
-
+import bezier
+import numpy as np
 
 def find_index_by_valueRange(LUT, rng: list):
 
@@ -49,7 +50,9 @@ def return_values_by_Idx(LUT, nodes):
 
 
 def keystoint(x):
-    return {int(k): v for k, v in x.items()}
+    # return {int(k): v for k, v in x.items()}
+    return {int(k) if k.lstrip('-').isdigit() else k: v for k, v in x.items()}
+
 
 def return_path_given_nodes(nodes, path_lst):
     '''
@@ -61,9 +64,9 @@ def return_path_given_nodes(nodes, path_lst):
     paths_idx = []
     for n in nodes:
         for k, v in path_lst.items():
-            if n in v:
+            if v['p1'] == n or v['p2'] == n:
                 paths_idx.append(k)
-    return paths_idx
+    return np.unique(paths_idx)
 
 
 def get_key_id(lst):
@@ -76,22 +79,28 @@ def get_key_id(lst):
     return key
 
 
-def save_data(path_to_save, lookupTable, paths_lst, words_lst, blocks_lst, G):
+
+def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives):
+
+    print('Saving all Lists ...')
     Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
 
-    with open(f"{path_to_save}/LUT.json", "w") as jf:
-        json.dump(lookupTable, jf)
-
-    with open(f"{path_to_save}/PathsL.json", "w") as jf:
-        json.dump(paths_lst, jf)
-
-    with open(f"{path_to_save}/TextBox.json", "w") as jf:
-        json.dump(words_lst, jf)
-
-    with open(f"{path_to_save}/BlockBox.json", "w") as jf:
-        json.dump(blocks_lst, jf)
-
     nx.write_graphml_lxml(G, f"{path_to_save}/graph.graphml")
+
+    with open(f"{path_to_save}/nodes_LUT.json", "w") as jf:
+        json.dump(nodes_LUT, jf, indent=4)
+
+    with open(f"{path_to_save}/paths_LUT.json", "w") as jf:
+        json.dump(paths_lst, jf, indent=4)
+
+    with open(f"{path_to_save}/textBox.json", "w") as jf:
+        json.dump(words_lst, jf, indent=4)
+
+    with open(f"{path_to_save}/blockBox.json", "w") as jf:
+        json.dump(blocks_lst, jf, indent=4)
+
+    with open(f"{path_to_save}/primitives.json", "w") as jf:
+        json.dump(primitives, jf, indent=4)
 
 
 def prepare_loaded_G(G):
@@ -104,20 +113,32 @@ def prepare_loaded_G(G):
 
     return G
 def load_data(path_to_save):
+
     G = nx.read_graphml(f"{path_to_save}/graph.graphml")
     G = prepare_loaded_G(G)
 
 
-    with open(f'{path_to_save}/LUT.json') as jf:
-        lookupTable = json.load(jf, object_hook=keystoint)
+    with open(f'{path_to_save}/nodes_LUT.json') as jf:
+        nodes_LUT = json.load(jf, object_hook=keystoint)
 
-    with open(f'{path_to_save}/PathsL.json') as jf:
+    with open(f'{path_to_save}/paths_LUT.json') as jf:
         paths_lst = json.load(jf, object_hook=keystoint)
 
-    with open(f'{path_to_save}/TextBox.json') as jf:
+    with open(f'{path_to_save}/textBox.json') as jf:
         words_lst = json.load(jf, object_hook=keystoint)
 
-    with open(f'{path_to_save}/BlockBox.json') as jf:
+    with open(f'{path_to_save}/blockBox.json') as jf:
         blocks_lst = json.load(jf, object_hook=keystoint)
 
-    return G, lookupTable, paths_lst, words_lst, blocks_lst
+    with open(f'{path_to_save}/primitives.json') as jf:
+        primitives = json.load(jf, object_hook=keystoint)
+
+    # primitives = None
+
+    return G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives
+
+
+def get_bezier_cPoints(nodes, num_points=10):
+    curve = bezier.Curve(nodes, degree=3)
+    curve_points = curve.evaluate_multi(np.linspace(0, 1, num_points))
+    return np.array(curve_points).T

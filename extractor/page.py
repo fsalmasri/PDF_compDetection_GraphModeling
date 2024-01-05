@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from . import utils
 
-from . import save_load_path
+from . import Saving_path
+from . import plotter
 
 class page():
     def __init__(self, p):
@@ -15,11 +16,12 @@ class page():
         self.ph = self.single_page.rect.height
 
         # self.line_nodes = []
-        self.lookupTable = {}  # a dictionary of nodes list and their coords.
+        self.nodes_LUT = {}  # a dictionary of nodes list and their coords.
         self.paths_lst = {}  # a dictionary of paths of formate [node 0 , coords, node 1, coords]
         self.words_lst = {}  # a dictionary of text boxes arrange with box id (x0, y0, x1, y1, "word", block_no, line_no, word_no)
         self.blocks_lst = {}  # a dictionary of text boxes arrange with box id (x0, y0, x1, y1, "word", block_no, line_no, word_no)
         self.G = nx.Graph()  # networkx graph network.
+        self.primitives ={}
 
         self.generate_empty_canvas()
 
@@ -43,81 +45,128 @@ class page():
         self.cv_canvas = np.zeros((np.ceil(self.ph).astype(int), np.ceil(self.pw).astype(int)))
 
 
-
-    def store_structued_data(self, eps: list):
+    def store_structued_data(self, item_paths: list):
         '''
-        Build a lookup table contains node id and its x, y coords.
+        Build a nodes and paths lookup table contains node id and its x, y coords.
         Build Graph networks giving the node ids and the edges.
 
-        :param eps: contain the path params in formate (x0,y0) (x1,y1). node 1 and node 2.
+        :param item_paths: contain a list of paths params in dictionary formate
+        {'p1': [x, y], 'p2': [x, y], 'item_type': item_type, 'path_type': path_type}
 
         :return:
         '''
 
-        nodes = []
-        for ep in eps:
-            # if nodes exist in the lookup table bring its id given its coordinates.
-            if ep in self.lookupTable.values():
-                node_id = list(self.lookupTable.keys())[list(self.lookupTable.values()).index(ep)]
-            else:
-                node_id = utils.get_key_id(self.lookupTable)
+        for path in item_paths:
+            eps = [path['p1'], path['p2']]
+            path_nodes = []
+            for ep in eps:
+                # if nodes exist in the lookup table bring its id given its coordinates.
+                if ep in self.nodes_LUT.values():
+                    node_id = list(self.nodes_LUT.keys())[list(self.nodes_LUT.values()).index(ep)]
+                else:
+                    node_id = utils.get_key_id(self.nodes_LUT)
 
-                self.lookupTable[node_id] = ep
+                    self.nodes_LUT[node_id] = ep
 
-            nodes.append(node_id)
+                path_nodes.append(node_id)
+                # subgraph_nodes.append(node_id)
+                self.G.add_node(node_id)
+            self.G.add_edge(path_nodes[0], path_nodes[1])
 
-            # assuming only path. then it only has two nodes.
-            self.G.add_node(node_id)
+            self.add_to_pathsL(path_nodes, path['item_type'], path['path_type'])
 
-        self.add_to_pathsL(nodes, eps)
-        self.G.add_edge(nodes[0], nodes[1])
-
-
-    def add_to_pathsL(self, nids, eps):
+    def add_to_pathsL(self, nids, item_type, dwg_type):
         path_id = utils.get_key_id(self.paths_lst)
-        self.paths_lst[path_id] = [nids[0], eps[0], nids[1], eps[1]]
-
+        self.paths_lst[path_id] = {'p1': nids[0], 'p2': nids[1],
+                                   'item_type': item_type, 'path_type': dwg_type, 'p_id': 0}
 
     def extract_paths(self):
 
-        # plt.figure()
-        # plt.imshow(self.e_canvas)
-        # //TODO other paths must be parsed. Circle, Rectangle...
-
-
         drawings = self.single_page.get_drawings()
 
-        test_type = []
-        for dwg in drawings:
-            test_type.append(dwg['type'])
+        # plt.figure()
+        # plt.imshow(self.e_canvas)
 
-        from collections import Counter
-        print(Counter(test_type))
-        exit()
-        print(f'found {len(drawings)} pathes')
-        # exit()
+        print(f'found {len(drawings)} paths')
+        for dwg_idx, dwg in enumerate(drawings[:500]):
+            dwg_items = dwg['items']
+            dwg_type = dwg['type']
+            dwg_rect = dwg['rect']
 
-        for d in drawings: #[:2000]:
-            for idx, ld in enumerate(d['items']):
-                # print(ld)
+            item_paths = []
+            def add_to_main(p1, p2, item_t):
+                item_paths.append({'p1': [p1[0], p1[1]], 'p2': [p2[0], p2[1]],
+                                   'item_type': item_t, 'path_type': dwg_type})
 
-                if 'l' in ld:
-                    ep1 = (ld[1].x, ld[1].y)
-                    ep2 = (ld[2].x, ld[2].y)
+            for idx, item in enumerate(dwg_items):
+                if item[0] == 'l':
+                    add_to_main([item[1].x, item[1].y], [item[2].x, item[2].y], item[0])
 
-                    # plt.plot([ld[1].x, ld[2].x], [ld[1].y, ld[2].y], c='white')
+                if item[0] == 'qu':
+                    quads = item[1]
 
-                    # p1 = (int(ld[1].x), int(ld[1].y))
-                    # p2 = (int(ld[2].x), int(ld[2].y))
-                    # cv2.line(self.cv_canvas, p1, p2, color=255, thickness=1)
+                    add_to_main([quads.ul.x, quads.ul.y], [quads.ur.x, quads.ur.y], item[0])
+                    add_to_main([quads.ur.x, quads.ur.y], [quads.lr.x, quads.lr.y], item[0])
+                    add_to_main([quads.lr.x, quads.lr.y], [quads.ll.x, quads.ll.y], item[0])
+                    add_to_main([quads.ll.x, quads.ll.y], [quads.ul.x, quads.ul.y], item[0])
 
-                    self.store_structued_data([list(ep1), list(ep2)])
+                if item[0] == 're':
+                    rect = item[1]
+                    add_to_main([rect.tl.x, rect.tl.y], [rect.tr.x, rect.tr.y], item[0])
+                    add_to_main([rect.tr.x, rect.tr.y], [rect.br.x, rect.br.y], item[0])
+                    add_to_main([rect.br.x, rect.br.y], [rect.bl.x, rect.bl.y], item[0])
+                    add_to_main([rect.bl.x, rect.bl.y], [rect.tl.x, rect.tl.y], item[0])
+
+                if item[0] == 'c':
+                    x_coords = [item[1].x, item[2].x, item[3].x, item[4].x]
+                    y_coords = [item[1].y, item[2].y, item[3].y, item[4].y]
+
+                    curve_points = utils.get_bezier_cPoints([x_coords, y_coords], num_points=10)
+                    for i in range(curve_points.shape[0] - 1): add_to_main(curve_points[i], curve_points[i + 1],
+                                                                           item[0])
+
+            if len(item_paths) > 0 and dwg_type == 'f' and item_paths[-1]['item_type'] == 'l':
+                item_paths.append({'p1': [item_paths[-1]['p2'][0], item_paths[-1]['p2'][1]],
+                                   'p2': [item_paths[0]['p1'][0], item_paths[0]['p1'][1]],
+                                   'item_type': 'l', 'path_type': dwg_type})
+
+            # plotter.plot_items(item_paths)
+        # plt.show()
+
+            if len(item_paths) > 0:
+                self.store_structued_data(item_paths)
 
         self.build_connected_components()
 
 
-    def build_connected_components(self):
+    def build_connected_components(self, update=True):
         self.connected_components = list(nx.connected_components(self.G))
+
+        if update:
+            self.update_tables()
+
+    def update_tables(self):
+        # print(len(self.connected_components))
+
+        subgraphs_nodes_lst = [ x for x in self.connected_components if len(x) > 1]
+
+        # print(len(subgraphs_nodes_lst))
+        # print(subgraphs_nodes_lst)
+
+        for subgraph in subgraphs_nodes_lst:
+
+            # add to primitives list
+            p_id = utils.get_key_id(self.primitives)
+            self.primitives[p_id] = list(subgraph)
+
+            # get all paths ids that contain the nodes in the subgraph
+            paths_idx = utils.return_path_given_nodes(list(subgraph), self.paths_lst)
+
+            # update the paths LUT with the p_id
+            for p in paths_idx:
+                self.paths_lst[p]['p_id'] = p_id
+
+        self.save_data(61)
 
 
     def study_connected_components(self):
@@ -157,7 +206,7 @@ class page():
 
     def find_connectedComp_inRegion(self, x, y):
 
-        idx = utils.find_index_by_valueRange(self.lookupTable, rng=[x, y])
+        idx = utils.find_index_by_valueRange(self.nodes_LUT, rng=[x, y])
 
         H = self.G.subgraph(idx)
         self.plot_graph_nx(H)
@@ -170,14 +219,12 @@ class page():
 
     def clean_data(self):
 
-        nidx = utils.look_in_txtBlocks_dict(self.lookupTable, self.words_lst)
+        nidx = utils.look_in_txtBlocks_dict(self.nodes_LUT, self.words_lst)
 
         paths_idx = utils.return_path_given_nodes(nidx, self.paths_lst)
         self.plot_paths_by_pathsIDs(paths_idx)
 
         plt.show()
-
-
 
 
     # General plotters
@@ -197,7 +244,7 @@ class page():
 
         pos = {}
         for n in G.nodes:
-            pos[n] = np.array(self.lookupTable[n])
+            pos[n] = np.array(self.nodes_LUT[n])
 
         fig, ax = plt.subplots()
         nx.draw(G, pos, with_labels=True, node_size=200, node_color='lightblue',
@@ -245,7 +292,7 @@ class page():
 
                 x, y = [], []
                 for e in edges_lst:
-                    p1, p2 = self.lookupTable[e[0]], self.lookupTable[e[1]]
+                    p1, p2 = self.nodes_LUT[e[0]], self.nodes_LUT[e[1]]
                     # print(e, p1, p2)
                     x.extend([p1[0], p2[0]])
                     y.extend([p1[1], p2[1]])
@@ -264,9 +311,7 @@ class page():
         fig, ax = plt.subplots()
         ax.imshow(self.e_canvas)
 
-
-
-        paths_lst = {k: v for k, v in self.paths_lst.items() if k in self.lookupTable}
+        paths_lst = {k: v for k, v in self.paths_lst.items() if k in self.nodes_LUT}
 
         for k, v in paths_lst.items():
             _, p1, _, p2 = v
@@ -290,13 +335,13 @@ class page():
 
     # General Utils.
     def save_data(self, fname):
-        utils.save_data(f'{save_load_path}/{fname}', self.lookupTable, self.paths_lst,
-              self.words_lst, self.blocks_lst, self.G)
+        utils.save_data(f'{Saving_path}/{fname}',
+                        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst, self.primitives)
 
     def load_data(self, fname):
 
-        self.G, self.lookupTable, self.paths_lst, self.words_lst, self.blocks_lst = (
-            utils.load_data(f'{save_load_path}/{fname}'))
+        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst, self.primitives = (
+            utils.load_data(f'{Saving_path}/{fname}'))
 
         self.build_connected_components()
 

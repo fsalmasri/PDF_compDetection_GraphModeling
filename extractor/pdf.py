@@ -1,5 +1,5 @@
 import fitz
-from . import save_load_path
+from . import Data_load_path
 
 from .page import page
 
@@ -29,7 +29,7 @@ class pdf():
             if save:
                 with fitz.open() as doc_tmp:
                     doc_tmp.insert_pdf(self.doc, from_page=i, to_page=i, rotate=-1, show_progress=False)
-                    doc_tmp.save(f'{save_load_path}/{i}.pdf')
+                    doc_tmp.save(f'{Data_load_path}/{i}.pdf')
 
             self.pages.append(page(p))
         self.pages_count = len(self.pages)

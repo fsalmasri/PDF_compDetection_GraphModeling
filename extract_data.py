@@ -1,22 +1,24 @@
-from extractor import doc, study_pathes, study_paths_extended
+from extractor import doc, study_pathes, study_paths_svg
 
 
 
 doc.load_pdf(pdfpath = '../data/pid/61.pdf')
 
 # study_pathes()
-study_paths_extended()
-exit()
+# study_paths_extended()
+# exit()
 # doc.print_pdfMData()
 
 sp = doc.get_current_page()
-# sp.extract_text()
+sp.extract_text()
 sp.extract_paths()
-
-
-
 # sp.save_data('61')
+
 # sp.load_data('61')
+sp.build_connected_components()
+exit()
+
+
 # sp.clean_data()
 
 # sp.plot_txtblocks_regions()
