@@ -50,11 +50,11 @@ def return_values_by_Idx(LUT, nodes):
     return pos
 
 
-def return_path_given_nodes(nodes, path_lst):
+def return_pathsIDX_given_nodes(nodes, path_lst):
     '''
     This function return path index (key value) in the path_list dictionary given a list of nodes.
     :param nodes: list of nodes to look for in the paths list
-    :param path_lst: list of all paths to check.
+    :param path_lst: list of all paths ID.
     :return:
     '''
     paths_idx = []
@@ -64,7 +64,37 @@ def return_path_given_nodes(nodes, path_lst):
                 paths_idx.append(k)
     return np.unique(paths_idx)
 
-# def return_nodes_by_
+def return_paths_given_nodes(nodes, path_lst, nodes_LUT=None, replace_nID=True):
+    '''
+    This function return path index (key value) in the path_list dictionary given a list of nodes.
+    :param nodes: list of nodes to look for in the paths list
+    :param path_lst: list of all paths. node ids are replaced with coordinates.
+    :param replace_nID: Replace node ids with coordinates
+    :return:
+    '''
+
+    paths = []
+    for n in nodes:
+        for k, v in path_lst.items():
+            if v['p1'] == n or v['p2'] == n:
+                if replace_nID:
+                    v['p1'] = nodes_LUT[v['p1']]
+                    v['p2'] = nodes_LUT[v['p2']]
+
+                paths.append(v)
+    return paths
+
+def return_primitives_by_node(primitives, n_id):
+    '''
+
+    :param primitives: primitives dictionary
+    :param n_id: node id to look for in primitives dictionary
+    :return: list of primitives id and its containing nodes.
+    '''
+    matching_primitives = [(prim_k, prim_v) for prim_k, prim_v in primitives.items() if n_id in prim_v]
+
+    return matching_primitives[0][0], matching_primitives[0][1]
+
 
 def get_key_id(lst):
     # if the dictionary is empty return key = 1, otherwise return the last item key +1.

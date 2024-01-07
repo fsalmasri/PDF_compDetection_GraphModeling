@@ -6,6 +6,7 @@ import numpy as np
 from . import doc
 from . import plotter
 
+from .utils import return_primitives_by_node, return_pathsIDX_given_nodes, return_paths_given_nodes
 
 
 def check_dwg_items(dwg):
@@ -62,23 +63,30 @@ def study_line_fill_connection():
 
     nodes = np.array(nodes)
 
+    nodes_in_primitives = []
     for path_id, path_value in sp.paths_lst.items():
-        if path_value['path_type'] != 'f' and path_value['item_type'] != 'l':
-            p1_coords = sp.nodes_LUT[path_value['p1']]
-            p2_coords = sp.nodes_LUT[path_value['p2']]
+        # I used the paths here instead of the nodes_lut to have control over the path type.
+        if not (path_value['path_type'] == 'f' and path_value['item_type'] == 'l'):
+            p1 = path_value['p1']
+            p2 = path_value['p2']
+            p1_coords = sp.nodes_LUT[p1]
+            p2_coords = sp.nodes_LUT[p2]
 
             for n_coords in nodes:
-                # //TODO add the y coords
-                if n_coords[0] - 1 < p1_coords[0] < n_coords[0] + 1:
+                if ((n_coords[0] - 1 < p1_coords[0] < n_coords[0] + 1
+                     and n_coords[1] - 1 < p1_coords[1] < n_coords[1] + 1)
+                        or (n_coords[0] - 1 < p2_coords[0] < n_coords[0] + 1
+                            and n_coords[1] - 1 < p2_coords[1] < n_coords[1] + 1)):
 
-                    path_value['p1'] = p1_coords
-                    path_value['p2'] = p2_coords
+                    if p1 not in nodes_in_primitives:
+                        p_id, p_nodes = return_primitives_by_node(sp.primitives, p1)
+                        nodes_in_primitives.extend(p_nodes)
+                    # if p2 not in nodes_in_primitives:
+                    #     p_id, p_nodes = return_primitives_by_node(sp.primitives, p2)
+                    #     nodes_in_primitives.extend(p_nodes)
 
-                    items.append(path_value)
-
-                # print(n_coords)
-                # print(p1_coords)
-                # exit()
+    paths_overlapped = return_paths_given_nodes(nodes_in_primitives, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+    items.extend(paths_overlapped)
 
     plotter.plot_items(items)
     plt.show()

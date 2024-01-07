@@ -159,7 +159,7 @@ class page():
             self.primitives[p_id] = list(subgraph)
 
             # get all paths ids that contain the nodes in the subgraph
-            paths_idx = utils.return_path_given_nodes(list(subgraph), self.paths_lst)
+            paths_idx = utils.return_pathsIDX_given_nodes(list(subgraph), self.paths_lst)
 
             # update the paths LUT with the p_id
             for p in paths_idx:
@@ -188,7 +188,7 @@ class page():
             H = self.G.subgraph(subFig_idx)
             self.plot_graph_nx(H)
 
-            paths_idx = utils.return_path_given_nodes(subFig_idx, self.paths_lst)
+            paths_idx = utils.return_pathsIDX_given_nodes(subFig_idx, self.paths_lst)
             self.plot_paths_by_pathsIDs(paths_idx)
 
 
@@ -208,7 +208,7 @@ class page():
         H = self.G.subgraph(idx)
         self.plot_graph_nx(H)
 
-        paths_idx = utils.return_path_given_nodes(idx, self.paths_lst)
+        paths_idx = utils.return_pathsIDX_given_nodes(idx, self.paths_lst)
         self.plot_paths_by_pathsIDs(paths_idx)
 
         plt.show()
@@ -218,7 +218,7 @@ class page():
 
         nidx = utils.look_in_txtBlocks_dict(self.nodes_LUT, self.words_lst)
 
-        paths_idx = utils.return_path_given_nodes(nidx, self.paths_lst)
+        paths_idx = utils.return_pathsIDX_given_nodes(nidx, self.paths_lst)
         self.plot_paths_by_pathsIDs(paths_idx)
 
         plt.show()

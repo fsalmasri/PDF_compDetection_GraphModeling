@@ -10,8 +10,10 @@ color_mapping = {'s': 'white', 'f': 'yellow', 'fs': 'blue',
 
 def plot_items(items):
     for path in items:
+        print(path)
+        # exit()
         path_color = color_mapping[path['path_type']] if path['item_type'] == 'l' else color_mapping[path['item_type']]
-        plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c= path_color)
+        plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c=path_color)
 
 
 def plot_graph_nx():
