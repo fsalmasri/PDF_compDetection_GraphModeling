@@ -50,11 +50,6 @@ def return_values_by_Idx(LUT, nodes):
     return pos
 
 
-def keystoint(x):
-    # return {int(k): v for k, v in x.items()}
-    return {int(k) if k.lstrip('-').isdigit() else k: v for k, v in x.items()}
-
-
 def return_path_given_nodes(nodes, path_lst):
     '''
     This function return path index (key value) in the path_list dictionary given a list of nodes.
@@ -69,6 +64,7 @@ def return_path_given_nodes(nodes, path_lst):
                 paths_idx.append(k)
     return np.unique(paths_idx)
 
+# def return_nodes_by_
 
 def get_key_id(lst):
     # if the dictionary is empty return key = 1, otherwise return the last item key +1.
@@ -79,34 +75,15 @@ def get_key_id(lst):
 
     return key
 
+def keystoint(x):
+    # return {int(k): v for k, v in x.items()}
+    return {int(k) if k.lstrip('-').isdigit() else k: v for k, v in x.items()}
 
 
-def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives):
-
-    print('Saving all Lists ...')
-    Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
-
-    nx.write_graphml_lxml(G, f"{path_to_save}/graph.graphml")
-    # pickle.dump(G, open(f'{path_to_save}/graph.xml', 'wb'))
-    #
-    #
-    # nx.write_gpickle(f'{path_to_save}/graph.txt')
-
-    with open(f"{path_to_save}/nodes_LUT.json", "w") as jf:
-        json.dump(nodes_LUT, jf, indent=4)
-
-    with open(f"{path_to_save}/paths_LUT.json", "w") as jf:
-        json.dump(paths_lst, jf, indent=4)
-
-    with open(f"{path_to_save}/textBox.json", "w") as jf:
-        json.dump(words_lst, jf, indent=4)
-
-    with open(f"{path_to_save}/blockBox.json", "w") as jf:
-        json.dump(blocks_lst, jf, indent=4)
-
-    with open(f"{path_to_save}/primitives.json", "w") as jf:
-        json.dump(primitives, jf, indent=4)
-
+def get_bezier_cPoints(nodes, num_points=10):
+    curve = bezier.Curve(nodes, degree=3)
+    curve_points = curve.evaluate_multi(np.linspace(0, 1, num_points))
+    return np.array(curve_points).T
 
 def prepare_loaded_G(G):
     nodes_list = [int(x) for x in G.nodes]
@@ -120,10 +97,9 @@ def prepare_loaded_G(G):
 
 def load_data(path_to_save):
 
-    G = nx.read_graphml(f"{path_to_save}/graph.graphml")
+    G = nx.read_graphml(f"{path_to_save}/graph.graphml", node_type=int, edge_key_type=int)
     # G = pickle.load(open(f'{path_to_save}/graph.txt'))
-    G = prepare_loaded_G(G)
-
+    # G = prepare_loaded_G(G)
 
 
     with open(f'{path_to_save}/nodes_LUT.json') as jf:
@@ -145,8 +121,30 @@ def load_data(path_to_save):
 
     return G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives
 
+def save_svg(filename, svg):
+    with open('{filename}.svg', 'w') as f:
+        f.write(svg)
 
-def get_bezier_cPoints(nodes, num_points=10):
-    curve = bezier.Curve(nodes, degree=3)
-    curve_points = curve.evaluate_multi(np.linspace(0, 1, num_points))
-    return np.array(curve_points).T
+def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives):
+
+    print('Saving all Lists ...')
+    Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
+
+    nx.write_graphml_lxml(G, f"{path_to_save}/graph.graphml")
+    # pickle.dump(G, open(f'{path_to_save}/graph.xml', 'wb'))
+
+    with open(f"{path_to_save}/nodes_LUT.json", "w") as jf:
+        json.dump(nodes_LUT, jf, indent=4)
+
+    with open(f"{path_to_save}/paths_LUT.json", "w") as jf:
+        json.dump(paths_lst, jf, indent=4)
+
+    with open(f"{path_to_save}/textBox.json", "w") as jf:
+        json.dump(words_lst, jf, indent=4)
+
+    with open(f"{path_to_save}/blockBox.json", "w") as jf:
+        json.dump(blocks_lst, jf, indent=4)
+
+    with open(f"{path_to_save}/primitives.json", "w") as jf:
+        json.dump(primitives, jf, indent=4)
+

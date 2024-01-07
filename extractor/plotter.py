@@ -15,8 +15,8 @@ def plot_items(items):
 
 
 def plot_graph_nx():
-    # pos = nx.spring_layout(self.G)
     # print(pos)
+
 
     sp = doc.get_current_page()
 

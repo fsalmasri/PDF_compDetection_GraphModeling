@@ -8,8 +8,9 @@ Saving_path = 'data'
 from .pdf import pdf
 doc = pdf()
 
-from .test import study_pathes
+from .test import study_line_fill_connection
 from .test import study_paths_svg
+# from . import test as tester
 
 from . import plotter
 

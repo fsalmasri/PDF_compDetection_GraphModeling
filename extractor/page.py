@@ -88,7 +88,7 @@ class page():
         # plt.imshow(self.e_canvas)
 
         print(f'found {len(drawings)} paths')
-        for dwg_idx, dwg in enumerate(drawings[:300]):
+        for dwg_idx, dwg in enumerate(drawings[:]):
             dwg_items = dwg['items']
             dwg_type = dwg['type']
             dwg_rect = dwg['rect']
@@ -164,8 +164,6 @@ class page():
             # update the paths LUT with the p_id
             for p in paths_idx:
                 self.paths_lst[p]['p_id'] = p_id
-
-        self.save_data(61)
 
 
     def study_connected_components(self):

@@ -4,6 +4,7 @@ import bezier
 import numpy as np
 
 from . import doc
+from . import plotter
 
 
 
@@ -25,8 +26,6 @@ def plot_lines(paths_lst, dwg_type):
         plt.plot([path[0][0], path[1][0]], [path[0][1], path[1][1]], c=color_mapping[dwg_type])
 
 
-
-
 # def draw_rect():
     # if dwg['type'] == 'f':
     #     rect = dwg['rect']
@@ -39,72 +38,54 @@ def plot_lines(paths_lst, dwg_type):
     #     plt.plot([rect.bl.x, rect.tl.x], [rect.bl.y, rect.tl.y],
     #              c=color_mapping['test'])
 
-def study_pathes():
 
+
+def study_line_fill_connection():
     sp = doc.get_current_page()
-    drawings = sp.single_page.get_drawings()
 
     plt.figure()
     plt.imshow(sp.e_canvas)
 
-    for dwg_idx, dwg in enumerate(drawings):
-        dwg_items = dwg['items']
-        dwg_type = dwg['type']
-        dwg_rect = dwg['rect']
+    items, nodes = [], []
+    for path_id, path_value in sp.paths_lst.items():
+        if path_value['path_type'] == 'f' and path_value['item_type'] == 'l':
+            p1 = path_value['p1']
+            p2 = path_value['p2']
 
-        item_paths = []
-        def add_to_main(p1, p2, item_t):
-            item_paths.append({'p1': [p1[0], p1[1]], 'p2': [p2[0], p2[1]],
-                               'item_type': item_t, 'path_type': dwg_type})
+            path_value['p1'] = sp.nodes_LUT[p1]
+            path_value['p2'] = sp.nodes_LUT[p2]
 
-        for idx, item in enumerate(dwg_items):
-            if item[0] == 'l':
-                add_to_main([item[1].x, item[1].y], [item[2].x, item[2].y], item[0])
+            nodes.append(sp.nodes_LUT[p1])
+            nodes.append(sp.nodes_LUT[p2])
 
-            if item[0] == 'qu':
-                quads = item[1]
+            items.append(path_value)
 
-                add_to_main([quads.ul.x, quads.ul.y], [quads.ur.x, quads.ur.y], item[0])
-                add_to_main([quads.ur.x, quads.ur.y], [quads.lr.x, quads.lr.y], item[0])
-                add_to_main([quads.lr.x, quads.lr.y], [quads.ll.x, quads.ll.y], item[0])
-                add_to_main([quads.ll.x, quads.ll.y], [quads.ul.x, quads.ul.y], item[0])
+    nodes = np.array(nodes)
 
-            if item[0] == 're':
-                rect = item[1]
-                add_to_main([rect.tl.x, rect.tl.y], [rect.tr.x, rect.tr.y], item[0])
-                add_to_main([rect.tr.x, rect.tr.y], [rect.br.x, rect.br.y], item[0])
-                add_to_main([rect.br.x, rect.br.y], [rect.bl.x, rect.bl.y], item[0])
-                add_to_main([rect.bl.x, rect.bl.y], [rect.tl.x, rect.tl.y], item[0])
+    for path_id, path_value in sp.paths_lst.items():
+        if path_value['path_type'] != 'f' and path_value['item_type'] != 'l':
+            p1_coords = sp.nodes_LUT[path_value['p1']]
+            p2_coords = sp.nodes_LUT[path_value['p2']]
 
-            if item[0] == 'c':
-                x_coords = [item[1].x, item[2].x, item[3].x, item[4].x]
-                y_coords = [item[1].y, item[2].y, item[3].y, item[4].y]
-                nodes = [x_coords, y_coords]
+            for n_coords in nodes:
+                # //TODO add the y coords
+                if n_coords[0] - 1 < p1_coords[0] < n_coords[0] + 1:
 
-                curve = bezier.Curve(nodes, degree=3)
-                num_points = 10
-                curve_points = curve.evaluate_multi(np.linspace(0, 1, num_points))
-                curve_points = np.array(curve_points).T
-                for i in range(curve_points.shape[0] - 1): add_to_main(curve_points[i], curve_points[i + 1], item[0])
+                    path_value['p1'] = p1_coords
+                    path_value['p2'] = p2_coords
 
+                    items.append(path_value)
 
-        if len(item_paths) > 0 and dwg_type == 'f' and item_paths[-1]['item_type'] == 'l':
-            item_paths.append({'p1':[item_paths[-1]['p2'][0], item_paths[-1]['p2'][1]],
-                               'p2':[item_paths[0]['p1'][0], item_paths[0]['p1'][1]],
-                               'item_type': 'l', 'path_type': dwg_type})
+                # print(n_coords)
+                # print(p1_coords)
+                # exit()
 
-        plot_items(item_paths)
-
-        # plot_lines(paths_lst, dwg_type)
-        # plot_lines(qu_lst, 'qu')
-        # plot_lines(rect_lst, 're')
-        # plot_lines(cu_lst, 'c')
-
+    plotter.plot_items(items)
     plt.show()
 
-def save_svg(filename, svg):
-    with open('{filename}.svg', 'w') as f:
-        f.write(svg)
+    # exit()
+        # exit()
+
 
 def study_paths_svg():
     sp = doc.get_current_page()
