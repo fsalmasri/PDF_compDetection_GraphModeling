@@ -41,8 +41,6 @@ def plot_lines(paths_lst, dwg_type):
 
 def study_pathes():
 
-
-
     sp = doc.get_current_page()
     drawings = sp.single_page.get_drawings()
 

@@ -6,7 +6,7 @@ import matplotlib.patches as patches
 from . import utils
 
 from . import Saving_path
-from . import plotter
+
 
 class page():
     def __init__(self, p):
@@ -88,7 +88,7 @@ class page():
         # plt.imshow(self.e_canvas)
 
         print(f'found {len(drawings)} paths')
-        for dwg_idx, dwg in enumerate(drawings[:500]):
+        for dwg_idx, dwg in enumerate(drawings[:300]):
             dwg_items = dwg['items']
             dwg_type = dwg['type']
             dwg_rect = dwg['rect']
@@ -131,27 +131,26 @@ class page():
                                    'item_type': 'l', 'path_type': dwg_type})
 
             # plotter.plot_items(item_paths)
-        # plt.show()
+            from .plotter import plot_items
+            # plot_items(item_paths)
 
             if len(item_paths) > 0:
                 self.store_structued_data(item_paths)
 
-        self.build_connected_components()
+        self.update_primitives_tables()
 
+        # plt.show()
 
     def build_connected_components(self, update=True):
         self.connected_components = list(nx.connected_components(self.G))
 
-        if update:
-            self.update_tables()
 
-    def update_tables(self):
+    def update_primitives_tables(self):
         # print(len(self.connected_components))
 
-        subgraphs_nodes_lst = [ x for x in self.connected_components if len(x) > 1]
+        self.build_connected_components()
 
-        # print(len(subgraphs_nodes_lst))
-        # print(subgraphs_nodes_lst)
+        subgraphs_nodes_lst = [ x for x in self.connected_components if len(x) > 1]
 
         for subgraph in subgraphs_nodes_lst:
 
@@ -238,22 +237,6 @@ class page():
         self.plot_canvas()
         plt.show()
 
-    def plot_graph_nx(self, G):
-        # pos = nx.spring_layout(self.G)
-        # print(pos)
-
-        pos = {}
-        for n in G.nodes:
-            pos[n] = np.array(self.nodes_LUT[n])
-
-        fig, ax = plt.subplots()
-        nx.draw(G, pos, with_labels=True, node_size=200, node_color='lightblue',
-                font_size=7, font_color='black', font_weight='bold', width=2, ax=ax)
-
-        plt.gca().invert_yaxis()
-        plt.axis('on')
-        ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-        # plt.show()
 
     def plot_paths_by_pathsIDs(self, paths_idx):
         paths_lst = {k: v for k, v in self.paths_lst.items() if k in paths_idx}

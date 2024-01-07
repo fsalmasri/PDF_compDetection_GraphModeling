@@ -1,9 +1,10 @@
-import numpy
-import networkx as nx
 import json
 from pathlib import Path
 import bezier
 import numpy as np
+import pickle
+import networkx as nx
+
 
 def find_index_by_valueRange(LUT, rng: list):
 
@@ -86,6 +87,10 @@ def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst, prim
     Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
 
     nx.write_graphml_lxml(G, f"{path_to_save}/graph.graphml")
+    # pickle.dump(G, open(f'{path_to_save}/graph.xml', 'wb'))
+    #
+    #
+    # nx.write_gpickle(f'{path_to_save}/graph.txt')
 
     with open(f"{path_to_save}/nodes_LUT.json", "w") as jf:
         json.dump(nodes_LUT, jf, indent=4)
@@ -112,10 +117,13 @@ def prepare_loaded_G(G):
     G.add_edges_from(edges_list)
 
     return G
+
 def load_data(path_to_save):
 
     G = nx.read_graphml(f"{path_to_save}/graph.graphml")
+    # G = pickle.load(open(f'{path_to_save}/graph.txt'))
     G = prepare_loaded_G(G)
+
 
 
     with open(f'{path_to_save}/nodes_LUT.json') as jf:

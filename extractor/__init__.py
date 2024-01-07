@@ -10,5 +10,6 @@ doc = pdf()
 
 from .test import study_pathes
 from .test import study_paths_svg
+
 from . import plotter
 
