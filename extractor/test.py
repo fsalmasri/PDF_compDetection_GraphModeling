@@ -2,6 +2,8 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import bezier
 import numpy as np
+from shapely.geometry import LineString, Point
+
 
 from . import doc
 from . import plotter
@@ -40,6 +42,123 @@ def plot_lines(paths_lst, dwg_type):
     #              c=color_mapping['test'])
 
 
+def study_buffering_by_paths():
+
+    sp = doc.get_current_page()
+
+    connected_primitives = [prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) > 2]
+    # unconnected_nodes = [sp.nodes_LUT[item] for prim_k, prim_v in sp.primitives.items() if len(prim_v) < 3 for item in prim_v]
+    unconnected_nodes = [prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) < 3]
+
+    fig, ax = plt.subplots()
+    plt.imshow(sp.e_canvas)
+
+    for prim_v in connected_primitives[150:300]:
+        paths = return_paths_given_nodes(prim_v, sp.paths_lst, sp.nodes_LUT,
+                                 replace_nID=True)
+
+        path_geometries = [LineString([tuple(p['p1']), tuple(p['p2'])]) for p in paths]
+
+        buffer_distance = 0.5  # Adjust the buffer distance as needed
+        path_buffers = [path.buffer(buffer_distance) for path in path_geometries]
+
+
+        # fig, ax = plt.subplots()
+        # plt.imshow(sp.e_canvas)
+        plotter.plot_items(paths)
+
+        for buffered_path in path_buffers:
+            x, y = buffered_path.exterior.xy
+            ax.plot(x, y, color='pink')  # Adjust color and styling as needed
+
+        for nodes in unconnected_nodes:
+            node = [sp.nodes_LUT[nodes[0]], sp.nodes_LUT[nodes[1]]]
+
+            node_point_1 = Point(node[0])
+            node_point_2 = Point(node[1])
+
+            for buffer_zone in path_buffers:
+                if node_point_1.within(buffer_zone) or node_point_2.within(buffer_zone):
+                    # print(f"Node {node} falls within a buffer zone. of {paths}")
+
+                    unconnected_paths = return_paths_given_nodes(nodes, sp.paths_lst, sp.nodes_LUT,
+                                                                 replace_nID=True, test='test')
+                    plotter.plot_items(unconnected_paths)
+
+                    # ax.scatter(nodes[0], nodes[1], s=120, marker='*', color='gold', zorder=3)
+
+
+    plt.show()
+
+
+def study_buffering_by_nodes():
+
+    sp = doc.get_current_page()
+
+    connected_primitives = [prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) > 2]
+    unconnected_nodes = [prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) < 3]
+
+    fig, ax = plt.subplots()
+    plt.imshow(sp.e_canvas)
+
+    for prim_v in connected_primitives[250:4000]:
+
+        paths = return_paths_given_nodes(prim_v, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+
+        if paths[0]['item_type'] == 'l':
+
+            node_buffer_distance = 0.1
+            node_buffers = [Point(sp.nodes_LUT[node]).buffer(node_buffer_distance) for node in prim_v]
+
+            # fig, ax = plt.subplots()
+            # plt.imshow(sp.e_canvas)
+            plotter.plot_items(paths)
+
+            for buffered_path in node_buffers:
+                x, y = buffered_path.exterior.xy
+                ax.plot(x, y, color='pink')  # Adjust color and styling as needed
+
+            for nodes in unconnected_nodes:
+                node = [sp.nodes_LUT[nodes[0]], sp.nodes_LUT[nodes[1]]]
+
+                node_point_1 = Point(node[0])
+                node_point_2 = Point(node[1])
+
+                for buffer_zone in node_buffers:
+                    if node_point_1.within(buffer_zone) or node_point_2.within(buffer_zone):
+                        # print(f"Node {node} falls within a buffer zone. of {paths}")
+
+                        unconnected_paths = return_paths_given_nodes(nodes, sp.paths_lst, sp.nodes_LUT,
+                                                                     replace_nID=True, test='test')
+                        plotter.plot_items(unconnected_paths)
+
+                        # ax.scatter(nodes[0], nodes[1], s=120, marker='*', color='gold', zorder=3)
+
+
+    plt.show()
+
+
+
+def study_disconnected_comp():
+    sp = doc.get_current_page()
+
+    from itertools import chain
+
+    print('start unconnected...')
+    unconnected_primitives = [item for prim_k, prim_v in sp.primitives.items() if len(prim_v) < 3 for item in prim_v]
+    unconnected_paths = return_paths_given_nodes(unconnected_primitives, sp.paths_lst, sp.nodes_LUT,
+                                                 replace_nID=True, test='test')
+
+    print('start connected...')
+    connected_primitives = [item for prim_k, prim_v in sp.primitives.items() if len(prim_v) > 2 for item in prim_v]
+    connected_paths = return_paths_given_nodes(connected_primitives, sp.paths_lst, sp.nodes_LUT,
+                                               replace_nID=True)
+
+    plt.figure()
+    plt.imshow(sp.e_canvas)
+    plotter.plot_items(unconnected_paths)
+    plotter.plot_items(connected_paths)
+    plt.show()
 
 def study_line_fill_connection():
     sp = doc.get_current_page()
@@ -81,9 +200,6 @@ def study_line_fill_connection():
                     if p1 not in nodes_in_primitives:
                         p_id, p_nodes = return_primitives_by_node(sp.primitives, p1)
                         nodes_in_primitives.extend(p_nodes)
-                    # if p2 not in nodes_in_primitives:
-                    #     p_id, p_nodes = return_primitives_by_node(sp.primitives, p2)
-                    #     nodes_in_primitives.extend(p_nodes)
 
     paths_overlapped = return_paths_given_nodes(nodes_in_primitives, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
     items.extend(paths_overlapped)

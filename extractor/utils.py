@@ -64,7 +64,7 @@ def return_pathsIDX_given_nodes(nodes, path_lst):
                 paths_idx.append(k)
     return np.unique(paths_idx)
 
-def return_paths_given_nodes(nodes, path_lst, nodes_LUT=None, replace_nID=True):
+def return_paths_given_nodes(nodes, path_lst, nodes_LUT=None, replace_nID=True, test=None):
     '''
     This function return path index (key value) in the path_list dictionary given a list of nodes.
     :param nodes: list of nodes to look for in the paths list
@@ -74,14 +74,20 @@ def return_paths_given_nodes(nodes, path_lst, nodes_LUT=None, replace_nID=True):
     '''
 
     paths = []
-    for n in nodes:
-        for k, v in path_lst.items():
-            if v['p1'] == n or v['p2'] == n:
-                if replace_nID:
-                    v['p1'] = nodes_LUT[v['p1']]
-                    v['p2'] = nodes_LUT[v['p2']]
+    nodes = set(nodes)
+    for k, v in path_lst.items():
+        if v['p1'] in nodes or v['p2'] in nodes:
 
-                paths.append(v)
+            path = v.copy()
+            if replace_nID:
+                path['p1'] = nodes_LUT[v['p1']]
+                path['p2'] = nodes_LUT[v['p2']]
+
+            if test is not None:
+                path['item_type'] = test
+                path['path_type'] = test
+
+            paths.append(path)
     return paths
 
 def return_primitives_by_node(primitives, n_id):

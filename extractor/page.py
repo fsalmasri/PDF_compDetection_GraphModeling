@@ -21,7 +21,7 @@ class page():
         self.words_lst = {}  # a dictionary of text boxes arrange with box id (x0, y0, x1, y1, "word", block_no, line_no, word_no)
         self.blocks_lst = {}  # a dictionary of text boxes arrange with box id (x0, y0, x1, y1, "word", block_no, line_no, word_no)
         self.G = nx.Graph()  # networkx graph network.
-        self.primitives ={}
+        self.primitives = {}
 
         self.generate_empty_canvas()
 

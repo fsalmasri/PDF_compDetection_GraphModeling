@@ -1,4 +1,5 @@
-from extractor import doc, study_line_fill_connection, study_paths_svg
+from extractor import doc, study_line_fill_connection, study_disconnected_comp
+from extractor import study_buffering_by_paths, study_buffering_by_nodes
 import extractor
 
 
@@ -16,7 +17,10 @@ sp = doc.get_current_page()
 
 sp.load_data('61')
 # extractor.plotter.plot_graph_nx()
-study_line_fill_connection()
+# study_line_fill_connection()
+# study_disconnected_comp()
+# study_buffering_by_paths()
+study_buffering_by_nodes()
 
 # sp.build_connected_components()
 exit()
