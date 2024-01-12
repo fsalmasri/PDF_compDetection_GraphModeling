@@ -101,6 +101,32 @@ def return_primitives_by_node(primitives, n_id):
 
     return matching_primitives[0][0], matching_primitives[0][1]
 
+def return_nodes_by_region(nodes, x, y):
+    '''
+    x = [[],[]]
+    y = [[],[]]
+    :param nodes:
+    :param x:
+    :param y:
+    :return:
+    '''
+    selected_nodes = {}
+    for k, v in nodes.items():
+        if x[0] < v[0] < x[1] and y[0] < v[1] < y[1]:
+            selected_nodes[k] = v
+
+    return selected_nodes
+
+def check_PointRange(p, rng):
+    '''
+    rng=[[100,170],[460,560]]
+    :param p:
+    :param rng:
+    :return:
+    '''
+    return p.x > rng[0][0] and p.x < rng[0][1] and p.y > rng[1][0] and p.y < rng[1][1]
+
+
 
 def get_key_id(lst):
     # if the dictionary is empty return key = 1, otherwise return the last item key +1.

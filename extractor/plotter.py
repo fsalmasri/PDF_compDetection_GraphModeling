@@ -8,12 +8,15 @@ from . import doc
 color_mapping = {'s': 'white', 'f': 'yellow', 'fs': 'blue',
                  'qu': 'purple', 're': 'red', 'c': 'orange', 'test': 'green'}
 
-def plot_items(items):
+def plot_items(items, standard_coloring = True):
+
     for path in items:
-        # print(path)
-        # exit()
         path_color = color_mapping[path['path_type']] if path['item_type'] == 'l' else color_mapping[path['item_type']]
-        plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c=path_color)
+        if standard_coloring:
+            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c=path_color)
+        else:
+            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]])
+
 
 
 def plot_graph_nx():

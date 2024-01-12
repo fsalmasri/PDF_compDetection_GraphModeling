@@ -1,5 +1,6 @@
 from extractor import doc, study_line_fill_connection, study_disconnected_comp
 from extractor import study_buffering_by_paths, study_buffering_by_nodes
+from extractor import plot_full_dwg
 import extractor
 
 
@@ -20,7 +21,10 @@ sp.load_data('61')
 # study_line_fill_connection()
 # study_disconnected_comp()
 # study_buffering_by_paths()
-study_buffering_by_nodes()
+# study_buffering_by_nodes()
+
+plot_full_dwg(region= True)
+
 
 # sp.build_connected_components()
 exit()

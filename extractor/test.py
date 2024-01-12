@@ -8,7 +8,7 @@ from shapely.geometry import LineString, Point
 from . import doc
 from . import plotter
 
-from .utils import return_primitives_by_node, return_pathsIDX_given_nodes, return_paths_given_nodes
+from .utils import return_primitives_by_node, return_pathsIDX_given_nodes, return_paths_given_nodes, return_nodes_by_region
 
 
 def check_dwg_items(dwg):
@@ -18,28 +18,37 @@ def check_dwg_items(dwg):
 
     return False
 
-def check_PointRange(p, rng=[[100,170],[460,560]]):
-    return p.x > rng[0][0] and p.x < rng[0][1] and p.y > rng[1][0] and p.y < rng[1][1]
 
 
-def plot_lines(paths_lst, dwg_type):
-    for path in paths_lst:
-        # print('here')
-        # print(path)
-        plt.plot([path[0][0], path[1][0]], [path[0][1], path[1][1]], c=color_mapping[dwg_type])
 
 
-# def draw_rect():
-    # if dwg['type'] == 'f':
-    #     rect = dwg['rect']
-    #     plt.plot([rect.tl.x, rect.tr.x], [rect.tl.y, rect.tr.y],
-    #              c=color_mapping['test'])
-    #     plt.plot([rect.tr.x, rect.br.x], [rect.tr.y, rect.br.y],
-    #              c=color_mapping['test'])
-    #     plt.plot([rect.br.x, rect.bl.x], [rect.br.y, rect.bl.y],
-    #              c=color_mapping['test'])
-    #     plt.plot([rect.bl.x, rect.tl.x], [rect.bl.y, rect.tl.y],
-    #              c=color_mapping['test'])
+def plot_full_dwg(region = False, x=None, y=None):
+
+    sp = doc.get_current_page()
+
+    if region:
+        x = [120,135]
+        y = [50,75]
+        selected_nodes = return_nodes_by_region(x, y)
+        print(f'found {len(selected_nodes)}')
+
+        canvas = sp.e_canvas #[x[0]:x[1], y[0]: y[1]]
+    else:
+        selected_nodes = sp.nodes_LUT
+        canvas = sp.e_canvas
+
+    fig, ax = plt.subplots()
+    plt.imshow(canvas)
+
+    for k, v in sp.paths_lst.items():
+        if v['p1'] in selected_nodes or v['p2'] in selected_nodes:
+            v['p1'] = sp.nodes_LUT[v['p1']]
+            v['p2'] = sp.nodes_LUT[v['p2']]
+            plotter.plot_items([v], standard_coloring=False)
+
+    plt.show()
+
+
 
 
 def study_buffering_by_paths():
@@ -95,30 +104,26 @@ def study_buffering_by_nodes():
 
     sp = doc.get_current_page()
 
+    all_comp = [prim_v for prim_k, prim_v in sp.primitives.items()]
     connected_primitives = [prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) > 2]
     unconnected_nodes = [prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) < 3]
+    node_buffer_distance = 0.1
 
     fig, ax = plt.subplots()
     plt.imshow(sp.e_canvas)
 
-    for prim_v in connected_primitives[250:4000]:
+    for prim_idx, prim_v in enumerate(all_comp[:]):
 
         paths = return_paths_given_nodes(prim_v, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
 
+        flag = False
         if paths[0]['item_type'] == 'l':
 
-            node_buffer_distance = 0.1
+            testing_comp = all_comp[:prim_idx] + all_comp[prim_idx + 1:]
+
             node_buffers = [Point(sp.nodes_LUT[node]).buffer(node_buffer_distance) for node in prim_v]
 
-            # fig, ax = plt.subplots()
-            # plt.imshow(sp.e_canvas)
-            plotter.plot_items(paths)
-
-            for buffered_path in node_buffers:
-                x, y = buffered_path.exterior.xy
-                ax.plot(x, y, color='pink')  # Adjust color and styling as needed
-
-            for nodes in unconnected_nodes:
+            for nodes in testing_comp:
                 node = [sp.nodes_LUT[nodes[0]], sp.nodes_LUT[nodes[1]]]
 
                 node_point_1 = Point(node[0])
@@ -132,8 +137,16 @@ def study_buffering_by_nodes():
                                                                      replace_nID=True, test='test')
                         plotter.plot_items(unconnected_paths)
 
+                        flag = True
+
                         # ax.scatter(nodes[0], nodes[1], s=120, marker='*', color='gold', zorder=3)
 
+            if flag:
+                for buffered_path in node_buffers:
+                    x, y = buffered_path.exterior.xy
+                    ax.plot(x, y, color='pink')  # Adjust color and styling as needed
+
+                plotter.plot_items(paths)
 
     plt.show()
 
