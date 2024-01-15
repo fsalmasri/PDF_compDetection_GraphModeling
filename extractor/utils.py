@@ -64,20 +64,26 @@ def return_pathsIDX_given_nodes(nodes, path_lst):
                 paths_idx.append(k)
     return np.unique(paths_idx)
 
-def return_paths_given_nodes(nodes, path_lst, nodes_LUT=None, replace_nID=True, test=None):
+def return_paths_given_nodes(nodes, path_lst, nodes_LUT=None, replace_nID=True, test=None, lst = True):
     '''
     This function return path index (key value) in the path_list dictionary given a list of nodes.
     :param nodes: list of nodes to look for in the paths list
     :param path_lst: list of all paths. node ids are replaced with coordinates.
     :param replace_nID: Replace node ids with coordinates
+    :param lst: boolean. if True return the output in list format. otherwise in dictionary.
     :return:
     '''
 
-    paths = []
-    nodes = set(nodes)
+    if lst: paths = []
+    else: paths = {}
+
+    # this function is necessary to speed up the process when sending list of only nodes ids.
+    # But when sending dictionary the set function removes the values in the dict and ket only the keys.
+    if isinstance(nodes, list):
+        nodes = set(nodes)
+
     for k, v in path_lst.items():
         if v['p1'] in nodes or v['p2'] in nodes:
-
             path = v.copy()
             if replace_nID:
                 path['p1'] = nodes_LUT[v['p1']]
@@ -87,19 +93,36 @@ def return_paths_given_nodes(nodes, path_lst, nodes_LUT=None, replace_nID=True, 
                 path['item_type'] = test
                 path['path_type'] = test
 
-            paths.append(path)
+            if lst: paths.append(path)
+            else: paths[k] = path
+
     return paths
 
-def return_primitives_by_node(primitives, n_id):
+def return_primitives_by_node(primitives, n_id, lst: bool):
     '''
 
     :param primitives: primitives dictionary
     :param n_id: node id to look for in primitives dictionary
+    :param lst: boolean. if True return the output in list format. otherwise in dictionary.
     :return: list of primitives id and its containing nodes.
     '''
-    matching_primitives = [(prim_k, prim_v) for prim_k, prim_v in primitives.items() if n_id in prim_v]
+    if lst:
+        matching_primitives = [(prim_k, prim_v) for prim_k, prim_v in primitives.items() if n_id in prim_v]
+        return matching_primitives[0][0], matching_primitives[0][1]
+    else:
+        return {prim_k: prim_v for prim_k, prim_v in primitives.items() if n_id in prim_v}
 
-    return matching_primitives[0][0], matching_primitives[0][1]
+def return_primitives_by_pathLst(primitives, path_lst):
+    '''
+    :param primitives: primitives dictionary
+    :param path_lst: Dictionary of paths to look for in primitives using p_id.
+    :return: select dictionary elements by keys
+    '''
+
+    primitives_dict = {v_path['p_id']: primitives[v_path['p_id']] for k_path, v_path in path_lst.items() if
+                       v_path['p_id'] in primitives}
+
+    return primitives_dict
 
 def return_nodes_by_region(nodes, x, y):
     '''
@@ -116,6 +139,13 @@ def return_nodes_by_region(nodes, x, y):
             selected_nodes[k] = v
 
     return selected_nodes
+
+def prepare_region(nodes, path_lst, primitives, x, y):
+    selected_nodes = return_nodes_by_region(nodes, x, y)
+    selected_paths = return_paths_given_nodes(selected_nodes, path_lst, replace_nID=False, lst=False)
+    selected_primitives = return_primitives_by_pathLst(primitives, selected_paths)
+
+    return selected_nodes, selected_paths, selected_primitives
 
 def check_PointRange(p, rng):
     '''
@@ -179,15 +209,16 @@ def load_data(path_to_save):
     with open(f'{path_to_save}/primitives.json') as jf:
         primitives = json.load(jf, object_hook=keystoint)
 
-    # primitives = None
+    with open(f'{path_to_save}/filled_stroke.json') as jf:
+        filled_stroke = json.load(jf, object_hook=keystoint)
 
-    return G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives
+    return G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives, filled_stroke
 
 def save_svg(filename, svg):
     with open('{filename}.svg', 'w') as f:
         f.write(svg)
 
-def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives):
+def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives, filled_stroke):
 
     print('Saving all Lists ...')
     Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
@@ -209,4 +240,7 @@ def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst, prim
 
     with open(f"{path_to_save}/primitives.json", "w") as jf:
         json.dump(primitives, jf, indent=4)
+
+    with open(f"{path_to_save}/filled_stroke.json", "w") as jf:
+        json.dump(filled_stroke, jf, indent=4)
 

@@ -1,4 +1,5 @@
 import numpy as np
+from collections import defaultdict
 import networkx as nx
 
 import matplotlib.pyplot as plt
@@ -22,6 +23,7 @@ class page():
         self.blocks_lst = {}  # a dictionary of text boxes arrange with box id (x0, y0, x1, y1, "word", block_no, line_no, word_no)
         self.G = nx.Graph()  # networkx graph network.
         self.primitives = {}
+        self.filled_stroke = defaultdict(list)
 
         self.generate_empty_canvas()
 
@@ -75,6 +77,12 @@ class page():
 
             self.add_to_pathsL(path_nodes, path['item_type'], path['path_type'])
 
+    def store_filled_paths(self, item_paths: list):
+        path_id = utils.get_key_id(self.filled_stroke)
+        for path in item_paths:
+            self.filled_stroke[path_id].append(path)
+
+
     def add_to_pathsL(self, nids, item_type, dwg_type):
         path_id = utils.get_key_id(self.paths_lst)
         self.paths_lst[path_id] = {'p1': nids[0], 'p2': nids[1],
@@ -92,6 +100,7 @@ class page():
             dwg_items = dwg['items']
             dwg_type = dwg['type']
             dwg_rect = dwg['rect']
+            flag = False
 
             item_paths = []
             def add_to_main(p1, p2, item_t):
@@ -130,12 +139,17 @@ class page():
                                    'p2': [item_paths[0]['p1'][0], item_paths[0]['p1'][1]],
                                    'item_type': 'l', 'path_type': dwg_type})
 
+                flag = True
+
             # plotter.plot_items(item_paths)
             from .plotter import plot_items
             # plot_items(item_paths)
 
             if len(item_paths) > 0:
-                self.store_structued_data(item_paths)
+                if flag:
+                    self.store_filled_paths(item_paths)
+                else:
+                    self.store_structued_data(item_paths)
 
         self.update_primitives_tables()
 
@@ -317,11 +331,11 @@ class page():
     # General Utils.
     def save_data(self, fname):
         utils.save_data(f'{Saving_path}/{fname}',
-                        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst, self.primitives)
+                        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst, self.primitives, dict(self.filled_stroke))
 
     def load_data(self, fname):
 
-        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst, self.primitives = (
+        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst, self.primitives, self.filled_stroke = (
             utils.load_data(f'{Saving_path}/{fname}'))
 
         self.build_connected_components()

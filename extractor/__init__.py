@@ -13,6 +13,11 @@ from .test import study_paths_svg
 from .test import study_disconnected_comp
 from .test import study_buffering_by_paths, study_buffering_by_nodes
 from .test import plot_full_dwg
+from .test import Clean_filling_strikes
+from .test import Detect_unconnected_letters
+from .test import clean_filled_strokes
+
+from .tables_utils import clean_duplicates_paths
 
 # from . import test as tester
 
