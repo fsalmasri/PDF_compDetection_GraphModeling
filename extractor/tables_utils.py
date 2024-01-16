@@ -55,3 +55,34 @@ def clean_duplicates_paths():
 
     if to_delete_lst:
         delete_update_tables(to_delete_lst, ref='paths')
+
+
+def return_new_nodeID():
+    sp = doc.get_current_page()
+    nodes_keys_list = list(sp.nodes_LUT.keys())
+    nodes_keys_list.sort()
+
+    new_key = nodes_keys_list[-1] + 1
+    sp.nodes_LUT[new_key] = []
+
+    return new_key
+
+def return_new_pathID():
+    sp = doc.get_current_page()
+    paths_keys_list = list(sp.paths_lst.keys())
+    paths_keys_list.sort()
+
+    new_key = paths_keys_list[-1] + 1
+    sp.paths_lst[new_key] = {}
+
+    return new_key
+
+def return_new_primitiveID():
+    sp = doc.get_current_page()
+    prim_keys_list = list(sp.primitives.keys())
+    prim_keys_list.sort()
+
+    new_key = prim_keys_list[-1] + 1
+    sp.primitives[new_key] = {}
+
+    return new_key

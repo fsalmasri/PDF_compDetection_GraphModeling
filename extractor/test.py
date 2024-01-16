@@ -106,14 +106,14 @@ def clean_filled_strokes():
 def Detect_unconnected_letters():
     sp = doc.get_current_page()
 
-    # x = [15, 200]
-    # y = [15, 200]
+    x = [15, 200]
+    y = [15, 200]
 
     # x = [15, 800]
     # y = [15, 800]
     #
-    # selected_nodes, selected_paths, selected_primitives = (
-    #     prepare_region(sp.nodes_LUT, sp.paths_lst, sp.primitives, x, y))
+    selected_nodes, selected_paths, selected_primitives = (
+        prepare_region(sp.nodes_LUT, sp.paths_lst, sp.primitives, x, y))
 
     # fig, ax = plt.subplots()
     # plt.imshow(sp.e_canvas)
@@ -122,7 +122,7 @@ def Detect_unconnected_letters():
     #     plotter.plot_items(paths, coloring='standard')
     # isolated_primes = {prim_k: prim_v for prim_k, prim_v in selected_primitives.items() if len(prim_v) < 3}
 
-    isolated_primes = {prim_k: prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) < 3}
+    isolated_primes = {prim_k: prim_v for prim_k, prim_v in selected_primitives.items() if len(prim_v) < 3} #sp.primitives
 
     # vertical_lines = []
     # horizontal_lines = []
@@ -152,30 +152,145 @@ def Detect_unconnected_letters():
     # Find intersections between vertical and horizontal lines
     intersections = []
     for kv_line, vv_line in vertical_dict.items():
-        print(vv_line)
-        exit()
         flag = False
-        for h_line in horizontal_lines:
-            intersection = v_line.intersection(h_line)
-            if intersection.is_empty is False and intersection.geom_type == 'Point':
-                intersections.append((v_line, h_line, intersection))
+        v_sPoint = Point(vv_line.coords[0])
+        v_ePoint = Point(vv_line.coords[-1])
 
-                x_shape, y_shape = h_line.xy
+        intersection_type = None
+        for kh_line, vh_line in horizontal_dict.items():
+            h_sPoint = Point(vh_line.coords[0])
+            h_ePoint = Point(vh_line.coords[-1])
+
+            intersection = vv_line.intersection(vh_line)
+            if intersection.is_empty is False and intersection.geom_type == 'Point':
+                x, y = intersection.xy[0][0], intersection.xy[1][0]
+
+                if intersection.equals(h_sPoint) or intersection.equals(h_ePoint):
+                    intersection_type = 'horizental'
+                    # print(intersection_type)
+                    intersections.append(['edge', (x, y), [kv_line, kh_line], kv_line])
+                elif intersection.equals(v_sPoint) or intersection.equals(v_ePoint):
+                    intersection_type = 'vertical'
+                    # print(intersection_type)
+                    intersections.append(['edge', (x, y), [kv_line, kh_line], kh_line])
+                else:
+                    # only in intersection we add a new node.
+                    new_nodeID = tables_utils.return_new_nodeID()
+
+                    # intersection_type = 'intersection'
+                    # intersections.append(['edge', (x, y), [kv_line, kh_line], kv_line])
+
+                    raise NotImplementedError
+
+                x_shape, y_shape = vh_line.xy
                 plt.plot(x_shape, y_shape, 'g-', label='Original Shape')
                 flag = True
         if flag:
-            x_shape, y_shape = v_line.xy
+            x_shape, y_shape = vv_line.xy
             plt.plot(x_shape, y_shape, 'g-', label='Original Shape')
 
+    # sp.nodes_LUT, sp.paths_lst, sp.primitives
+    print(f'found intersection: {len(intersections)}')
+    for intersect in intersections:
+        print(intersect)
+        intersection_type = intersect[0]
+
+        if intersection_type == 'edge':
+            path1_pid = intersect[2][0]
+            path2_pid = intersect[2][1]
+
+            # get a copy of the selected paths
+            path1 = [[k, v] for k, v in sp.paths_lst.items() if v['p_id'] == path1_pid].copy()[0]
+            path2 = [[k, v] for k, v in sp.paths_lst.items() if v['p_id'] == path2_pid].copy()[0]
+
+            # get their keys
+            path1_key = path1[0]
+            path2_key = path2[0]
+
+            # # Delete paths
+            # del sp.paths_lst[path1_key]
+            # del sp.paths_lst[path2_key]
+
+            path_to_change_id = intersect[3]
+
+            if path_to_change_id == path1[1]['p_id']:
+                print('1')
+
+                del sp.paths_lst[path1_key]
+
+                intersect_node = None
+                if intersect[1] == tuple(sp.nodes_LUT[path2[1]['p1']]):
+                    intersect_node = path2[1]['p1']
+                elif intersect[1] == tuple(sp.nodes_LUT[path2[1]['p2']]):
+                    intersect_node = path2[1]['p2']
+
+                # Generate new paths Ids
+                path_sec1_id = tables_utils.return_new_pathID()
+                path_sec2_id = tables_utils.return_new_pathID()
+                path2_id = tables_utils.return_new_pathID()
+
+                # Generate the new path two sections and a new other intersected path.
+                path_sec1 = {path_sec1_id: {'p1': path1[1]['p1'], 'p2': intersect_node, 'item_type': path1[1]['item_type'],
+                                            'path_type': path1[1]['path_type'], 'p_id': path1[1]['p_id']}}
+
+                path_sec2 = {path_sec2_id: {'p1': intersect_node, 'p2': path1[1]['p2'], 'item_type': path1[1]['item_type'],
+                                            'path_type': path1[1]['path_type'], 'p_id': path1[1]['p_id']}}
+
+                print(path2)
+                print(path_sec1)
+                print(path_sec1)
+                exit()
+                paths_to_add = [path2, path_sec1, path_sec2]
+
+                # # Merge the primitives into a new one.
+                # prim_id = tables_utils.return_new_primitiveID()
+                # nodes_to_add = set()
+                # for path in paths_to_add:
+                #     path_values = list(path.values())[0]
+                #     nodes_to_add.add(path_values['p1'])
+                #     nodes_to_add.add(path_values['p2'])
+                #
+                # nodes_to_add = list(nodes_to_add)
+
+                exit()
+
+
+                print(path2)
+                print(path_sec1)
+                print(path_sec2)
+
+                exit()
+            elif path_to_change_id == path2[1]['p_id']:
+                print('2')
+
+
+            else:
+                raise NotImplementedError
+
+            print(path_to_change_id)
+            print(path1[0], path1[1])
+            print(path2[0], path2[1])
+            exit()
+
+        # intersect_point_id = intersect[0]
+        # intersect_point_coords = intersect[1]
+        # path1_prim_id = intersect[2]
+        # path2_prim_id = intersect[3]
+        # primitive_id = intersect[4]
+
+
+        # //TODO added the broken line nodes. still need to add the new line.
+        # //TODO I think it is better if I correct the path list first.
+        prim_nodes = sp.primitives[primitive_id]
+        sp.primitives[primitive_id] = [prim_nodes[0], intersect_point_id, prim_nodes[1]]
+
+
+        # --------------------
+
+        exit()
+    print(intersections)
     plt.show()
     exit()
-    # Join the lines at intersections
-    for v_line, h_line, intersection in intersections:
-        x, y = intersection.xy
-        new_point = (x[0], y[0])
-        new_line = LineString([v_line.coords[0], new_point, h_line.coords[1]])
-        paths.append({'p1': list(new_line.coords[0]), 'p2': list(new_line.coords[1])})
-
 
 
 def Clean_filling_strikes():
