@@ -14,7 +14,7 @@ from . import plotter
 from . import tables_utils
 
 from .utils import return_primitives_by_node, return_pathsIDX_given_nodes, return_paths_given_nodes
-from .utils import return_nodes_by_region, prepare_region
+from .utils import return_nodes_by_region, prepare_region, check_PointRange
 
 
 def shrink_line(line, shrink_factor):
@@ -26,6 +26,80 @@ def shrink_line(line, shrink_factor):
     shrunken_line = LineString([start_point, end_point])
 
     return shrunken_line
+
+
+def remove_borders():
+    sp = doc.get_current_page()
+
+    borders_range = [[40, sp.pw],[40, sp.ph]]
+
+    prims_to_remove = []
+    for k_path, v_path in sp.paths_lst.items():
+        # print(v_path)
+        # print(sp.nodes_LUT[v_path['p1']])
+        # print(sp.nodes_LUT[v_path['p2']])
+        p1_cond = check_PointRange(sp.nodes_LUT[v_path['p1']], borders_range)
+        p2_cond = check_PointRange(sp.nodes_LUT[v_path['p2']], borders_range)
+        if not (p1_cond and p2_cond):
+            prims_to_remove.append(v_path['p_id'])
+
+    fig, ax = plt.subplots()
+    plt.imshow(sp.e_canvas)
+
+    for k_prim in prims_to_remove:
+
+        print(k_prim)
+        exit()
+
+        v_path = sp.paths_lst[k_path].copy()
+
+        v_path['p1'] = sp.nodes_LUT[v_path['p1']]
+        v_path['p2'] = sp.nodes_LUT[v_path['p2']]
+        plotter.plot_items([v_path], coloring='standard')
+
+        # del sp.paths_lst[k_path]
+        # if v_path['p_id'] in sp.primitives:
+        #     del sp.primitives[v_path['p_id']]
+        # if v_path['p1'] in sp.nodes_LUT:
+        #     del sp.nodes_LUT[v_path['p1']]
+        # if v_path['p2'] in sp.nodes_LUT:
+        #     del sp.nodes_LUT[v_path['p2']]
+
+    plt.show()
+
+def plot_full_dwg(region=False, x=None, y=None):
+    # // TODO should change it to use prepare_region() function.
+    sp = doc.get_current_page()
+
+    if region:
+        x = [120, 135]
+        y = [50, 75]
+        selected_nodes = return_nodes_by_region(x, y)
+        print(f'found {len(selected_nodes)}')
+
+        canvas = sp.e_canvas  # [x[0]:x[1], y[0]: y[1]]
+    else:
+        selected_nodes = sp.nodes_LUT
+        canvas = sp.e_canvas
+
+    fig, ax = plt.subplots()
+    plt.imshow(sp.e_canvas)
+    for k_prime, v_prime in sp.primitives.items():
+        paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+        plotter.plot_items(paths, coloring='group')
+    # plt.show()
+
+    fig, ax = plt.subplots()
+    plt.imshow(canvas)
+
+    for k, v in sp.paths_lst.items():
+        if v['p1'] in selected_nodes or v['p2'] in selected_nodes:
+            v['p1'] = sp.nodes_LUT[v['p1']]
+            v['p2'] = sp.nodes_LUT[v['p2']]
+            plotter.plot_items([v], coloring='standard')
+
+    plt.show()
+
 
 
 
@@ -184,33 +258,6 @@ def Clean_filling_strikes():
 
 
 
-
-def plot_full_dwg(region = False, x=None, y=None):
-
-    #// TODO should change it to use prepare_region() function.
-    sp = doc.get_current_page()
-
-    if region:
-        x = [120,135]
-        y = [50,75]
-        selected_nodes = return_nodes_by_region(x, y)
-        print(f'found {len(selected_nodes)}')
-
-        canvas = sp.e_canvas #[x[0]:x[1], y[0]: y[1]]
-    else:
-        selected_nodes = sp.nodes_LUT
-        canvas = sp.e_canvas
-
-    fig, ax = plt.subplots()
-    plt.imshow(canvas)
-
-    for k, v in sp.paths_lst.items():
-        if v['p1'] in selected_nodes or v['p2'] in selected_nodes:
-            v['p1'] = sp.nodes_LUT[v['p1']]
-            v['p2'] = sp.nodes_LUT[v['p2']]
-            plotter.plot_items([v], coloring=False)
-
-    plt.show()
 
 
 
@@ -388,118 +435,10 @@ def study_line_fill_connection():
         # exit()
 
 
-def check_dwg_item_type(dwg, type='c'):
-    for item in dwg['items']:
-        if item[0] == type: # or item[0] == 're' or item[0] == 'qu':
-            return True
-
-    return False
 
 
-def study_paths_svg():
-    sp = doc.get_current_page()
-
-    # from PIL import Image
-    # import cairosvg
-    # from io import BytesIO
-    # import pysvg
-    # import xml.etree.ElementTree as ET
-    from xml.dom import minidom
-    from svg.path import parse_path
-    from svg.path.path import Line, Move, CubicBezier
-
-    svg_image = sp.single_page.get_svg_image()
-    svg_dom = minidom.parseString(svg_image)
 
 
-    clip_paths = svg_dom.getElementsByTagName('clipPath')
-    g_tag = svg_dom.getElementsByTagName('g')
-
-    for g in g_tag:
-        group_id = g.getAttribute('id')
-        path_elements = g.getElementsByTagName('path')
-
-        plt.figure()
-        plt.imshow(sp.e_canvas)
-
-        # Iterate through path elements
-        for path_element in path_elements[:]:
-            path_data = path_element.getAttribute('d')  # Get the 'd' attribute containing the path data
-
-            transform_matrix_data = path_element.getAttribute('transform')
-            transform_matrix = list(map(float, transform_matrix_data[7:-1].split(',')))
-
-            transform_matrix = np.array([[transform_matrix[0], transform_matrix[2], transform_matrix[4]],
-                                         [transform_matrix[1], transform_matrix[3], transform_matrix[5]],
-                                         [0, 0, 1]])
-
-            parsed_path = parse_path(path_data)
-
-            # Print the clipPath ID and path data line by line
-            # print(f"Group ID: {group_id}")
-            # print(f"Path Data: {path_data}")
-            # print(f"Parsed Path Data: {parsed_path}")
-            # print(transform_matrix)
-
-            def transform_points(x, y, transform_matrix):
-                point_vector = np.array([x, y, 1])
-                transformed_point = np.dot(transform_matrix, point_vector)
-                transformed_x, transformed_y, _ = transformed_point
-
-                return transformed_x, transformed_y
-
-            def check_PointRange_2(x, y, rng=[[140, 151], [490, 510]]): #[100, 170], [460, 560]
-                return x > rng[0][0] and x < rng[0][1] and y > rng[1][0] and y < rng[1][1]
-
-            flag = False
-            for e in parsed_path:
-                if isinstance(e, Line):
-                    x0 = e.start.real
-                    y0 = e.start.imag
-                    x1 = e.end.real
-                    y1 = e.end.imag
-
-                    # print(path_data, transform_matrix_data)
-                    # print("(%.2f, %.2f) - (%.2f, %.2f)" % (x0, y0, x1, y1))
-
-                    x0, y0 = transform_points(x0, y0, transform_matrix)
-                    x1, y1 = transform_points(x1, y1, transform_matrix)
-
-                    # print("(%.2f, %.2f) - (%.2f, %.2f)" % (x0, y0, x1, y1))
-
-                    if check_PointRange_2(x0, y0) and check_PointRange_2(x1, y1):
-                        flag = True
-                        # print(e)
-                        print("(%.2f, %.2f) - (%.2f, %.2f)" % (x0, y0, x1, y1))
-                        plt.plot([x0, x1], [y0, y1], c='white')
-
-
-                elif isinstance(e, Move):
-                    pass
-
-                elif isinstance(e, CubicBezier):
-                    pass
-
-                else:
-                    pass
-
-            if flag:
-
-                import svgpathtools
-
-                print(path_element.attributes.items())
-                print(svgpathtools.parse_path(path_data))
-                exit()
-                # for e in parsed_path:
-                #     print(e)
-
-                print("--------------------")
-
-
-        plt.show()
-        exit()
-
-    exit()
 
 
 

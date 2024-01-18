@@ -1,27 +1,27 @@
 from extractor import doc, study_line_fill_connection, study_disconnected_comp
 from extractor import study_buffering_by_paths, study_buffering_by_nodes
 from extractor import plot_full_dwg, Clean_filling_strikes, Detect_unconnected_letters, clean_filled_strokes
-from extractor import clean_duplicates_paths
+from extractor import clean_duplicates_paths, remove_borders
 import extractor
 
 
-doc.load_pdf(pdfpath = '../data/pid/61.pdf')
+page_number = 0
 
-# restart_filled_stroke_extraction()
-# exit()
-# study_pathes()
-# study_paths_extended()
-# exit()
-# doc.print_pdfMData()
+doc.load_pdf(pdfpath= f'../Distill.data.v2/PID/{page_number}.pdf')
 
 sp = doc.get_current_page()
 # sp.extract_text()
 # sp.extract_paths()
 # Detect_unconnected_letters()
-# sp.save_data('61')
+# sp.save_data(str(page_number))
 
 
-sp.load_data('61')
+sp.load_data(str(page_number))
+remove_borders()
+# sp.save_data(str(page_number))
+# exit()
+
+# exit()
 # clean_duplicates_paths()
 # exit()
 # extractor.plotter.plot_graph_nx()
@@ -30,14 +30,13 @@ sp.load_data('61')
 # study_buffering_by_paths()
 # study_buffering_by_nodes()
 
-# plot_full_dwg(region= True)
+# plot_full_dwg()
 
 
 
 # Clean_filling_strikes()
 # clean_filled_strokes()
 
-# sp.build_connected_components()
 exit()
 
 

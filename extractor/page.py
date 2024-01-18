@@ -24,6 +24,7 @@ class page():
         self.G = nx.Graph()  # networkx graph network.
         self.primitives = {}
         self.filled_stroke = defaultdict(list)
+        self.connected_components = []
 
         self.generate_empty_canvas()
 
@@ -155,18 +156,17 @@ class page():
 
         # plt.show()
 
-    def build_connected_components(self, update=True):
+    def build_connected_components(self):
         self.connected_components = list(nx.connected_components(self.G))
 
 
-    def update_primitives_tables(self, connected_components=None):
+    def update_primitives_tables(self):
         # print(len(self.connected_components))
 
-        if connected_components is None:
-            connected_components = self.build_connected_components()
+        if not self.connected_components:
+            self.build_connected_components()
 
-        subgraphs_nodes_lst = [ x for x in connected_components if len(x) > 1]
-
+        subgraphs_nodes_lst = [x for x in self.connected_components if len(x) > 1]
         for subgraph in subgraphs_nodes_lst:
 
             # add to primitives list

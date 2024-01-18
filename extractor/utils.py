@@ -4,6 +4,7 @@ import bezier
 import numpy as np
 import pickle
 import networkx as nx
+import shapely
 
 
 def find_index_by_valueRange(LUT, rng: list):
@@ -149,13 +150,18 @@ def prepare_region(nodes, path_lst, primitives, x, y):
 
 def check_PointRange(p, rng):
     '''
-    rng=[[100,170],[460,560]]
-    :param p:
+    rng=[[100,170],[460,560]] - [x0,x1],[y0,y1]
+    :param p: shapely Point or list
     :param rng:
     :return:
     '''
-    return p.x > rng[0][0] and p.x < rng[0][1] and p.y > rng[1][0] and p.y < rng[1][1]
-
+    from shapely.geometry import Point
+    if isinstance(p, Point):
+        return p.x > rng[0][0] and p.x < rng[0][1] and p.y > rng[1][0] and p.y < rng[1][1]
+    elif isinstance(p, list):
+        return p[0] > rng[0][0] and p[0] < rng[0][1] and p[1] > rng[1][0] and p[1] < rng[1][1]
+    else:
+        raise NotImplementedError
 
 
 def get_key_id(lst):
