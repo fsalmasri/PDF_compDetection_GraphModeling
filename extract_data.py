@@ -17,7 +17,9 @@ doc.load_pdf(pdfpath = '../data/pid/61.pdf')
 sp = doc.get_current_page()
 # sp.extract_text()
 # sp.extract_paths()
+# Detect_unconnected_letters()
 # sp.save_data('61')
+
 
 sp.load_data('61')
 # clean_duplicates_paths()
@@ -34,7 +36,7 @@ sp.load_data('61')
 
 # Clean_filling_strikes()
 # clean_filled_strokes()
-Detect_unconnected_letters()
+
 # sp.build_connected_components()
 exit()
 

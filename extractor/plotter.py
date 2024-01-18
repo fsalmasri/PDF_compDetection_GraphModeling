@@ -29,18 +29,18 @@ def plot_items(items, coloring = 'standard'):
 
 
 
-def plot_graph_nx():
-    # print(pos)
-
+def plot_graph_nx(g= None):
 
     sp = doc.get_current_page()
+    if g is None:
+        g = sp.G
 
     pos = {}
-    for n in sp.G.nodes:
+    for n in g.nodes:
         pos[n] = np.array(sp.nodes_LUT[n])
 
     fig, ax = plt.subplots()
-    nx.draw(sp.G, pos, with_labels=True, node_size=200, node_color='lightblue',
+    nx.draw(g, pos, with_labels=True, node_size=200, node_color='lightblue',
             font_size=7, font_color='black', font_weight='bold', width=2, ax=ax)
 
     plt.gca().invert_yaxis()

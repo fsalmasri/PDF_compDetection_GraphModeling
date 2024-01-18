@@ -1,5 +1,6 @@
 from . import doc
 
+from shapely.geometry import LineString, Point
 
 def delete_update_tables(to_delete_lst, ref='paths'):
     sp = doc.get_current_page()
@@ -86,3 +87,53 @@ def return_new_primitiveID():
     sp.primitives[new_key] = {}
 
     return new_key
+
+
+def split_creat_intersected_paths(intersect, path_to_split, path_touching, type='edge'):
+    sp = doc.get_current_page()
+
+    intersect_node = None
+    if type == 'edge':
+        if intersect[1] == tuple(sp.nodes_LUT[path_touching[1]['p1']]):
+            intersect_node = path_touching[1]['p1']
+        elif intersect[1] == tuple(sp.nodes_LUT[path_touching[1]['p2']]):
+            intersect_node = path_touching[1]['p2']
+    elif type == 'cross':
+        intersect_node = return_new_nodeID()
+        sp.nodes_LUT[intersect_node] = [intersect[1][0], intersect[1][1]]
+
+
+    path_sec1_id = return_new_pathID()
+    path_sec2_id = return_new_pathID()
+
+
+    sp.paths_lst[path_sec1_id] = {'p1': path_to_split[1]['p1'], 'p2': intersect_node, 'item_type': path_to_split[1]['item_type'],
+                                  'path_type': path_to_split[1]['path_type'], 'p_id': path_to_split[1]['p_id']}
+
+    sp.paths_lst[path_sec2_id] = {'p1': intersect_node, 'p2': path_to_split[1]['p2'], 'item_type': path_to_split[1]['item_type'],
+                                  'path_type': path_to_split[1]['path_type'], 'p_id': path_to_split[1]['p_id']}
+
+
+    return path_sec1_id, path_sec2_id
+
+
+def correct_path_ending_by_IntersectionPoint(k_line, v_line, intersection):
+    sp = doc.get_current_page()
+
+    sel_path = [[k, v] for k, v in sp.paths_lst.items() if v['p_id'] == k_line][0]
+
+    start_distance = intersection.distance(Point(v_line.coords[0]))
+    end_distance = intersection.distance(Point(v_line.coords[-1]))
+
+    if start_distance < end_distance:
+        v_line = LineString([(intersection.x, intersection.y)] + list(v_line.coords[1:]))
+        node_to_correct = sel_path[1]['p1']
+        sp.nodes_LUT[node_to_correct] = [intersection.x, intersection.y]
+
+
+    else:
+        v_line = LineString(list(v_line.coords[:-1]) + [(intersection.x, intersection.y)])
+        node_to_correct = sel_path[1]['p2']
+        sp.nodes_LUT[node_to_correct] = [intersection.x, intersection.y]
+
+    return v_line
