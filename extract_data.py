@@ -4,7 +4,7 @@ from extractor import plot_full_dwg, Clean_filling_strikes, Detect_unconnected_l
 from extractor import clean_duplicates_paths, remove_borders
 import extractor
 
-
+import matplotlib.pyplot as plt
 page_number = 0
 
 doc.load_pdf(pdfpath= f'../Distill.data.v2/PID/{page_number}.pdf')
@@ -13,11 +13,13 @@ sp = doc.get_current_page()
 # sp.extract_text()
 # sp.extract_paths()
 # Detect_unconnected_letters()
+# remove_borders()
 # sp.save_data(str(page_number))
 
 
 sp.load_data(str(page_number))
-remove_borders()
+# plot_full_dwg()
+
 # sp.save_data(str(page_number))
 # exit()
 
@@ -30,9 +32,7 @@ remove_borders()
 # study_buffering_by_paths()
 # study_buffering_by_nodes()
 
-# plot_full_dwg()
-
-
+plot_full_dwg()
 
 # Clean_filling_strikes()
 # clean_filled_strokes()

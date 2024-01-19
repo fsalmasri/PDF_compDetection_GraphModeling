@@ -31,41 +31,32 @@ def shrink_line(line, shrink_factor):
 def remove_borders():
     sp = doc.get_current_page()
 
-    borders_range = [[40, sp.pw],[40, sp.ph]]
+    exclude_borders_range = [[40, sp.pw], [40, sp.ph]]
+    include_borders_range = [[1550, sp.pw], [1660, sp.ph]]
 
-    prims_to_remove = []
+    prims_to_remove = set()
     for k_path, v_path in sp.paths_lst.items():
-        # print(v_path)
-        # print(sp.nodes_LUT[v_path['p1']])
-        # print(sp.nodes_LUT[v_path['p2']])
-        p1_cond = check_PointRange(sp.nodes_LUT[v_path['p1']], borders_range)
-        p2_cond = check_PointRange(sp.nodes_LUT[v_path['p2']], borders_range)
+        p1_cond = check_PointRange(sp.nodes_LUT[v_path['p1']], exclude_borders_range)
+        p2_cond = check_PointRange(sp.nodes_LUT[v_path['p2']], exclude_borders_range)
         if not (p1_cond and p2_cond):
-            prims_to_remove.append(v_path['p_id'])
+            prims_to_remove.add(v_path['p_id'])
+        p1_cond = check_PointRange(sp.nodes_LUT[v_path['p1']], include_borders_range)
+        p2_cond = check_PointRange(sp.nodes_LUT[v_path['p2']], include_borders_range)
+        if p1_cond and p2_cond:
+            prims_to_remove.add(v_path['p_id'])
 
-    fig, ax = plt.subplots()
-    plt.imshow(sp.e_canvas)
 
     for k_prim in prims_to_remove:
+        paths_to_remove = [k_path for k_path, v_path in sp.paths_lst.items() if v_path['p_id'] == k_prim]
+        nodes_to_remove = sp.primitives[k_prim]
 
-        print(k_prim)
-        exit()
+        if k_prim in sp.primitives:
+            del sp.primitives[k_prim]
+        for path_id in paths_to_remove:
+            del sp.paths_lst[path_id]
+        for node_id in nodes_to_remove:
+            del sp.nodes_LUT[node_id]
 
-        v_path = sp.paths_lst[k_path].copy()
-
-        v_path['p1'] = sp.nodes_LUT[v_path['p1']]
-        v_path['p2'] = sp.nodes_LUT[v_path['p2']]
-        plotter.plot_items([v_path], coloring='standard')
-
-        # del sp.paths_lst[k_path]
-        # if v_path['p_id'] in sp.primitives:
-        #     del sp.primitives[v_path['p_id']]
-        # if v_path['p1'] in sp.nodes_LUT:
-        #     del sp.nodes_LUT[v_path['p1']]
-        # if v_path['p2'] in sp.nodes_LUT:
-        #     del sp.nodes_LUT[v_path['p2']]
-
-    plt.show()
 
 def plot_full_dwg(region=False, x=None, y=None):
     # // TODO should change it to use prepare_region() function.
@@ -74,12 +65,12 @@ def plot_full_dwg(region=False, x=None, y=None):
     if region:
         x = [120, 135]
         y = [50, 75]
-        selected_nodes = return_nodes_by_region(x, y)
+        selected_nodes = return_nodes_by_region(sp.nodes_LUT, x, y)
         print(f'found {len(selected_nodes)}')
 
         canvas = sp.e_canvas  # [x[0]:x[1], y[0]: y[1]]
     else:
-        selected_nodes = sp.nodes_LUT
+        selected_nodes = sp.nodes_LUT.copy()
         canvas = sp.e_canvas
 
     fig, ax = plt.subplots()
@@ -87,16 +78,16 @@ def plot_full_dwg(region=False, x=None, y=None):
     for k_prime, v_prime in sp.primitives.items():
         paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
         plotter.plot_items(paths, coloring='group')
-    # plt.show()
 
     fig, ax = plt.subplots()
     plt.imshow(canvas)
 
     for k, v in sp.paths_lst.items():
-        if v['p1'] in selected_nodes or v['p2'] in selected_nodes:
-            v['p1'] = sp.nodes_LUT[v['p1']]
-            v['p2'] = sp.nodes_LUT[v['p2']]
-            plotter.plot_items([v], coloring='standard')
+        path = v.copy()
+        if path['p1'] in selected_nodes or path['p2'] in selected_nodes:
+            path['p1'] = sp.nodes_LUT[path['p1']]
+            path['p2'] = sp.nodes_LUT[path['p2']]
+            plotter.plot_items([path], coloring='standard')
 
     plt.show()
 
