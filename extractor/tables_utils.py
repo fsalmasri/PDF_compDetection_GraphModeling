@@ -2,6 +2,26 @@ from . import doc
 
 from shapely.geometry import LineString, Point
 
+
+def clean_tables_by_prims(prims_to_remove):
+    '''
+    Remove all paths, nodes, primitives using primitives ID.
+    :param prims_to_remove: list primitives ID
+    :return:
+    '''
+    sp = doc.get_current_page()
+
+    for k_prim in prims_to_remove:
+        paths_to_remove = [k_path for k_path, v_path in sp.paths_lst.items() if v_path['p_id'] == k_prim]
+        nodes_to_remove = sp.primitives[k_prim]
+
+        if k_prim in sp.primitives:
+            del sp.primitives[k_prim]
+        for path_id in paths_to_remove:
+            del sp.paths_lst[path_id]
+        for node_id in nodes_to_remove:
+            del sp.nodes_LUT[node_id]
+
 def delete_update_tables(to_delete_lst, ref='paths'):
     sp = doc.get_current_page()
 

@@ -28,34 +28,7 @@ def shrink_line(line, shrink_factor):
     return shrunken_line
 
 
-def remove_borders():
-    sp = doc.get_current_page()
 
-    exclude_borders_range = [[40, sp.pw], [40, sp.ph]]
-    include_borders_range = [[1550, sp.pw], [1660, sp.ph]]
-
-    prims_to_remove = set()
-    for k_path, v_path in sp.paths_lst.items():
-        p1_cond = check_PointRange(sp.nodes_LUT[v_path['p1']], exclude_borders_range)
-        p2_cond = check_PointRange(sp.nodes_LUT[v_path['p2']], exclude_borders_range)
-        if not (p1_cond and p2_cond):
-            prims_to_remove.add(v_path['p_id'])
-        p1_cond = check_PointRange(sp.nodes_LUT[v_path['p1']], include_borders_range)
-        p2_cond = check_PointRange(sp.nodes_LUT[v_path['p2']], include_borders_range)
-        if p1_cond and p2_cond:
-            prims_to_remove.add(v_path['p_id'])
-
-
-    for k_prim in prims_to_remove:
-        paths_to_remove = [k_path for k_path, v_path in sp.paths_lst.items() if v_path['p_id'] == k_prim]
-        nodes_to_remove = sp.primitives[k_prim]
-
-        if k_prim in sp.primitives:
-            del sp.primitives[k_prim]
-        for path_id in paths_to_remove:
-            del sp.paths_lst[path_id]
-        for node_id in nodes_to_remove:
-            del sp.nodes_LUT[node_id]
 
 
 def plot_full_dwg(region=False, x=None, y=None):

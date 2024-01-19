@@ -9,8 +9,9 @@ from . import doc
 from . import plotter
 from . import tables_utils
 
-from .utils import return_primitives_by_node, return_pathsIDX_given_nodes, return_paths_given_nodes
-from .utils import return_nodes_by_region, prepare_region
+from .utils import return_paths_given_nodes
+from .utils import check_PointRange
+
 
 def is_vertical(line, threshold=10):
     angle = np.degrees(np.arctan2(line.xy[1][1] - line.xy[1][0], line.xy[0][1] - line.xy[0][0]))
@@ -154,4 +155,25 @@ def Detect_unconnected_letters():
 
     connected_components = list(nx.connected_components(g))
     sp.update_primitives_tables(connected_components)
+
+
+def remove_borders():
+    sp = doc.get_current_page()
+
+    # TODO define Global params for defining borders and tables in drawings
+    exclude_borders_range = [[40, sp.pw], [40, sp.ph]]
+    include_borders_range = [[1550, sp.pw], [1660, sp.ph]]
+
+    prims_to_remove = set()
+    for k_path, v_path in sp.paths_lst.items():
+        p1_cond = check_PointRange(sp.nodes_LUT[v_path['p1']], exclude_borders_range)
+        p2_cond = check_PointRange(sp.nodes_LUT[v_path['p2']], exclude_borders_range)
+        if not (p1_cond and p2_cond):
+            prims_to_remove.add(v_path['p_id'])
+        p1_cond = check_PointRange(sp.nodes_LUT[v_path['p1']], include_borders_range)
+        p2_cond = check_PointRange(sp.nodes_LUT[v_path['p2']], include_borders_range)
+        if p1_cond and p2_cond:
+            prims_to_remove.add(v_path['p_id'])
+
+    tables_utils.clean_tables_by_prims(prims_to_remove)
 
