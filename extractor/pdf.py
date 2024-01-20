@@ -53,9 +53,16 @@ class pdf():
 
         return pw, ph
 
+
     def get_current_page(self, page_number=None):
         if not page_number:
             return self.pages[self.current_page]
         else:
             return self.pages[page_number]
+
+
+    def save_image(self, pid):
+        sp = self.get_current_page(pid)
+        return sp.single_page.get_pixmap()
+
 

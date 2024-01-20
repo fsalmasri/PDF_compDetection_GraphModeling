@@ -5,6 +5,8 @@ import random
 
 from . import doc
 
+from .utils import return_nodes_by_region
+from .utils import return_paths_given_nodes
 
 color_mapping = {'s': 'white', 'f': 'yellow', 'fs': 'blue',
                  'qu': 'purple', 're': 'red', 'c': 'orange', 'test': 'yellow'}
@@ -47,6 +49,41 @@ def plot_graph_nx(g= None):
     plt.axis('on')
     ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
     plt.show()
+
+
+
+def plot_full_dwg(region=False, x=None, y=None):
+    # // TODO should change it to use prepare_region() function.
+    sp = doc.get_current_page()
+
+    if region:
+        x = [120, 135]
+        y = [50, 75]
+        selected_nodes = return_nodes_by_region(sp.nodes_LUT, x, y)
+        print(f'found {len(selected_nodes)}')
+
+        canvas = sp.e_canvas  # [x[0]:x[1], y[0]: y[1]]
+    else:
+        selected_nodes = sp.nodes_LUT.copy()
+        canvas = sp.e_canvas
+
+    fig, ax = plt.subplots()
+    plt.imshow(canvas)
+
+    for k, v in sp.paths_lst.items():
+        path = v.copy()
+        if path['p1'] in selected_nodes or path['p2'] in selected_nodes:
+            path['p1'] = sp.nodes_LUT[path['p1']]
+            path['p2'] = sp.nodes_LUT[path['p2']]
+            plot_items([path], coloring='standard')
+
+    fig, ax = plt.subplots()
+    plt.imshow(sp.e_canvas)
+    for k_prime, v_prime in sp.primitives.items():
+        paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+        plot_items(paths, coloring='group')
+
+    # plt.show()
 
 
 def get_colors(i):

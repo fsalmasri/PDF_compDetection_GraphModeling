@@ -50,6 +50,11 @@ def return_values_by_Idx(LUT, nodes):
 
     return pos
 
+def return_pathsIDx_by_primID(p_id, paths_lst):
+    return [k_path for k_path, v_path in paths_lst.items() if v_path['p_id'] == p_id].copy()
+
+def return_paths_by_primID(p_id, paths_lst):
+    return {k_path: v_path for k_path, v_path in paths_lst.items() if v_path['p_id'] == p_id}.copy()
 
 def return_pathsIDX_given_nodes(nodes, path_lst):
     '''

@@ -1,9 +1,12 @@
 from extractor import doc, study_line_fill_connection, study_disconnected_comp
 from extractor import study_buffering_by_paths, study_buffering_by_nodes
-from extractor import plot_full_dwg, Clean_filling_strikes, Detect_unconnected_letters, clean_filled_strokes
+from extractor import Clean_filling_strikes, Detect_unconnected_letters, clean_filled_strokes
 from extractor import clean_duplicates_paths
-from extractor import remove_borders
+from extractor import remove_borders, find_boundingBoxes
+
 import extractor
+from extractor import plotter
+
 
 
 import matplotlib.pyplot as plt
@@ -20,10 +23,10 @@ sp = doc.get_current_page()
 
 
 sp.load_data(str(page_number))
-plot_full_dwg()
+plotter.plot_full_dwg()
+find_boundingBoxes()
 
-# sp.save_data(str(page_number))
-# exit()
+plt.show()
 
 # exit()
 # clean_duplicates_paths()
