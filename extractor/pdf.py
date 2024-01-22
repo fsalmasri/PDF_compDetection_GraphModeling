@@ -25,7 +25,7 @@ class pdf():
 
     def extract_pages(self):
         for i, p in enumerate(self.doc):
-            self.pages.append(page(p))
+            self.pages.append(page(p, i))
 
         self.pages_count = len(self.pages)
 

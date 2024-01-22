@@ -1,6 +1,7 @@
 
 import numpy as np
 import networkx as nx
+from collections import defaultdict
 
 
 from shapely.geometry import LineString, Point, Polygon
@@ -177,3 +178,94 @@ def remove_borders():
 
     tables_utils.clean_tables_by_prims(prims_to_remove)
 
+def filter_bbxs(bounding_boxes):
+    # Sort bounding boxes by area in descending order
+    sorted_indices = sorted(range(len(bounding_boxes)), key=lambda i: bounding_boxes[i][2] * bounding_boxes[i][3],
+                            reverse=True)
+    sorted_bounding_boxes = np.array(bounding_boxes)[sorted_indices]
+
+    # List to store indices of bounding boxes to remove
+    to_remove_indices = []
+
+    # List to store relationships (container, contained)
+    relationships = defaultdict(list)
+
+    # Iterate through the sorted bounding boxes
+    for i, bb1 in enumerate(sorted_bounding_boxes):
+        for j, bb2 in enumerate(sorted_bounding_boxes[i+1:]):
+            # Check if bb2 is completely inside bb1
+            if (
+                bb2[0] >= bb1[0] and
+                bb2[1] >= bb1[1] and
+                (bb2[0] + bb2[2]) <= (bb1[0] + bb1[2]) and
+                (bb2[1] + bb2[3]) <= (bb1[1] + bb1[3])
+            ):
+                # bb2 is completely inside bb1, mark for removal
+                to_remove_indices.append(i + j + 1)
+                relationships[i].append(i + j + 1)
+
+
+    for i, bb in enumerate(sorted_bounding_boxes):
+        if (i not in relationships) and (i not in to_remove_indices):
+            relationships[i] = []
+
+    return sorted_indices, relationships
+
+def find_boundingBoxes():
+    sp = doc.get_current_page()
+
+    selected_primes = {prim_k: prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) > 2}
+
+    bbx_lst, kprims_lst = [], []
+    for k_prim, v_prim in selected_primes.items():
+        nodes_set = [tuple(sp.nodes_LUT[x]) for x in v_prim]
+
+        path_geometry = LineString(nodes_set)
+        bounding_box = path_geometry.bounds
+
+        # Add a 1% margin to the bounding box size
+        margin_percentage = 0.05
+
+        # Calculate area, height and width
+        bounding_box_area = (bounding_box[2] - bounding_box[0]) * (bounding_box[3] - bounding_box[1])
+        margin = (bounding_box_area ** 0.5) * margin_percentage
+
+        # Expand the bounding box with the margin
+        bounding_box_margin = (
+            bounding_box[0] - margin,
+            bounding_box[1] - margin,
+            bounding_box[2] + margin,
+            bounding_box[3] + margin
+        )
+
+        x = bounding_box_margin[0]
+        y = bounding_box_margin[1]
+        width = bounding_box_margin[2] - bounding_box_margin[0]
+        height = bounding_box_margin[3] - bounding_box_margin[1]
+
+        bbox = [x,y,width,height]
+
+        if bounding_box_area < 46942:
+            bbx_lst.append(bbox)
+            kprims_lst.append(k_prim)
+
+
+    sorted_indices, relationships = filter_bbxs(bbx_lst)
+    sorted_bounding_boxes = [bbx_lst[i] for i in sorted_indices]
+    sorted_kprims = [kprims_lst[i] for i in sorted_indices]
+
+    for k_rel, v_rel in relationships.items():
+        prim_id = sorted_kprims[k_rel]
+        bbx = sorted_bounding_boxes[k_rel]
+        sp.grouped_prims[prim_id] = {'nodes': sp.primitives[prim_id], 'bbx': bbx}
+
+        vsub = sp.grouped_prims[prim_id]
+        if v_rel:
+            sub_dict = {}
+            for v in v_rel:
+                sub_prim_id = sorted_kprims[v]
+                tmp_dict = {'nodes': sp.primitives[sub_prim_id], 'bbx': sorted_bounding_boxes[v]}
+                sub_dict[sub_prim_id] = tmp_dict
+            vsub['sub'] = sub_dict
+        else:
+            vsub['sub'] = None

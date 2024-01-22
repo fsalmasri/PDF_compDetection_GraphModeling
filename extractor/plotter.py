@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 import networkx as nx
 import random
 
@@ -83,7 +85,16 @@ def plot_full_dwg(region=False, x=None, y=None):
         paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
         plot_items(paths, coloring='group')
 
-    # plt.show()
+
+    currentAxis = plt.gca()
+    for k_grouped, v_grouped in sp.grouped_prims.items():
+        x, y, width, height = v_grouped['bbx']
+        rect = patches.Rectangle((x, y), width, height, linewidth=1, edgecolor='white', facecolor='none',
+                                 linestyle='dashed')
+        currentAxis.add_patch(rect)
+
+        # exit()
+    plt.show()
 
 
 def get_colors(i):

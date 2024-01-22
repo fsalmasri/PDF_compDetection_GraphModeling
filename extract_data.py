@@ -6,27 +6,31 @@ from extractor import remove_borders, find_boundingBoxes
 
 import extractor
 from extractor import plotter
-
-
-
 import matplotlib.pyplot as plt
+
+
 page_number = 0
 
 doc.load_pdf(pdfpath= f'../Distill.data.v2/PID/{page_number}.pdf')
 
 sp = doc.get_current_page()
+# sp.extract_page_info()
 # sp.extract_text()
 # sp.extract_paths()
-# Detect_unconnected_letters()
 # remove_borders()
+# find_boundingBoxes()
+# //TODO save images png and SVG
+sp.save_images()
+# sp.save_data()
+
+
+# sp.load_data()
+# plotter.plot_full_dwg()
 # sp.save_data(str(page_number))
 
+# Detect_unconnected_letters()
 
-sp.load_data(str(page_number))
-plotter.plot_full_dwg()
-find_boundingBoxes()
-
-plt.show()
+# plt.show()
 
 # exit()
 # clean_duplicates_paths()

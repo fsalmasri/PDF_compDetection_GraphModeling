@@ -10,13 +10,15 @@ from . import Saving_path
 
 
 class page():
-    def __init__(self, p):
+    def __init__(self, p, i):
         self.single_page = p
+        self.fname = i
 
         self.pw = self.single_page.rect.width
         self.ph = self.single_page.rect.height
 
         # self.line_nodes = []
+        self.page_info = {}
         self.nodes_LUT = {}  # a dictionary of nodes list and their coords.
         self.paths_lst = {}  # a dictionary of paths of formate [node 0 , coords, node 1, coords]
         self.words_lst = {}  # a dictionary of text boxes arrange with box id (x0, y0, x1, y1, "word", block_no, line_no, word_no)
@@ -25,6 +27,8 @@ class page():
         self.primitives = {}
         self.filled_stroke = defaultdict(list)
         self.connected_components = []
+        self.grouped_prims ={}
+
 
         self.generate_empty_canvas()
 
@@ -135,12 +139,14 @@ class page():
                     for i in range(curve_points.shape[0] - 1): add_to_main(curve_points[i], curve_points[i + 1],
                                                                            item[0])
 
-            if len(item_paths) > 0 and dwg_type == 'f' and item_paths[-1]['item_type'] == 'l':
-                item_paths.append({'p1': [item_paths[-1]['p2'][0], item_paths[-1]['p2'][1]],
-                                   'p2': [item_paths[0]['p1'][0], item_paths[0]['p1'][1]],
-                                   'item_type': 'l', 'path_type': dwg_type})
-
-                flag = True
+            # if len(item_paths) > 0 and dwg_type == 'f' and item_paths[-1]['item_type'] == 'l':
+            #     item_paths.append({'p1': [item_paths[-1]['p2'][0], item_paths[-1]['p2'][1]],
+            #                        'p2': [item_paths[0]['p1'][0], item_paths[0]['p1'][1]],
+            #                        'item_type': 'l', 'path_type': dwg_type})
+            #
+            #     flag = True
+            # elif len(item_paths) > 0 and item_paths[-1]['item_type']  == 'c':
+            #     flag = True
 
             # plotter.plot_items(item_paths)
             from .plotter import plot_items
@@ -180,164 +186,178 @@ class page():
             for p in paths_idx:
                 self.paths_lst[p]['p_id'] = p_id
 
+    def extract_page_info(self):
+        self.page_info = {'width': self.pw, 'height': self.ph}
 
-    def study_connected_components(self):
+    def save_images(self):
+        pixmap = self.single_page.get_pixmap()
+        self.im = utils.pixmap_to_image(pixmap)
+        self.svg = self.single_page.get_svg_image()
 
-        ccomp_byLength = {}
-        for idx, con_x in enumerate(self.connected_components):
-            if len(con_x) not in ccomp_byLength:
-                ccomp_byLength[len(con_x)] = [idx]
-            else:
-                ccomp_byLength[len(con_x)].append(idx)
-
-        ccomp_byLength = dict(sorted(ccomp_byLength.items()))
-
-        s = [[k, len(v)] for k, v in ccomp_byLength.items()]
-
-        print(s)
-        # exit()
-
-        for k in ccomp_byLength[28]:
-            subFig_idx = self.connected_components[k]
-
-            H = self.G.subgraph(subFig_idx)
-            self.plot_graph_nx(H)
-
-            paths_idx = utils.return_pathsIDX_given_nodes(subFig_idx, self.paths_lst)
-            self.plot_paths_by_pathsIDs(paths_idx)
+        self.im.save(f'{Saving_path}/{self.fname}/{self.fname}.png', quality=100, compression=0)
+        with open(f'{Saving_path}/{self.fname}/{self.fname}.svg', 'w', encoding='utf-8') as svg_file:
+            svg_file.write(self.svg)
 
 
-            plt.show()
-
-        # from collections import Counter
-        #
-        # print(Counter(g_len).keys())
-        # print(Counter(g_len).values())
-
-        # print(np.unique(g_len))
-
-    def find_connectedComp_inRegion(self, x, y):
-
-        idx = utils.find_index_by_valueRange(self.nodes_LUT, rng=[x, y])
-
-        H = self.G.subgraph(idx)
-        self.plot_graph_nx(H)
-
-        paths_idx = utils.return_pathsIDX_given_nodes(idx, self.paths_lst)
-        self.plot_paths_by_pathsIDs(paths_idx)
-
-        plt.show()
-
-
-    def clean_data(self):
-
-        nidx = utils.look_in_txtBlocks_dict(self.nodes_LUT, self.words_lst)
-
-        paths_idx = utils.return_pathsIDX_given_nodes(nidx, self.paths_lst)
-        self.plot_paths_by_pathsIDs(paths_idx)
-
-        plt.show()
-
-
+    # def study_connected_components(self):
+    #
+    #     ccomp_byLength = {}
+    #     for idx, con_x in enumerate(self.connected_components):
+    #         if len(con_x) not in ccomp_byLength:
+    #             ccomp_byLength[len(con_x)] = [idx]
+    #         else:
+    #             ccomp_byLength[len(con_x)].append(idx)
+    #
+    #     ccomp_byLength = dict(sorted(ccomp_byLength.items()))
+    #
+    #     s = [[k, len(v)] for k, v in ccomp_byLength.items()]
+    #
+    #     print(s)
+    #     # exit()
+    #
+    #     for k in ccomp_byLength[28]:
+    #         subFig_idx = self.connected_components[k]
+    #
+    #         H = self.G.subgraph(subFig_idx)
+    #         self.plot_graph_nx(H)
+    #
+    #         paths_idx = utils.return_pathsIDX_given_nodes(subFig_idx, self.paths_lst)
+    #         self.plot_paths_by_pathsIDs(paths_idx)
+    #
+    #
+    #         plt.show()
+    #
+    #     # from collections import Counter
+    #     #
+    #     # print(Counter(g_len).keys())
+    #     # print(Counter(g_len).values())
+    #
+    #     # print(np.unique(g_len))
+    #
+    # def find_connectedComp_inRegion(self, x, y):
+    #
+    #     idx = utils.find_index_by_valueRange(self.nodes_LUT, rng=[x, y])
+    #
+    #     H = self.G.subgraph(idx)
+    #     self.plot_graph_nx(H)
+    #
+    #     paths_idx = utils.return_pathsIDX_given_nodes(idx, self.paths_lst)
+    #     self.plot_paths_by_pathsIDs(paths_idx)
+    #
+    #     plt.show()
+    #
+    #
+    # def clean_data(self):
+    #
+    #     nidx = utils.look_in_txtBlocks_dict(self.nodes_LUT, self.words_lst)
+    #
+    #     paths_idx = utils.return_pathsIDX_given_nodes(nidx, self.paths_lst)
+    #     self.plot_paths_by_pathsIDs(paths_idx)
+    #
+    #     plt.show()
+    #
+    #
     # General plotters
 
-    def plot_canvas(self):
-        plt.figure()
-        plt.imshow(self.cv_canvas)
-
-    def plot_two_full_figures(self):
-        self.plot_graph_nx(self.G)
-        self.plot_canvas()
-        plt.show()
-
-
-    def plot_paths_by_pathsIDs(self, paths_idx):
-        paths_lst = {k: v for k, v in self.paths_lst.items() if k in paths_idx}
-
-        plt.figure()
-        for k, v in paths_lst.items():
-            _, p1, _, p2 = v
-
-            plt.plot([p1[0], p2[0]], [p1[1], p2[1]], color='black')
-
-        plt.gca().invert_yaxis()
-
-
-
-    def plot_connected_components(self):
-        # /TODO check function name and behavior.
-
-        connected_components = list(nx.connected_components(self.G))
-
-        fig = plt.subplots()
-        plt.imshow(self.e_canvas)
-
-        cmap = plt.get_cmap('tab20b')
-        colors = [cmap(i) for i in np.linspace(0, 1, len(connected_components))]
-
-        for i, component in enumerate(connected_components):
-            # print(f"Connected Component {i + 1}:")
-
-            if len(component) > 1:
-
-                # fig = plt.subplots()
-                # plt.imshow(self.e_canvas)
-
-                component = list(component)
-                edges_lst = self.G.edges(component)
-
-                x, y = [], []
-                for e in edges_lst:
-                    p1, p2 = self.nodes_LUT[e[0]], self.nodes_LUT[e[1]]
-                    # print(e, p1, p2)
-                    x.extend([p1[0], p2[0]])
-                    y.extend([p1[1], p2[1]])
-                    plt.plot([p1[0], p2[0]], [p1[1], p2[1]], color=colors[i]) #c='white'
-
-                # plt.plot(x, y)
-                # plt.show()
-
-        #     for line in lines:
-        #         if any(endpoint in component for endpoint in line):
-        #             print(line)
-
-        plt.show()
-
-    def plot_txtblocks_regions(self):
-        fig, ax = plt.subplots()
-        ax.imshow(self.e_canvas)
-
-        paths_lst = {k: v for k, v in self.paths_lst.items() if k in self.nodes_LUT}
-
-        for k, v in paths_lst.items():
-            _, p1, _, p2 = v
-
-            ax.plot([p1[0], p2[0]], [p1[1], p2[1]], color='white')
-
-        # plt.gca().invert_yaxis()
-
-        for k, tbl in self.words_lst.items():
-            for tb in tbl:
-                print(tb)
-                lam = 1.2
-                w = (tb[2]-tb[0]) + 2
-                h = (tb[3]-tb[1]) + 2
-
-                rect = patches.Rectangle((tb[0]-1, tb[1]-1), width=w, height=h, linewidth=1, edgecolor='r', facecolor='none')
-                ax.add_patch(rect)
-
-        plt.show()
+    # def plot_canvas(self):
+    #     plt.figure()
+    #     plt.imshow(self.cv_canvas)
+    #
+    # def plot_two_full_figures(self):
+    #     self.plot_graph_nx(self.G)
+    #     self.plot_canvas()
+    #     plt.show()
+    #
+    #
+    # def plot_paths_by_pathsIDs(self, paths_idx):
+    #     paths_lst = {k: v for k, v in self.paths_lst.items() if k in paths_idx}
+    #
+    #     plt.figure()
+    #     for k, v in paths_lst.items():
+    #         _, p1, _, p2 = v
+    #
+    #         plt.plot([p1[0], p2[0]], [p1[1], p2[1]], color='black')
+    #
+    #     plt.gca().invert_yaxis()
+    #
+    #
+    #
+    # def plot_connected_components(self):
+    #     # /TODO check function name and behavior.
+    #
+    #     connected_components = list(nx.connected_components(self.G))
+    #
+    #     fig = plt.subplots()
+    #     plt.imshow(self.e_canvas)
+    #
+    #     cmap = plt.get_cmap('tab20b')
+    #     colors = [cmap(i) for i in np.linspace(0, 1, len(connected_components))]
+    #
+    #     for i, component in enumerate(connected_components):
+    #         # print(f"Connected Component {i + 1}:")
+    #
+    #         if len(component) > 1:
+    #
+    #             # fig = plt.subplots()
+    #             # plt.imshow(self.e_canvas)
+    #
+    #             component = list(component)
+    #             edges_lst = self.G.edges(component)
+    #
+    #             x, y = [], []
+    #             for e in edges_lst:
+    #                 p1, p2 = self.nodes_LUT[e[0]], self.nodes_LUT[e[1]]
+    #                 # print(e, p1, p2)
+    #                 x.extend([p1[0], p2[0]])
+    #                 y.extend([p1[1], p2[1]])
+    #                 plt.plot([p1[0], p2[0]], [p1[1], p2[1]], color=colors[i]) #c='white'
+    #
+    #             # plt.plot(x, y)
+    #             # plt.show()
+    #
+    #     #     for line in lines:
+    #     #         if any(endpoint in component for endpoint in line):
+    #     #             print(line)
+    #
+    #     plt.show()
+    #
+    # def plot_txtblocks_regions(self):
+    #     fig, ax = plt.subplots()
+    #     ax.imshow(self.e_canvas)
+    #
+    #     paths_lst = {k: v for k, v in self.paths_lst.items() if k in self.nodes_LUT}
+    #
+    #     for k, v in paths_lst.items():
+    #         _, p1, _, p2 = v
+    #
+    #         ax.plot([p1[0], p2[0]], [p1[1], p2[1]], color='white')
+    #
+    #     # plt.gca().invert_yaxis()
+    #
+    #     for k, tbl in self.words_lst.items():
+    #         for tb in tbl:
+    #             print(tb)
+    #             lam = 1.2
+    #             w = (tb[2]-tb[0]) + 2
+    #             h = (tb[3]-tb[1]) + 2
+    #
+    #             rect = patches.Rectangle((tb[0]-1, tb[1]-1), width=w, height=h, linewidth=1, edgecolor='r', facecolor='none')
+    #             ax.add_patch(rect)
+    #
+    #     plt.show()
 
 
     # General Utils.
-    def save_data(self, fname):
-        utils.save_data(f'{Saving_path}/{fname}',
-                        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst, self.primitives, dict(self.filled_stroke))
+    def save_data(self):
+        utils.save_data(f'{Saving_path}/{self.fname}',
+                        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst,
+                        self.primitives, dict(self.filled_stroke), self.grouped_prims, self.page_info)
 
-    def load_data(self, fname):
+    def load_data(self):
 
-        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst, self.primitives, self.filled_stroke = (
-            utils.load_data(f'{Saving_path}/{fname}'))
+        (self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst,
+         self.primitives, self.filled_stroke, self.grouped_prims, self.page_info) = (
+            utils.load_data(f'{Saving_path}/{self.fname}'))
 
         self.build_connected_components()
 

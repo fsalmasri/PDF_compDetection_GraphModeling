@@ -5,6 +5,7 @@ import numpy as np
 import pickle
 import networkx as nx
 import shapely
+from PIL import Image
 
 
 def find_index_by_valueRange(LUT, rng: list):
@@ -223,13 +224,31 @@ def load_data(path_to_save):
     with open(f'{path_to_save}/filled_stroke.json') as jf:
         filled_stroke = json.load(jf, object_hook=keystoint)
 
-    return G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives, filled_stroke
+    with open(f'{path_to_save}/grouped_prims.json') as jf:
+        grouped_prims = json.load(jf, object_hook=keystoint)
+
+    with open(f'{path_to_save}/info.json') as jf:
+        page_info = json.load(jf, object_hook=keystoint)
+
+
+
+    return G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives, filled_stroke, grouped_prims, page_info
 
 def save_svg(filename, svg):
     with open('{filename}.svg', 'w') as f:
         f.write(svg)
 
-def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives, filled_stroke):
+def pixmap_to_numpy(pixmap):
+    img = Image.frombytes("RGB", [pixmap.width, pixmap.height], pixmap.samples)
+    img_array = np.array(img)
+    return img_array
+
+def pixmap_to_image(pixmap):
+    img = Image.frombytes("RGB", [pixmap.width, pixmap.height], pixmap.samples)
+    return img
+
+def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst,
+              primitives, filled_stroke, grouped_prims, page_info):
 
     print('Saving all Lists ...')
     Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
@@ -254,4 +273,10 @@ def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst, prim
 
     with open(f"{path_to_save}/filled_stroke.json", "w") as jf:
         json.dump(filled_stroke, jf, indent=4)
+
+    with open(f"{path_to_save}/grouped_prims.json", "w") as jf:
+        json.dump(grouped_prims, jf, indent=4)
+
+    with open(f"{path_to_save}/info.json", "w") as jf:
+        json.dump(page_info, jf, indent=4)
 

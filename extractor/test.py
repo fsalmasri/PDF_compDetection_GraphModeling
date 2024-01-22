@@ -20,104 +20,12 @@ from .utils import return_nodes_by_region, prepare_region, check_PointRange
 
 
 
-def filter_and_relationships(bounding_boxes):
-    # Sort bounding boxes by area in descending order
-    sorted_bounding_boxes = sorted(bounding_boxes, key=lambda bb: bb[2] * bb[3], reverse=True)
-
-    # List to store indices of bounding boxes to remove
-    to_remove_indices = []
-
-    # List to store relationships (container, contained)
-    relationships = []
-
-    # Iterate through the sorted bounding boxes
-    for i, bb1 in enumerate(sorted_bounding_boxes):
-        for j, bb2 in enumerate(sorted_bounding_boxes[i+1:]):
-            # Check if bb2 is completely inside bb1
-            if (
-                bb2[0] >= bb1[0] and
-                bb2[1] >= bb1[1] and
-                (bb2[0] + bb2[2]) <= (bb1[0] + bb1[2]) and
-                (bb2[1] + bb2[3]) <= (bb1[1] + bb1[3])
-            ):
-                # bb2 is completely inside bb1, mark for removal
-                to_remove_indices.append(i + j + 1)
-                relationships.append((i, i + j + 1))
-
-    # Remove marked bounding boxes from the original list
-    filtered_bounding_boxes = [bb for i, bb in enumerate(sorted_bounding_boxes) if i not in to_remove_indices]
-
-    return filtered_bounding_boxes, relationships
-
-def find_boundingBoxes():
-    sp = doc.get_current_page()
-
-    selected_primes = {prim_k: prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) > 2}
-
-    # fig, ax = plt.subplots()
-    # plt.imshow(sp.e_canvas)
-
-    bbx_area_dist = []
-    bbx_lst = []
-    for k_prim, v_prim in selected_primes.items():
-        # paths = return_paths_by_primID(k_prim, sp.paths_lst)
-        nodes_set = [tuple(sp.nodes_LUT[x]) for x in v_prim]
-
-        path_geometry = LineString(nodes_set)
-        bounding_box = path_geometry.bounds
-
-        # Add a 1% margin to the bounding box size
-        margin_percentage = 0.05
-
-        # Calculate area, height and width
-        height = bounding_box[3] - bounding_box[1]
-        width = bounding_box[2] - bounding_box[0]
-        bounding_box_area = (bounding_box[2] - bounding_box[0]) * (bounding_box[3] - bounding_box[1])
-        margin = (bounding_box_area ** 0.5) * margin_percentage
-
-        bbx_area_dist.append(bounding_box_area)
-
-        # Expand the bounding box with the margin
-        bounding_box_margin = (
-            bounding_box[0] - margin,
-            bounding_box[1] - margin,
-            bounding_box[2] + margin,
-            bounding_box[3] + margin
-        )
-
-        x = bounding_box_margin[0]
-        y = bounding_box_margin[1]
-        width = bounding_box_margin[2] - bounding_box_margin[0]
-        height = bounding_box_margin[3] - bounding_box_margin[1]
-
-        bbox = [x,y,width,height]
-
-        if bounding_box_area < 46942:
-            bbx_lst.append(bbox)
-            # minx, miny, maxx, maxy = bounding_box_margin
-            # bbox_x = [minx, maxx, maxx, minx, minx]
-            # bbox_y = [miny, miny, maxy, maxy, miny]
-            # plt.plot(bbox_x, bbox_y, label='Bounding Box (Original)', linestyle='dashed', c='yellow')
-
-    currentAxis = plt.gca()
-
-    # for bbx in bbx_lst:
-    #     # Plot the original bounding box
-    #     x, y, width, height = bbx
-    #     rect = patches.Rectangle((x, y), width, height, linewidth=1, edgecolor='r', facecolor='none')
-    #     currentAxis.add_patch(rect)
 
 
-    filtered_bounding_boxes, relationships = filter_and_relationships(bbx_lst)
-    for bbx in filtered_bounding_boxes:
-        # Plot the original bounding box
-        x, y, width, height = bbx
-        rect = patches.Rectangle((x, y), width, height, linewidth=1, edgecolor='white', facecolor='none', linestyle='dashed')
-        currentAxis.add_patch(rect)
 
 
-    plt.show()
-    exit()
+
+
 
 
 def shrink_line(line, shrink_factor):

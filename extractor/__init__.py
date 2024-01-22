@@ -13,14 +13,14 @@ from .test import study_disconnected_comp
 from .test import study_buffering_by_paths, study_buffering_by_nodes
 from .test import Clean_filling_strikes
 from .test import clean_filled_strokes
-from .test import find_boundingBoxes
+
 
 from .tables_utils import clean_duplicates_paths
+
 from .cleaning_grouping import Detect_unconnected_letters
 from .cleaning_grouping import remove_borders
+from .cleaning_grouping import find_boundingBoxes
 
-
-# from . import test as tester
 
 from . import plotter
 
