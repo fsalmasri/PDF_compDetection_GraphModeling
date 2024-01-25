@@ -22,7 +22,69 @@ from .utils import return_nodes_by_region, prepare_region, check_PointRange
 
 
 
+# from esig import tosig
+import esig
 
+def normalize_coords(coords, image_width, image_height):
+    x = coords[0] / image_width
+    y = coords[1] / image_height
+
+    return (x,y)
+
+def study_clustering():
+    histogram_length = 4
+
+    sp = doc.get_current_page()
+
+    image_width = sp.pw
+    image_height = sp.ph
+
+    signatures_dic = {}
+    for k_gprims, v_gprims in sp.grouped_prims.items():
+        sub_groups = v_gprims['sub']
+        # main_nodes = [normalize_coords(sp.nodes_LUT[x], image_width, image_height) for x in v_gprims['nodes']]
+        main_nodes = [sp.nodes_LUT[x] for x in v_gprims['nodes']]
+
+        signature = esig.stream2sig(main_nodes, depth=3)
+        signatures_dic[k_gprims] = [signature]
+
+        if sub_groups is not None:
+            for k_sub, v_sub in sub_groups.items():
+                # sub_nodes = [normalize_coords(sp.nodes_LUT[x], image_width, image_height) for x in v_sub['nodes']]
+                sub_nodes = [sp.nodes_LUT[x] for x in v_sub['nodes']]
+                signature = esig.stream2sig(sub_nodes, depth=1)
+                signatures_dic[k_gprims].append(signature)
+
+        conc_signature = np.concatenate(signatures_dic[k_gprims], axis=0)
+
+        histogram, _ = np.histogram(conc_signature, bins=histogram_length, density=True)
+
+        # You may choose to normalize the histogram if needed
+        # normalized_histogram = histogram / np.linalg.norm(histogram)
+        signatures_dic[k_gprims] = histogram
+
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.cluster import DBSCAN
+    scaler = StandardScaler()
+
+
+    all_hist = [v for k,v in signatures_dic.items()]
+    all_hist = np.array(all_hist)
+
+    histograms_array_scaled = scaler.fit_transform(all_hist)
+
+    dbscan = DBSCAN(eps=.3, min_samples=5)  # You may need to adjust eps and min_samples based on your data
+    cluster_labels = dbscan.fit_predict(histograms_array_scaled)
+
+    print(cluster_labels)
+    plt.scatter(histograms_array_scaled[:, 0], histograms_array_scaled[:, 1], c=cluster_labels, cmap='viridis')
+    plt.xlabel('Feature 1')
+    plt.ylabel('Feature 2')
+    plt.title('DBSCAN Clustering of Histograms')
+    plt.show()
+
+    for idx, (k_gprims, v_gprims) in enumerate(sp.grouped_prims.items()):
+        v_gprims['class'] = int(cluster_labels[idx])
 
 
 

@@ -40,14 +40,13 @@ def create_rectangle_label_result(id, x, y, width, height, labels, img_size):
           "origin": "manual"
         }
 
+class_dict = {0: 'valv', 1: 'compressor', 2: 'car', 3: 'cartoon', 4:'test', -1:'test2'}
 
-# image_path = "/data/upload/1/f5099cd7-0.png"
-# image_path = "/data/local-files?d=images/0.png"
-image_path = "/data/local-files/?d=images/0.svg"
+Path("LS/annots").mkdir(parents=True, exist_ok=True)
+pages_lst = sorted(os.listdir('data'))
+for page in pages_lst[:2]:
 
-
-pages_lst = os.listdir('data')
-for page in pages_lst[:1]:
+    image_path = f"/data/local-files/?d=images/{page}_cleaned.svg"
     grouped_prims = json.load(open(f'data/{page}/grouped_prims.json'), object_hook=keystoint)
     page_info = json.load(open(f'data/{page}/info.json'), object_hook=keystoint)
 
@@ -65,10 +64,11 @@ for page in pages_lst[:1]:
         percentage_height = (height / image_height) * 100
 
         test = create_rectangle_label_result(k_group, percentage_x, percentage_y, percentage_width, percentage_height,
-                                             ["valve"], [image_width, image_height])
+                                             [class_dict[v_group['class']]], [image_width, image_height])
         results.append(test)
 
     task = create_label_studio_task(1, image_path, results)
+
     output_file_path = f"LS/annots/{page}.json"
     with open(output_file_path, 'w') as output_file:
         json.dump(task, output_file, indent=4)

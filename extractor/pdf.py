@@ -11,22 +11,25 @@ class pdf():
         self.pdfpath = None
         self.pages = []
         self.pages_count = 0
-        self.current_page = 0 #61
+        self.current_page = 0
 
 
     def load_pdf(self, pdfpath):
+        import os
+
         self.pdfpath = pdfpath
         self.doc = fitz.open(self.pdfpath)
-        self.extract_pages()
+        self.extract_pages(os.path.basename(pdfpath)[:-4])
 
 
     def extract_singlePage(self, pn):
         return self.doc.load_page(pn)
 
-    def extract_pages(self):
-        for i, p in enumerate(self.doc):
+    def extract_pages(self, i):
+        # for i, p in enumerate(self.doc):
+        #     self.pages.append(page(p, i))
+        for p in self.doc:
             self.pages.append(page(p, i))
-
         self.pages_count = len(self.pages)
 
         print(f'{self.pages_count} pages found')

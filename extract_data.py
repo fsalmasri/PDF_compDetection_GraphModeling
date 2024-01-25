@@ -2,14 +2,15 @@ from extractor import doc, study_line_fill_connection, study_disconnected_comp
 from extractor import study_buffering_by_paths, study_buffering_by_nodes
 from extractor import Clean_filling_strikes, Detect_unconnected_letters, clean_filled_strokes
 from extractor import clean_duplicates_paths
-from extractor import remove_borders, find_boundingBoxes
+from extractor import remove_borders, find_boundingBoxes, study_clustering
 
+from extractor.svg_extraction import clean_borders_svg
 import extractor
 from extractor import plotter
 import matplotlib.pyplot as plt
 
 
-page_number = 0
+page_number = 1
 
 doc.load_pdf(pdfpath= f'../Distill.data.v2/PID/{page_number}.pdf')
 
@@ -19,12 +20,13 @@ sp = doc.get_current_page()
 # sp.extract_paths()
 # remove_borders()
 # find_boundingBoxes()
-# //TODO save images png and SVG
-sp.save_images()
+# sp.save_images()
 # sp.save_data()
+# clean_borders_svg(page_number)
 
-
-# sp.load_data()
+sp.load_data()
+study_clustering()
+sp.save_data()
 # plotter.plot_full_dwg()
 # sp.save_data(str(page_number))
 

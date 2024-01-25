@@ -251,7 +251,7 @@ def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst,
               primitives, filled_stroke, grouped_prims, page_info):
 
     print('Saving all Lists ...')
-    Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
+    # Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
 
     nx.write_graphml_lxml(G, f"{path_to_save}/graph.graphml")
     # pickle.dump(G, open(f'{path_to_save}/graph.xml', 'wb'))

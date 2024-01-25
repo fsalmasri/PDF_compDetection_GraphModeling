@@ -4,6 +4,8 @@ import networkx as nx
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from pathlib import Path
+
 from . import utils
 
 from . import Saving_path
@@ -13,6 +15,9 @@ class page():
     def __init__(self, p, i):
         self.single_page = p
         self.fname = i
+
+        path_to_save = f'{Saving_path}/{self.fname}'
+        Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
 
         self.pw = self.single_page.rect.width
         self.ph = self.single_page.rect.height
