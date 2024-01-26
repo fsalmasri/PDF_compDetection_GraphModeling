@@ -10,23 +10,23 @@ from extractor import plotter
 import matplotlib.pyplot as plt
 
 
-page_number = 1
+page_number = 0
 
 doc.load_pdf(pdfpath= f'../Distill.data.v2/PID/{page_number}.pdf')
 
 sp = doc.get_current_page()
-# sp.extract_page_info()
-# sp.extract_text()
-# sp.extract_paths()
-# remove_borders()
-# find_boundingBoxes()
-# sp.save_images()
-# sp.save_data()
-# clean_borders_svg(page_number)
-
-sp.load_data()
-study_clustering()
+sp.extract_page_info()
+sp.extract_text()
+sp.extract_paths()
+remove_borders()
+find_boundingBoxes()
+sp.save_images()
 sp.save_data()
+clean_borders_svg(page_number)
+
+# sp.load_data()
+# study_clustering()
+# sp.save_data()
 # plotter.plot_full_dwg()
 # sp.save_data(str(page_number))
 

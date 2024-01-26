@@ -23,7 +23,7 @@ from .utils import return_nodes_by_region, prepare_region, check_PointRange
 
 
 # from esig import tosig
-import esig
+# import esig
 
 def normalize_coords(coords, image_width, image_height):
     x = coords[0] / image_width
