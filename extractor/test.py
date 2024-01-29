@@ -19,8 +19,11 @@ from .utils import return_primitives_by_node, return_pathsIDX_given_nodes, retur
 from .utils import return_nodes_by_region, prepare_region, check_PointRange
 
 
-
-
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.cluster import DBSCAN
+from sklearn.decomposition import PCA
+from PIL import Image
+import cv2
 
 # from esig import tosig
 # import esig
@@ -31,6 +34,109 @@ def normalize_coords(coords, image_width, image_height):
 
     return (x,y)
 
+def calculate_graph_based_features(graph):
+    features = {
+        'Number_of_Nodes': nx.number_of_nodes(graph),
+        'Number_of_Edges': nx.number_of_edges(graph),
+        'Density': nx.density(graph),
+        # 'Is_Connected': nx.is_connected(graph),
+        'Number_Connected_Components': nx.number_connected_components(graph),
+        'Average_Degree': np.mean(list(dict(graph.degree()).values())),
+        # 'Average_Clustering_Coefficient': nx.average_clustering(graph),
+        # 'Diameter': nx.diameter(graph),
+        # 'Eccentricity_Central_Node': nx.eccentricity(graph, center=min(graph.nodes())),
+        # Add more features as needed
+    }
+    return features
+
+def extrct_features():
+    from skimage.feature import hog
+    from skimage import measure
+
+    sp = doc.get_current_page()
+
+    signatures_dic = []
+    for k_gprims, v_gprims in sp.grouped_prims.items():
+        bbx = v_gprims['bbx']
+        nodes = v_gprims['nodes']
+
+        if (bbx[2] > 1) and (bbx[3] > 1):
+            im_zeros = np.zeros((int(bbx[3]), int(bbx[2])))
+
+            G = nx.Graph()
+
+            group_paths = [v for k, v in sp.paths_lst.items() if v['p_id'] == k_gprims]
+            for g in group_paths:
+                G.add_edge(g['p1'], g['p2'])
+
+            if v_gprims['sub'] is not None:
+                for sub_id in v_gprims['sub']:
+                    paths = [v for k, v in sp.paths_lst.items() if v['p_id'] == sub_id]
+                    group_paths.extend(paths)
+                    nodes.extend(v_gprims['sub'][sub_id]['nodes'])
+
+                    for g in paths:
+                        G.add_edge(g['p1'], g['p2'])
+
+
+            parsed_paths = [[sp.nodes_LUT[x['p1']].copy(), sp.nodes_LUT[x['p2']].copy()] for x in group_paths]
+
+            for p in parsed_paths:
+                p[0][0] = int(p[0][0] - bbx[0])
+                p[0][1] = int(p[0][1] - bbx[1])
+                p[1][0] = int(p[1][0] - bbx[0])
+                p[1][1] = int(p[1][1] - bbx[1])
+
+                cv2.line(im_zeros, tuple(p[0]), tuple(p[1]), 1, 1)
+
+            moments = cv2.moments(im_zeros)
+            hu_moments = cv2.HuMoments(moments).flatten()
+
+            import math
+            # huMoments[i] = -1 * copysign(1.0, huMoments[i]) * log10(abs(huMoments[i])))
+            # hu_moments = [-1 * math.copysign(1.0, x) * math.log10(abs(x)+1) for x in hu_moments]
+
+            # labeled_image = measure.label(im_zeros)
+            # regions = measure.regionprops(labeled_image)
+            # if len(regions) > 0:
+            #     hu_moments = np.hstack((hu_moments, [len(nodes)])) #,regions[0].area, regions[0].perimeter, , regions[0].orientation
+            # else:
+            #     hu_moments = np.hstack((hu_moments, [len(nodes)]))
+            GFEX = calculate_graph_based_features(G)
+            hu_moments = np.hstack((hu_moments, [GFEX['Number_of_Nodes'],
+                                                 GFEX['Number_of_Edges'],
+                                                 GFEX['Density'],
+                                                 GFEX['Number_Connected_Components'],
+                                                 GFEX['Average_Degree']
+                                                 ]))
+
+            signatures_dic.append([sp.fname, k_gprims, hu_moments])
+
+    return signatures_dic
+
+
+def group_clustering(hist):
+    if hist.shape[0] > 1:
+        scaler = StandardScaler()
+        # scaler = MinMaxScaler()
+        histograms_array_scaled = scaler.fit_transform(hist)
+
+        # dbscan = DBSCAN(eps=.2, min_samples=2)
+        dbscan = DBSCAN(eps=.05, min_samples=8)
+        cluster_labels = dbscan.fit_predict(histograms_array_scaled)
+
+        # For visualization purpose
+        pca = PCA(n_components=2)
+        pc = pca.fit_transform(histograms_array_scaled)
+
+        plt.scatter(pc[:, 0], pc[:, 1], c=cluster_labels, cmap='viridis')
+        plt.xlabel('Feature 1')
+        plt.ylabel('Feature 2')
+        plt.title('DBSCAN Clustering of Histograms')
+        plt.show()
+
+        return cluster_labels
+
 def study_clustering():
     histogram_length = 4
 
@@ -40,53 +146,120 @@ def study_clustering():
     image_height = sp.ph
 
     signatures_dic = {}
+
     for k_gprims, v_gprims in sp.grouped_prims.items():
-        sub_groups = v_gprims['sub']
-        # main_nodes = [normalize_coords(sp.nodes_LUT[x], image_width, image_height) for x in v_gprims['nodes']]
-        main_nodes = [sp.nodes_LUT[x] for x in v_gprims['nodes']]
 
-        signature = esig.stream2sig(main_nodes, depth=3)
-        signatures_dic[k_gprims] = [signature]
+        # initiate None element in case we couldn't define a class.
+        v_gprims['class'] = None
 
-        if sub_groups is not None:
-            for k_sub, v_sub in sub_groups.items():
-                # sub_nodes = [normalize_coords(sp.nodes_LUT[x], image_width, image_height) for x in v_sub['nodes']]
-                sub_nodes = [sp.nodes_LUT[x] for x in v_sub['nodes']]
-                signature = esig.stream2sig(sub_nodes, depth=1)
-                signatures_dic[k_gprims].append(signature)
+        bbx = v_gprims['bbx']
+        im_zeros = np.zeros((int(bbx[3]), int(bbx[2])))
 
-        conc_signature = np.concatenate(signatures_dic[k_gprims], axis=0)
-
-        histogram, _ = np.histogram(conc_signature, bins=histogram_length, density=True)
-
-        # You may choose to normalize the histogram if needed
-        # normalized_histogram = histogram / np.linalg.norm(histogram)
-        signatures_dic[k_gprims] = histogram
-
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.cluster import DBSCAN
-    scaler = StandardScaler()
+        if bbx[2] > 0 and bbx[3] > 0:
+            # print(bbx)
+            group_paths = [v for k, v in sp.paths_lst.items() if v['p_id'] == k_gprims]
+            if v_gprims['sub'] is not None:
+                for sub_id in v_gprims['sub']:
+                    paths = [v for k, v in sp.paths_lst.items() if v['p_id'] == sub_id]
+                    group_paths.extend(paths)
 
 
-    all_hist = [v for k,v in signatures_dic.items()]
+            parsed_paths = [[sp.nodes_LUT[x['p1']].copy(), sp.nodes_LUT[x['p2']].copy()] for x in group_paths]
+
+
+            for p in parsed_paths:
+                p[0][0] = int(p[0][0] - bbx[0])
+                p[0][1] = int(p[0][1] - bbx[1])
+                p[1][0] = int(p[1][0] - bbx[0])
+                p[1][1] = int(p[1][1] - bbx[1])
+
+                # print(p[0], p[1], (bbx[3]), (bbx[2]) )
+                cv2.line(im_zeros, tuple(p[0]), tuple(p[1]), 1, 1)
+
+
+        moments = cv2.moments(im_zeros)
+        hu_moments = cv2.HuMoments(moments).flatten()
+        signatures_dic[k_gprims] = hu_moments
+
+    all_hist = [v for k, v in signatures_dic.items()]
     all_hist = np.array(all_hist)
 
-    histograms_array_scaled = scaler.fit_transform(all_hist)
+    if all_hist.shape[0] > 1:
+        scaler = StandardScaler()
+        histograms_array_scaled = scaler.fit_transform(all_hist)
 
-    dbscan = DBSCAN(eps=.3, min_samples=5)  # You may need to adjust eps and min_samples based on your data
-    cluster_labels = dbscan.fit_predict(histograms_array_scaled)
+        dbscan = DBSCAN(eps=.2, min_samples=2)
+        cluster_labels = dbscan.fit_predict(histograms_array_scaled)
 
-    print(cluster_labels)
-    plt.scatter(histograms_array_scaled[:, 0], histograms_array_scaled[:, 1], c=cluster_labels, cmap='viridis')
-    plt.xlabel('Feature 1')
-    plt.ylabel('Feature 2')
-    plt.title('DBSCAN Clustering of Histograms')
-    plt.show()
+        # pca = PCA(n_components=2)
+        # pc = pca.fit_transform(histograms_array_scaled)
 
-    for idx, (k_gprims, v_gprims) in enumerate(sp.grouped_prims.items()):
-        v_gprims['class'] = int(cluster_labels[idx])
+        # print(np.unique(cluster_labels))
+        # plt.scatter(pc[:, 0], pc[:, 1], c=cluster_labels, cmap='viridis')
+        # plt.xlabel('Feature 1')
+        # plt.ylabel('Feature 2')
+        # plt.title('DBSCAN Clustering of Histograms')
+        # plt.show()
+
+        for idx, (k_gprims, v_gprims) in enumerate(sp.grouped_prims.items()):
+            v_gprims['class'] = int(cluster_labels[idx])
 
 
+# def study_clustering():
+#     histogram_length = 4
+#
+#     sp = doc.get_current_page()
+#
+#     image_width = sp.pw
+#     image_height = sp.ph
+#
+#     signatures_dic = {}
+#     for k_gprims, v_gprims in sp.grouped_prims.items():
+#         sub_groups = v_gprims['sub']
+#         # main_nodes = [normalize_coords(sp.nodes_LUT[x], image_width, image_height) for x in v_gprims['nodes']]
+#         main_nodes = [sp.nodes_LUT[x] for x in v_gprims['nodes']]
+#
+#         signature = esig.stream2sig(main_nodes, depth=3)
+#         signatures_dic[k_gprims] = [signature]
+#
+#         if sub_groups is not None:
+#             for k_sub, v_sub in sub_groups.items():
+#                 # sub_nodes = [normalize_coords(sp.nodes_LUT[x], image_width, image_height) for x in v_sub['nodes']]
+#                 sub_nodes = [sp.nodes_LUT[x] for x in v_sub['nodes']]
+#                 signature = esig.stream2sig(sub_nodes, depth=1)
+#                 signatures_dic[k_gprims].append(signature)
+#
+#         conc_signature = np.concatenate(signatures_dic[k_gprims], axis=0)
+#
+#         histogram, _ = np.histogram(conc_signature, bins=histogram_length, density=True)
+#
+#         # You may choose to normalize the histogram if needed
+#         # normalized_histogram = histogram / np.linalg.norm(histogram)
+#         signatures_dic[k_gprims] = histogram
+#
+#
+#     scaler = StandardScaler()
+#
+#
+#     all_hist = [v for k,v in signatures_dic.items()]
+#     all_hist = np.array(all_hist)
+#
+#     histograms_array_scaled = scaler.fit_transform(all_hist)
+#
+#     dbscan = DBSCAN(eps=.3, min_samples=5)  # You may need to adjust eps and min_samples based on your data
+#     cluster_labels = dbscan.fit_predict(histograms_array_scaled)
+#
+#     print(cluster_labels)
+#     plt.scatter(histograms_array_scaled[:, 0], histograms_array_scaled[:, 1], c=cluster_labels, cmap='viridis')
+#     plt.xlabel('Feature 1')
+#     plt.ylabel('Feature 2')
+#     plt.title('DBSCAN Clustering of Histograms')
+#     plt.show()
+#
+#     for idx, (k_gprims, v_gprims) in enumerate(sp.grouped_prims.items()):
+#         v_gprims['class'] = int(cluster_labels[idx])
+#
+#
 
 
 

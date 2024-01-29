@@ -1,32 +1,92 @@
+import numpy as np
+
 from extractor import doc, study_line_fill_connection, study_disconnected_comp
 from extractor import study_buffering_by_paths, study_buffering_by_nodes
 from extractor import Clean_filling_strikes, Detect_unconnected_letters, clean_filled_strokes
 from extractor import clean_duplicates_paths
-from extractor import remove_borders, find_boundingBoxes, study_clustering
+from extractor import remove_borders, find_boundingBoxes, study_clustering, extrct_features, group_clustering
 
 from extractor.svg_extraction import clean_borders_svg
 import extractor
 from extractor import plotter
 import matplotlib.pyplot as plt
+import os
+import json
+
+from extractor.utils import keystoint
+
+# flst = np.sort(os.listdir('../Distill.data.v2/PID'))
+# page_number = 1
+#
+# for p in flst[:]:
+#     page_number= int(p[:-4])
+#     print(f'parsing page {page_number}')
+#
+#     doc.pages = []
+#     doc.load_pdf(pdfpath= f'../Distill.data.v2/PID/{page_number}.pdf')
+#
+#     sp = doc.get_current_page()
+#     sp.extract_page_info()
+#     if sp.pw == 2837.0 and sp.ph == 1965.0:
+#
+#         sp.extract_text()
+#         sp.extract_paths()
+#         remove_borders()
+#         sp.save_images()
+#         find_boundingBoxes(margin_percentage=0.25)
+#         # clean_borders_svg(page_number)
+#
+#         # plotter.plot_full_dwg()
+# #         # sp.load_data()
+#         sp.save_data()
+
+flst = np.sort(os.listdir('data'))
+group_feX = []
+for p in flst[:]:
+    page_number = int(p)
+
+    doc.pages = []
+    doc.load_pdf(pdfpath=f'../Distill.data.v2/PID/{page_number}.pdf')
+
+    sp = doc.get_current_page()
+    sp.load_data()
+    feX = extrct_features()
+    group_feX.extend(feX)
 
 
-page_number = 0
+hist = [x[2] for x in group_feX]
+hist = np.vstack(hist)
+labels = group_clustering(hist)
 
-doc.load_pdf(pdfpath= f'../Distill.data.v2/PID/{page_number}.pdf')
+print(f'len of sent histograms: {len(hist)}  unique labels: {np.unique(labels)}')
 
-sp = doc.get_current_page()
-sp.extract_page_info()
-sp.extract_text()
-sp.extract_paths()
-remove_borders()
-find_boundingBoxes()
-sp.save_images()
-sp.save_data()
-clean_borders_svg(page_number)
+# update grouped_prims with class label
+[x.append(idx) for idx, x in enumerate(group_feX)]
+for p in flst:
+    sub_group = [x for x in group_feX if x[0] == p]
 
-# sp.load_data()
-# study_clustering()
-# sp.save_data()
+    with open(f'data/{p}/grouped_prims.json') as jf:
+        grouped_prims = json.load(jf, object_hook=keystoint)
+
+    for g in sub_group:
+        page_number, GID, _, idx = g
+
+        grouped_prims[GID]['class'] = int(labels[idx])
+
+    with open(f"data/{p}/grouped_prims.json", "w") as jf:
+        json.dump(grouped_prims, jf, indent=4)
+
+
+
+
+
+
+
+
+
+# exit()
+
+
 # plotter.plot_full_dwg()
 # sp.save_data(str(page_number))
 

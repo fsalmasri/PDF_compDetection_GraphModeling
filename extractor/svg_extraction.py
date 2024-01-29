@@ -75,7 +75,7 @@ def is_point_inside_region(node, regions):
 
     return flag
 
-def parse(path_element, transform_matrix_data = None):
+def local_parse(path_element, transform_matrix_data = None):
 
     path_data = path_element.getAttribute('d')
     if not transform_matrix_data:
@@ -131,7 +131,7 @@ def clean_borders_svg(fname):
         if data_text and xlink_href.startswith('#font_'):
             selected_path_element = find_path_by_id(path_elements, xlink_href[1:])
             if selected_path_element:
-                parsed_nodes = parse(selected_path_element, transform_matrix_data)
+                parsed_nodes = local_parse(selected_path_element, transform_matrix_data)
                 if parsed_nodes:
                     for node in parsed_nodes:
                         if is_point_inside_region(node, regions):
@@ -150,7 +150,7 @@ def clean_borders_svg(fname):
 
 
     for path_element in path_elements:
-        parsed_nodes = parse(path_element)
+        parsed_nodes = local_parse(path_element)
         flag = False
         if parsed_nodes:
             for node in parsed_nodes:
@@ -162,8 +162,10 @@ def clean_borders_svg(fname):
             parent.removeChild(path_element)
 
     output_svg_file = f'{LS_path}/images/{fname}_cleaned.svg'
-    with open(output_svg_file, 'w') as output_file:
-        output_file.write(doc.toprettyxml())
-
+    with open(output_svg_file, 'w', encoding="utf-8") as output_file:
+        # output_file.write(doc.toprettyxml())
+        for line in doc.toprettyxml().splitlines():
+            if line.strip():  # Check if the line is not empty after stripping whitespace
+                output_file.write(line + '\n')
 
 

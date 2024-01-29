@@ -15,6 +15,8 @@ from .test import study_buffering_by_paths, study_buffering_by_nodes
 from .test import Clean_filling_strikes
 from .test import clean_filled_strokes
 from .test import study_clustering
+from .test import extrct_features
+from .test import group_clustering
 
 
 from .tables_utils import clean_duplicates_paths

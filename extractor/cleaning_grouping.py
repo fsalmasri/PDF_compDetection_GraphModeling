@@ -211,7 +211,7 @@ def filter_bbxs(bounding_boxes):
 
     return sorted_indices, relationships
 
-def find_boundingBoxes():
+def find_boundingBoxes(margin_percentage = 0.05):
     sp = doc.get_current_page()
 
     selected_primes = {prim_k: prim_v for prim_k, prim_v in sp.primitives.items() if len(prim_v) > 2}
@@ -222,9 +222,6 @@ def find_boundingBoxes():
 
         path_geometry = LineString(nodes_set)
         bounding_box = path_geometry.bounds
-
-        # Add a 1% margin to the bounding box size
-        margin_percentage = 0.05
 
         # Calculate area, height and width
         bounding_box_area = (bounding_box[2] - bounding_box[0]) * (bounding_box[3] - bounding_box[1])
