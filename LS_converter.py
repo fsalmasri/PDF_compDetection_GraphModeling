@@ -3,7 +3,7 @@ import os
 import shutil
 from pathlib import Path
 
-from extractor.utils import  keystoint
+from extractor.utils import keystoint
 
 def create_label_studio_task(id, image_path, results):
     task = {
@@ -47,8 +47,8 @@ def create_rectangle_label_result(id, x, y, width, height, labels, img_size):
 
 class_dict = {x:f'test_{x}' for x in range(-1,350,1)}
 
-for t, v in class_dict.items():
-    print(v)
+# for t, v in class_dict.items():
+#     print(v)
 # exit()
 
 Path("LS/annots").mkdir(parents=True, exist_ok=True)

@@ -34,12 +34,13 @@ from extractor.utils import keystoint
 #         remove_borders()
 #         sp.save_images()
 #         find_boundingBoxes(margin_percentage=0.25)
-#         # clean_borders_svg(page_number)
+#         clean_borders_svg(page_number)
 #
 #         # plotter.plot_full_dwg()
 # #         # sp.load_data()
 #         sp.save_data()
 
+# exit()
 flst = np.sort(os.listdir('data'))
 group_feX = []
 for p in flst[:]:
