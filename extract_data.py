@@ -32,15 +32,17 @@ from extractor.utils import keystoint
 #         sp.extract_text()
 #         sp.extract_paths()
 #         remove_borders()
-#         sp.save_images()
-#         find_boundingBoxes(margin_percentage=0.25)
-#         clean_borders_svg(page_number)
 #
-#         # plotter.plot_full_dwg()
+#         # sp.save_images()
+#         find_boundingBoxes(margin_percentage=0.25)
+#         # clean_borders_svg(page_number)
+#
+#         print('group', len(sp.grouped_prims))
+#         plotter.plot_full_dwg()
 # #         # sp.load_data()
-#         sp.save_data()
+# #         sp.save_data()
 
-# exit()
+
 flst = np.sort(os.listdir('data'))
 group_feX = []
 for p in flst[:]:
@@ -57,6 +59,7 @@ for p in flst[:]:
 
 hist = [x[2] for x in group_feX]
 hist = np.vstack(hist)
+np.save('hist.npy', hist)
 labels = group_clustering(hist)
 
 print(f'len of sent histograms: {len(hist)}  unique labels: {np.unique(labels)}')

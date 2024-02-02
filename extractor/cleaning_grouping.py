@@ -28,7 +28,7 @@ def Detect_unconnected_letters():
     sp = doc.get_current_page()
 
     # Biased values
-    maximum_lines_length = 3.0
+    maximum_lines_length = 20.0
     percent_for_cross = 0.1
 
     vertical_dict = {}
@@ -48,7 +48,7 @@ def Detect_unconnected_letters():
                 # horizontal_lines.append(line)
 
     # print(f'{len(selected_paths)}, {len(horizontal_lines)}, {len(vertical_lines)}')
-    print(f'{len(horizontal_dict)}, {len(vertical_dict)}')
+    print(f'horizontal lines: {len(horizontal_dict)}, vertical lines: {len(vertical_dict)}')
 
     # Find intersections between vertical and horizontal lines
     intersections = []
@@ -113,12 +113,14 @@ def Detect_unconnected_letters():
             path_to_change_id = intersect[3]
             if path_to_change_id == path1[1]['p_id']:
                 del sp.paths_lst[path1[0]]
+                print(f'path deleted {path1[0]}')
                 path_sec1_id, path_sec2_id = (
                     tables_utils.split_creat_intersected_paths(intersect, path_to_split=path1, path_touching=path2))
                 seconf_path_to_add = path2[0]
 
             elif path_to_change_id == path2[1]['p_id']:
                 del sp.paths_lst[path2[0]]
+                print(f'path deleted {path2[0]}')
                 path_sec1_id, path_sec2_id = (
                     tables_utils.split_creat_intersected_paths(intersect, path_to_split=path2, path_touching=path1))
                 seconf_path_to_add = path1[0]
@@ -132,6 +134,7 @@ def Detect_unconnected_letters():
             path2 = [[k, v] for k, v in sp.paths_lst.items() if v['p_id'] == intersect[2][1]].copy()[0]
             del sp.paths_lst[path1[0]]
             del sp.paths_lst[path2[0]]
+            print(f'path deleted {path1[0]} {path2[0]}')
             path_sec1_id, path_sec2_id = (
                 tables_utils.split_creat_intersected_paths(intersect, path_to_split=path1, path_touching=path2, type='cross'))
 
@@ -144,9 +147,11 @@ def Detect_unconnected_letters():
             new_paths_id.append(path_sec2_id)
 
 
+    print(f'new_paths_id: {new_paths_id}')
+    # exit()
     g = nx.Graph()
     for path_id in new_paths_id:
-        path_v = sp.paths_lst[path_id]
+        path_v = sp.paths_lst[path_id].copy()
         g.add_node(path_v['p1'])
         g.add_node(path_v['p2'])
         g.add_edge(path_v['p1'], path_v['p2'])

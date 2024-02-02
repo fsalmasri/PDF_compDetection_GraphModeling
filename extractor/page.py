@@ -168,16 +168,20 @@ class page():
         # plt.show()
 
     def build_connected_components(self):
-        self.connected_components = list(nx.connected_components(self.G))
+        return list(nx.connected_components(self.G))
 
 
-    def update_primitives_tables(self):
+    def update_primitives_tables(self, connected_components= None):
         # print(len(self.connected_components))
 
-        if not self.connected_components:
-            self.build_connected_components()
+        # if not self.connected_components:
+        #     connected_components = self.build_connected_components()
 
-        subgraphs_nodes_lst = [x for x in self.connected_components if len(x) > 1]
+        if connected_components is None:
+            connected_components = self.build_connected_components()
+
+
+        subgraphs_nodes_lst = [x for x in connected_components if len(x) > 1]
         for subgraph in subgraphs_nodes_lst:
 
             # add to primitives list

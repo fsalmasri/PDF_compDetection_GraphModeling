@@ -24,9 +24,11 @@ from sklearn.cluster import DBSCAN
 from sklearn.decomposition import PCA
 from PIL import Image
 import cv2
+from cv2.ximgproc import fourierDescriptor
+
 
 # from esig import tosig
-# import esig
+import esig
 
 def normalize_coords(coords, image_width, image_height):
     x = coords[0] / image_width
@@ -81,17 +83,24 @@ def extrct_features():
 
             parsed_paths = [[sp.nodes_LUT[x['p1']].copy(), sp.nodes_LUT[x['p2']].copy()] for x in group_paths]
 
+            test = [[[x[0][0]/2837, x[0][1]/1965],[x[1][0]/2837, x[1][1]/1965]] for x in parsed_paths.copy()]
+            esig_features = esig.stream2sig(test, depth=3)
+
             for p in parsed_paths:
                 p[0][0] = int(p[0][0] - bbx[0])
                 p[0][1] = int(p[0][1] - bbx[1])
                 p[1][0] = int(p[1][0] - bbx[0])
                 p[1][1] = int(p[1][1] - bbx[1])
 
+
+
                 cv2.line(im_zeros, tuple(p[0]), tuple(p[1]), 1, 1)
 
-            moments = cv2.moments(im_zeros)
+            reshaped_arr = np.array(test).reshape(-1, 2)
+            moments = cv2.moments(np.array(reshaped_arr))
             hu_moments = cv2.HuMoments(moments).flatten()
 
+            # exit()
             import math
             # huMoments[i] = -1 * copysign(1.0, huMoments[i]) * log10(abs(huMoments[i])))
             # hu_moments = [-1 * math.copysign(1.0, x) * math.log10(abs(x)+1) for x in hu_moments]
@@ -103,15 +112,29 @@ def extrct_features():
             # else:
             #     hu_moments = np.hstack((hu_moments, [len(nodes)]))
             GFEX = calculate_graph_based_features(G)
-            hu_moments = np.hstack((hu_moments, [GFEX['Number_of_Nodes'],
-                                                 GFEX['Number_of_Edges'],
-                                                 GFEX['Density'],
-                                                 GFEX['Number_Connected_Components'],
-                                                 GFEX['Average_Degree']
-                                                 ]))
+            hu_moments = np.hstack((hu_moments,
+                                    [
+                                        GFEX['Number_of_Nodes'],
+                                        GFEX['Number_of_Edges'],
+                                        GFEX['Density'],
+                                        GFEX['Number_Connected_Components'],
+                                        GFEX['Average_Degree']
+                                    ],
+                                    esig_features))
 
             signatures_dic.append([sp.fname, k_gprims, hu_moments])
-
+    #
+    # hist = [x[2] for x in signatures_dic]
+    # hist = np.vstack(hist)
+    # scaler = StandardScaler()
+    # # scaler = MinMaxScaler()
+    # hist = scaler.fit_transform(hist)
+    # print(hist.shape)
+    #
+    # plt.boxplot(hist)
+    #
+    # plt.show()
+    # exit()
     return signatures_dic
 
 
@@ -119,15 +142,16 @@ def group_clustering(hist):
     if hist.shape[0] > 1:
         scaler = StandardScaler()
         # scaler = MinMaxScaler()
-        histograms_array_scaled = scaler.fit_transform(hist)
+        hist_scaled = scaler.fit_transform(hist)
 
         # dbscan = DBSCAN(eps=.2, min_samples=2)
         dbscan = DBSCAN(eps=.05, min_samples=8)
-        cluster_labels = dbscan.fit_predict(histograms_array_scaled)
+        # dbscan = DBSCAN(eps=.02, min_samples=4)
+        cluster_labels = dbscan.fit_predict(hist_scaled)
 
         # For visualization purpose
         pca = PCA(n_components=2)
-        pc = pca.fit_transform(histograms_array_scaled)
+        pc = pca.fit_transform(hist_scaled)
 
         plt.scatter(pc[:, 0], pc[:, 1], c=cluster_labels, cmap='viridis')
         plt.xlabel('Feature 1')

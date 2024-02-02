@@ -45,7 +45,7 @@ def create_rectangle_label_result(id, x, y, width, height, labels, img_size):
 #               12: 'test8', 13: 'test9',  14: 'test10', 15: 'test11', 16: 'test12', 17: 'test13',
 #               -1:'minus'}
 
-class_dict = {x:f'test_{x}' for x in range(-1,350,1)}
+class_dict = {x:f'test_{x}' for x in range(-1,650,1)}
 
 # for t, v in class_dict.items():
 #     print(v)
