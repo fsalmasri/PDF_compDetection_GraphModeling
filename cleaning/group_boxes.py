@@ -10,8 +10,32 @@ import networkx as nx
 
 flst = sorted(os.listdir('../LS/annots'))
 labels_lst = set()
-# labels_to_group = {'test_30', 'test_3', 'test_19', 'test_18'} #1052
-labels_to_group = {'test_15', 'test_17', 'test_16', '1057', 'test_29', 'test_40', 'test_41'} #1057
+# labels_to_group = [{'test_30', 'test_3', 'test_19', 'test_18'}, '1052']
+# labels_to_group = [{'test_15', 'test_17', 'test_16', '1057', 'test_29', 'test_40',
+#                     'test_41', 'test_63', 'test_23', 'test_185', 'test_41', 'test_20'}, '1057']
+labels_to_group = [{'test_13', 'test_39', 'test_36', 'test_162', 'test_59', 'test_56'}, '1051']
+# labels_to_group = [{'test_145', 'test_147', 'test_146', 'test_188', 'test_229', 'test_82', 'test_16', 'test_202'}, '48']
+# labels_to_group = [{'test_155', 'test_152', 'test_154', 'test_192', 'test_34', 'test_33', 'test_189', 'test_143',
+#                     'test_212', 'test_1', 'test_201', 'test_0', 'test_89'}, '9']
+# labels_to_group = [{'test_82', 'test_33', 'test_67', 'test_175', 'test_202', 'test_205', 'test_67'}, '8']
+# labels_to_group = [{'test_30', 'test_23', 'test_42', 'test_19', 'test_307', 'test_116', '1055'}, '1055']
+# labels_to_group = [{'test_19', 'test_23', 'test_18', 'test_159', 'test_42', '1055'}, '20']
+# labels_to_group = [{'test_1', 'test_13', 'test_64', 'test_0', 'test_156'}, '13']
+# labels_to_group = [{'test_1', 'test_39', 'test_21', 'test_34', 'test_148'}, '46']
+# labels_to_group = [{'test_3', 'test_20', 'test_62', 'test_108', '17'}, '17']
+# labels_to_group = [{'test_62', 'test_16'}, '1088']
+# labels_to_group = [{'test_14', 'test_39', 'test_19', 'test_59', 'test_21', 'test_74', 'arrow', 'test_232',
+#                     'test_37'}, '45']
+# labels_to_group = [{'test_73', 'test_34', 'test_1', 'test_137', 'test_2', 'test_1', 'test_301', 'test_115',
+#                     'test_62', 'test_0'}, '18']
+# labels_to_group = [{'1057', 'test_20', 'test_21', 'test_108', 'test_23', 'test_62', '22'}, '22']
+# labels_to_group = [{'test_37', 'test_292', 'test_291'}, '99']
+# labels_to_group = [{'test_37', 'test_305'}, '66']
+# labels_to_group = [{'test_82', 'test_64'}, '11']
+
+
+labels_to_group = [{'test_17', 'test_21', 'test_64', 'test_326', 'test_210', 'unknown',
+                    'test_109', 'test_6', 'test_6', 'test_83', '1094'}, 'unknown']
 
 
 def overlap(box1, box2):
@@ -26,7 +50,7 @@ def overlap(box1, box2):
     area_box2 = w2 * h2
 
     iou = area_intersection / float(area_box1 + area_box2 - area_intersection)
-    return iou > 0.1
+    return iou > 0 #0.000005
 
 
 
@@ -85,6 +109,7 @@ def merge_bbx(bbx_to_merge):
     return merged_box
 
 
+total_deleted = 0
 for f in flst:
     with open(f'../LS/annots/{f}', 'r') as jf:
         annot = json.load(jf)
@@ -102,7 +127,7 @@ for f in flst:
         value = res['value']
         k_id = res['id']
 
-        if label in labels_to_group:
+        if label in labels_to_group[0]:
             current_box = {'idx': idx, 'k_id': k_id,
                            'bbx': [value['x'], value['y'], value['width'], value['height']]}
             detected_boxes[label].append(current_box)
@@ -131,14 +156,16 @@ for f in flst:
             merged_result['value']['y'] = merged_box[1]
             merged_result['value']['width'] = merged_box[2]
             merged_result['value']['height'] = merged_box[3]
-            merged_result['value']['rectanglelabels'] = ['1057']
+            merged_result['value']['rectanglelabels'] = [labels_to_group[1]]
 
             symbols_to_add.append(merged_result)
 
-        print(len(results_lst))
+        before_len = len(results_lst)
         flattened_connected_symbols = [element for subset in connected_symbols for element in subset]
         results_lst= [x for idx, x in enumerate(results_lst) if idx not in flattened_connected_symbols]
-        print(len(results_lst))
+        after_len = len(results_lst)
+
+        total_deleted += (before_len-after_len)
 
         [results_lst.append(x) for x in symbols_to_add]
         annot['annotations'][0]['result'] = results_lst
@@ -147,5 +174,5 @@ for f in flst:
     with open(output_file_path, 'w') as output_file:
         json.dump(annot, output_file, indent=4)
 
-
+print(f'total deleted: {total_deleted}')
 

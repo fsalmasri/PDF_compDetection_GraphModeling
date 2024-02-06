@@ -9,7 +9,7 @@ def clean_group_ls():
     flst = os.listdir('../LS/annots')
     labels_lst = set()
     for f in flst:
-        with open(f'LS/annots/{f}', 'r') as jf:
+        with open(f'../LS/annots/{f}', 'r') as jf:
             annot = json.load(jf)
 
         to_delete = []
@@ -32,9 +32,11 @@ def clean_group_ls():
 
         annot['annotations'][0]['result'] = results_lst
 
-        with open(f'LS/annots/{f}', 'w') as jf:
+        with open(f'../LS/annots/{f}', 'w') as jf:
             json.dump(annot, jf, indent=4)
 
 
     for label in labels_lst:
         print(label)
+
+clean_group_ls()

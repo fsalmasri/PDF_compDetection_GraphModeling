@@ -1,9 +1,9 @@
-replacement_dict = {'test_7': '1', 'test_8': '1', 'test_9': '1', 'test_10': '1', 'test_294': '1',
+replacement_dict = {'test_7': '1', 'test_8': '1', 'test_9': '1', 'test_10': '1', 'test_294': '1', 'test_124': '1',
+                    'test_195': '1', 'test_196': '1', 'test_303': '1',
                     'test_5': '600', 'test_11': '600', 'test_47': '600', 'test_48': '600', 'test_70': '600',
                     'test_97': '600', 'test_314': '600',
                     'test_26': '603', 'test_27': '603', 'test_57': '603', 'test_69': '603', 'test_114': '603',
-                    'test_306': '603',
-                    'test_171': '603',
+                    'test_131': '603', 'test_306': '603', 'test_171': '603',
                     'test_54': '1306', 'test_65': '1306', 'test_75': '1306', 'test_76': '1306',
                     'test_60': '37', 'test_88': '37', 'test_111': '37', 'test_207': '37',
                     'test_61': '601', 'test_91': '601', 'test_99': '601', 'test_160': '601',
@@ -21,8 +21,15 @@ replacement_dict = {'test_7': '1', 'test_8': '1', 'test_9': '1', 'test_10': '1',
                     'test_151': 'test_152',
                     'test_177': 'test_178',
                     'test_190': 'test_217', 'test_191': 'test_217', 'test_216': 'test_217',
-
-
+                    'test_32': 'test_38',
+                    'test_58': '14', 'test_59': '14', 'test_74': '14', 'test_82': '14', 'test_162': '14',
+                    'test_197': '14', 'test_215': '14', 'test_220': '14', 'test_240': '14', 'test_325': '14',
+                    'test_115': '15',
+                    'test_136': '1092', 'test_144': '1092', 'test_298': '1092',
+                    'test_146': '48', 'test_147': '48', 'test_202': '48',
+                    'test_205': '32',
+                    'test_321': 'test_318',
+                    'test_323': 'test_324',
 
                     'test_31': 'arrow', 'test_22': 'arrow', 'test_43': 'arrow', 'test_55': 'arrow', 'test_77': 'arrow',
                     'test_90': 'arrow', 'test_194': 'arrow',  'test_101': 'arrow',  'test_179': 'arrow',
@@ -31,6 +38,10 @@ replacement_dict = {'test_7': '1', 'test_8': '1', 'test_9': '1', 'test_10': '1',
                     'test_104': 'test_202',
                     'test_38': 'test_39',
                     'test_24': 'test_82',
+
+                    'test_46': 'unknown', 'test_157': 'unknown', 'test_180': 'unknown', 'test_208': 'unknown',
+                    'test_222': 'unknown', 'test_223': 'unknown', 'test_225': 'unknown', 'test_256': 'unknown',
+                    'test_284': 'unknown', 'test_285': 'unknown', 'test_289': 'unknown', 'test_313': 'unknown'
 
 
                     }
@@ -44,5 +55,8 @@ delete_set = ('test_-1', 'test_50', 'test_71', 'test_72', 'test_78', 'test_79', 
               'test_257', 'test_258', 'test_259', 'test_260', 'test_261', 'test_262', 'test_263', 'test_264',
               'test_265', 'test_266', 'test_267', 'test_268', 'test_269', 'test_270', 'test_271', 'test_272',
               'test_273', 'test_274', 'test_275', 'test_280', 'test_281', 'test_282', 'test_283', 'test_293',
-              'test_297', 'test_299', 'test_300', 'test_302', 'test_304', 'test_308', 'test_327'
+              'test_297', 'test_299', 'test_300', 'test_302', 'test_304', 'test_308', 'test_327', 'test_51',
+              'test_17', 'test_40', 'test_42', 'test_49', 'test_63', 'test_67', 'test_73', 'test_100', 'test_143',
+              'test_159', 'test_198', 'test_199', 'test_232', 'test_295', 'test_307', 'test_315', 'test_316',
+              'test_317', 'test_186', 'test_187'
               )

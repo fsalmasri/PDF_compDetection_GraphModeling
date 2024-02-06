@@ -24,11 +24,11 @@ from sklearn.cluster import DBSCAN
 from sklearn.decomposition import PCA
 from PIL import Image
 import cv2
-from cv2.ximgproc import fourierDescriptor
+# from cv2.ximgproc import fourierDescriptor
 
 
 # from esig import tosig
-import esig
+# import esig
 
 def normalize_coords(coords, image_width, image_height):
     x = coords[0] / image_width
