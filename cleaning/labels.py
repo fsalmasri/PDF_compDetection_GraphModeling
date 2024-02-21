@@ -33,6 +33,7 @@ replacement_dict = {'test_7': '1', 'test_8': '1', 'test_9': '1', 'test_10': '1',
 
                     'test_31': 'arrow', 'test_22': 'arrow', 'test_43': 'arrow', 'test_55': 'arrow', 'test_77': 'arrow',
                     'test_90': 'arrow', 'test_194': 'arrow',  'test_101': 'arrow',  'test_179': 'arrow',
+                    'test_23': 'node',
 
 
                     'test_104': 'test_202',
@@ -58,5 +59,5 @@ delete_set = ('test_-1', 'test_50', 'test_71', 'test_72', 'test_78', 'test_79', 
               'test_297', 'test_299', 'test_300', 'test_302', 'test_304', 'test_308', 'test_327', 'test_51',
               'test_17', 'test_40', 'test_42', 'test_49', 'test_63', 'test_67', 'test_73', 'test_100', 'test_143',
               'test_159', 'test_198', 'test_199', 'test_232', 'test_295', 'test_307', 'test_315', 'test_316',
-              'test_317', 'test_186', 'test_187'
+              'test_317', 'test_186', 'test_187',
               )
