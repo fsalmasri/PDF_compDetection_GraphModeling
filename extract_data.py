@@ -15,35 +15,50 @@ import json
 
 from extractor.utils import keystoint
 
-# flst = np.sort(os.listdir('../Distill.data.v2/PID'))
-# page_number = 1
-#
-# for p in flst[:]:
-#     page_number= int(p[:-4])
-#     print(f'parsing page {page_number}')
-#
-#     doc.pages = []
-#     doc.load_pdf(pdfpath= f'../Distill.data.v2/PID/{page_number}.pdf')
-#
-#     sp = doc.get_current_page()
-#     sp.extract_page_info()
-#     if sp.pw == 2837.0 and sp.ph == 1965.0:
-#
-#         sp.extract_text()
-#         sp.extract_paths()
-#         remove_borders()
-#
-#         # sp.save_images()
-#         find_boundingBoxes(margin_percentage=0.25)
-#         # clean_borders_svg(page_number)
-#
-#         print('group', len(sp.grouped_prims))
-#         plotter.plot_full_dwg()
-# #         # sp.load_data()
-# #         sp.save_data()
 
 
-flst = np.sort(os.listdir('data'))
+folders_lst = np.sort(os.listdir(extractor.Data_load_path))
+AOI = [60, 60, 780, 500] # x0,y0,x1,y1
+
+
+for folder in folders_lst:
+
+    current_path = f'{extractor.Data_load_path}/{folder}'
+    flst = np.sort(os.listdir(current_path))
+
+    for p in flst[0:]:
+        page_number= int(p[:-4])
+        print(f'parsing page {page_number}')
+
+        pdf_path = f'{current_path}/{p}'
+        doc.pages = []
+        doc.load_pdf(pdfpath= f'{current_path}/{p}')
+
+        sp = doc.get_current_page()
+        sp.extract_page_info()
+        # print(sp.page_info)
+    #     if sp.pw == 2837.0 and sp.ph == 1965.0:
+    #
+        sp.extract_text()
+        sp.extract_paths(OCR_cleaner=True, AOI=AOI)
+        sp.save_data()
+
+                # remove_borders()
+    #
+        # sp.save_images(pdfpath= f'{current_path}/{p}', dpi=300)
+    #         find_boundingBoxes(margin_percentage=0.25)
+    #         # clean_borders_svg(page_number)
+    #
+    #         print('group', len(sp.grouped_prims))
+    #     sp.load_data()
+    #     plotter.plot_txtblocks_regions()
+    #     plotter.plot_full_dwg(paths=False, connected_com=True)
+
+        # exit()
+    exit()
+# flst = np.sort(os.listdir('data'))
+flst = np.sort(os.listdir('data/LOGIC/0'))
+
 group_feX = []
 for p in flst[:]:
     page_number = int(p)

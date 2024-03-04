@@ -54,9 +54,18 @@ def plot_graph_nx(g= None):
 
 
 
-def plot_full_dwg(region=False, x=None, y=None):
+def plot_full_dwg(region=False, paths=True, connected_com= True):
     # // TODO should change it to use prepare_region() function.
     sp = doc.get_current_page()
+
+
+    import json
+    from .utils import keystoint
+    with open(f'data/LOGIC/0_EFF00_10CRF02.CG/0/OCRbox.json') as jf:
+        OCR_bbx = json.load(jf, object_hook=keystoint)
+    OCR_bbx = [k[0][:4] for v, k in OCR_bbx.items()]
+
+
 
     if region:
         x = [120, 135]
@@ -69,33 +78,73 @@ def plot_full_dwg(region=False, x=None, y=None):
         selected_nodes = sp.nodes_LUT.copy()
         canvas = sp.e_canvas
 
-    fig, ax = plt.subplots()
-    plt.imshow(canvas)
+    if paths:
+        fig, ax = plt.subplots()
+        plt.imshow(canvas)
 
-    for k, v in sp.paths_lst.items():
-        path = v.copy()
-        if path['p1'] in selected_nodes or path['p2'] in selected_nodes:
-            path['p1'] = sp.nodes_LUT[path['p1']]
-            path['p2'] = sp.nodes_LUT[path['p2']]
-            plot_items([path], coloring='standard')
+        for k, v in sp.paths_lst.items():
+            path = v.copy()
+            if path['p1'] in selected_nodes or path['p2'] in selected_nodes:
+                path['p1'] = sp.nodes_LUT[path['p1']]
+                path['p2'] = sp.nodes_LUT[path['p2']]
+                plot_items([path], coloring='standard')
 
-    fig, ax = plt.subplots()
-    plt.imshow(sp.e_canvas)
-    for k_prime, v_prime in sp.primitives.items():
-        paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
-        plot_items(paths, coloring='group')
+    if connected_com:
+        fig, ax = plt.subplots()
+        plt.imshow(sp.e_canvas)
+        for k_prime, v_prime in sp.primitives.items():
+            paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+            plot_items(paths, coloring='group')
 
 
-    currentAxis = plt.gca()
-    for k_grouped, v_grouped in sp.grouped_prims.items():
-        x, y, width, height = v_grouped['bbx']
-        rect = patches.Rectangle((x, y), width, height, linewidth=1, edgecolor='white', facecolor='none',
-                                 linestyle='dashed')
-        currentAxis.add_patch(rect)
+    # currentAxis = plt.gca()
+    # for k_grouped, v_grouped in sp.grouped_prims.items():
+    #     x, y, width, height = v_grouped['bbx']
+    #     rect = patches.Rectangle((x, y), width, height, linewidth=1, edgecolor='white', facecolor='none',
+    #                              linestyle='dashed')
+    #     currentAxis.add_patch(rect)
 
-        # exit()
+
     plt.show()
 
+
+def plot_txtblocks_regions():
+    sp = doc.get_current_page()
+
+    fig, ax = plt.subplots()
+    ax.imshow(sp.e_canvas)
+
+    paths_lst = {k: v for k, v in sp.paths_lst.items() if k in sp.nodes_LUT}
+
+    for k, v in paths_lst.items():
+        path = v.copy()
+        path['p1'] = sp.nodes_LUT[path['p1']]
+        path['p2'] = sp.nodes_LUT[path['p2']]
+        plot_items([path], coloring='standard')
+
+    # for k, tbl in sp.words_lst.items():
+    #     for tb in tbl:
+    #         print(tb)
+    #         lam = 1.2
+    #         w = (tb[2]-tb[0]) + 2
+    #         h = (tb[3]-tb[1]) + 2
+    #
+    #         rect = patches.Rectangle((tb[0]-1, tb[1]-1), width=w, height=h, linewidth=1, edgecolor='r', facecolor='none')
+    #         ax.add_patch(rect)
+
+    for k, tb in sp.blocks_lst.items():
+        print(tb)
+        tb = tb[0]
+        lam = 1.2
+        w = (tb[2] - tb[0]) + 2
+        h = (tb[3] - tb[1]) + 2
+
+        rect = patches.Rectangle((tb[0] - 1, tb[1] - 1), width=w, height=h, linewidth=1, edgecolor='r',
+                                 facecolor='none')
+        ax.add_patch(rect)
+
+
+    # plt.show()
 
 def get_colors(i):
 

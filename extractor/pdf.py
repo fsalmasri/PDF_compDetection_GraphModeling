@@ -1,7 +1,10 @@
 import fitz
-from . import Data_load_path
+from pathlib import Path
 
+from . import Data_load_path
 from .page import page
+import os
+
 
 class pdf():
     def __init__(self):
@@ -15,21 +18,21 @@ class pdf():
 
 
     def load_pdf(self, pdfpath):
-        import os
-
         self.pdfpath = pdfpath
         self.doc = fitz.open(self.pdfpath)
-        self.extract_pages(os.path.basename(pdfpath)[:-4])
+        self.pdf_fname = os.path.basename(pdfpath)[:-4]
+
+        self.extract_pages(pdfpath)
 
 
     def extract_singlePage(self, pn):
         return self.doc.load_page(pn)
 
-    def extract_pages(self, i):
-        # for i, p in enumerate(self.doc):
-        #     self.pages.append(page(p, i))
+    def extract_pages(self, pdf_path):
+        pname = os.path.basename(pdf_path)[:-4]
+
         for p in self.doc:
-            self.pages.append(page(p, i))
+            self.pages.append(page(p, pname, pdf_path))
         self.pages_count = len(self.pages)
 
         print(f'{self.pages_count} pages found')
@@ -38,7 +41,11 @@ class pdf():
         for i, p in enumerate(self.doc):
             with fitz.open() as doc_tmp:
                 doc_tmp.insert_pdf(self.doc, from_page=i, to_page=i, rotate=-1, show_progress=False)
-                doc_tmp.save(f'{Data_load_path}/PID/{i}.pdf')
+
+                Path(f"{Data_load_path}/{self.pdf_fname}").mkdir(parents=True, exist_ok=True)
+                # Path(f"{Data_load_path}").mkdir(parents=True, exist_ok=True)
+                doc_tmp.save(f'{Data_load_path}/{self.pdf_fname}/{i}.pdf')
+
 
     def print_pdfMData(self):
 

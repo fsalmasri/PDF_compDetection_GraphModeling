@@ -9,15 +9,14 @@ from pathlib import Path
 from . import utils
 
 from . import Saving_path
+# from .plotter import plot_items
 
 
 class page():
-    def __init__(self, p, i):
+    def __init__(self, p, i, pdf_path):
         self.single_page = p
         self.fname = i
-
-        path_to_save = f'{Saving_path}/{self.fname}'
-        Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
+        self.pdf_saving_path = f'{Saving_path}/{pdf_path.split("/")[-2]}/{pdf_path.split("/")[-1][:-4]}'
 
         self.pw = self.single_page.rect.width
         self.ph = self.single_page.rect.height
@@ -98,26 +97,69 @@ class page():
         self.paths_lst[path_id] = {'p1': nids[0], 'p2': nids[1],
                                    'item_type': item_type, 'path_type': dwg_type, 'p_id': 0}
 
-    def extract_paths(self):
+    def extract_paths(self, OCR_cleaner=False, AOI = None):
+
+        if OCR_cleaner:
+            import json
+            from .utils import keystoint
+            with open(f'{self.pdf_saving_path}/OCRbox.json') as jf:
+                OCR_bbx = json.load(jf, object_hook=keystoint)
+            OCR_bbx = [k[0][:4] for v, k in OCR_bbx.items()]
 
         drawings = self.single_page.get_drawings()
 
-        # plt.figure()
-        # plt.imshow(self.e_canvas)
 
-        print(f'found {len(drawings)} paths')
+        print(f'found {len(drawings)} drawings')
         for dwg_idx, dwg in enumerate(drawings[:]):
+
             dwg_items = dwg['items']
             dwg_type = dwg['type']
             dwg_rect = dwg['rect']
             flag = False
 
+
             item_paths = []
+            item_types = []
+
+            def is_point_inside_bbox(point, bbox, normalized=False):
+                '''
+                Check if a point is falls in one of the bounding boxes.
+                if bbxs are normalized, points must be normalized to the page size
+                :param point: [x,y]
+                :param bbox: [x0,y0,x1,y1]
+                :param normalized: flag when boxs are normalized
+                :return: True if point is inside the bounding
+                '''
+
+                x, y = point
+                if normalized:
+                    x, y = x/self.pw, y/self.ph
+
+                x0, y0, x1, y1 = bbox
+                return x0 <= x <= x1 and y0 <= y <= y1
+
             def add_to_main(p1, p2, item_t):
-                item_paths.append({'p1': [p1[0], p1[1]], 'p2': [p2[0], p2[1]],
-                                   'item_type': item_t, 'path_type': dwg_type})
+
+                if AOI is not None:
+                    if not(is_point_inside_bbox(p1, AOI, normalized=False) and is_point_inside_bbox(p2, AOI, normalized=False)):
+                        return
+
+                adding_flag = True
+                if OCR_cleaner:
+                    for bbx in OCR_bbx:
+                        if is_point_inside_bbox(p1, bbx, normalized=True) and is_point_inside_bbox(p2, bbx, normalized=True):
+                            adding_flag = False
+                            break
+
+                if adding_flag:
+                    item_paths.append({'p1': [p1[0], p1[1]], 'p2': [p2[0], p2[1]],
+                                       'item_type': item_t, 'path_type': dwg_type})
+
 
             for idx, item in enumerate(dwg_items):
+
+                item_types.append(item[0])
+                # print(dwg_idx, idx)
                 if item[0] == 'l':
                     add_to_main([item[1].x, item[1].y], [item[2].x, item[2].y], item[0])
 
@@ -144,18 +186,19 @@ class page():
                     for i in range(curve_points.shape[0] - 1): add_to_main(curve_points[i], curve_points[i + 1],
                                                                            item[0])
 
-            # if len(item_paths) > 0 and dwg_type == 'f' and item_paths[-1]['item_type'] == 'l':
-            #     item_paths.append({'p1': [item_paths[-1]['p2'][0], item_paths[-1]['p2'][1]],
-            #                        'p2': [item_paths[0]['p1'][0], item_paths[0]['p1'][1]],
-            #                        'item_type': 'l', 'path_type': dwg_type})
-            #
+            if len(item_paths) > 0 and (dwg_type == 'f' or dwg_type == 'fs'):
+                #//TODO loop to check if all are l instead of last item item_paths[-1]['item_type'] == 'l'
+                if all(item == 'l' for item in item_types):
+                    item_paths.append({'p1': [item_paths[-1]['p2'][0], item_paths[-1]['p2'][1]],
+                                       'p2': [item_paths[0]['p1'][0], item_paths[0]['p1'][1]],
+                                       'item_type': 'l', 'path_type': dwg_type})
+
             #     flag = True
             # elif len(item_paths) > 0 and item_paths[-1]['item_type']  == 'c':
             #     flag = True
 
-            # plotter.plot_items(item_paths)
-            from .plotter import plot_items
             # plot_items(item_paths)
+            # plt.show()
 
             if len(item_paths) > 0:
                 if flag:
@@ -163,7 +206,10 @@ class page():
                 else:
                     self.store_structued_data(item_paths)
 
+        print('finished parsing the paths.')
+
         self.update_primitives_tables()
+
 
         # plt.show()
 
@@ -174,16 +220,12 @@ class page():
     def update_primitives_tables(self, connected_components= None):
         # print(len(self.connected_components))
 
-        # if not self.connected_components:
-        #     connected_components = self.build_connected_components()
-
         if connected_components is None:
             connected_components = self.build_connected_components()
 
-
         subgraphs_nodes_lst = [x for x in connected_components if len(x) > 1]
-        for subgraph in subgraphs_nodes_lst:
-
+        print(f'found {len(subgraphs_nodes_lst)} subGraphs')
+        for idx, subgraph in enumerate(subgraphs_nodes_lst):
             # add to primitives list
             p_id = utils.get_key_id(self.primitives)
             self.primitives[p_id] = list(subgraph)
@@ -198,50 +240,38 @@ class page():
     def extract_page_info(self):
         self.page_info = {'width': self.pw, 'height': self.ph}
 
-    def save_images(self):
-        pixmap = self.single_page.get_pixmap()
+    def save_images(self, pdfpath, dpi=150):
+        pixmap = self.single_page.get_pixmap(dpi=dpi)
         self.im = utils.pixmap_to_image(pixmap)
         self.svg = self.single_page.get_svg_image()
 
-        self.im.save(f'{Saving_path}/{self.fname}/{self.fname}.png', quality=100, compression=0)
-        with open(f'{Saving_path}/{self.fname}/{self.fname}.svg', 'w', encoding='utf-8') as svg_file:
-            svg_file.write(self.svg)
+        path_to_load = f'{Saving_path}/{pdfpath.split("/")[-2]}/{pdfpath.split("/")[-1][:-4]}'
 
 
-    # def study_connected_components(self):
-    #
-    #     ccomp_byLength = {}
-    #     for idx, con_x in enumerate(self.connected_components):
-    #         if len(con_x) not in ccomp_byLength:
-    #             ccomp_byLength[len(con_x)] = [idx]
-    #         else:
-    #             ccomp_byLength[len(con_x)].append(idx)
-    #
-    #     ccomp_byLength = dict(sorted(ccomp_byLength.items()))
-    #
-    #     s = [[k, len(v)] for k, v in ccomp_byLength.items()]
-    #
-    #     print(s)
-    #     # exit()
-    #
-    #     for k in ccomp_byLength[28]:
-    #         subFig_idx = self.connected_components[k]
-    #
-    #         H = self.G.subgraph(subFig_idx)
-    #         self.plot_graph_nx(H)
-    #
-    #         paths_idx = utils.return_pathsIDX_given_nodes(subFig_idx, self.paths_lst)
-    #         self.plot_paths_by_pathsIDs(paths_idx)
-    #
-    #
-    #         plt.show()
-    #
-    #     # from collections import Counter
-    #     #
-    #     # print(Counter(g_len).keys())
-    #     # print(Counter(g_len).values())
-    #
-    #     # print(np.unique(g_len))
+        self.im.save(f'{path_to_load}/img.png', quality=100, compression=0)
+        # with open(f'{Saving_path}/{self.fname}/{self.fname}.svg', 'w', encoding='utf-8') as svg_file:
+        #     svg_file.write(self.svg)
+
+    def save_data(self):
+
+        Path(f"{self.pdf_saving_path}").mkdir(parents=True, exist_ok=True)
+
+        utils.save_data(self.pdf_saving_path,
+                        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst,
+                        self.primitives, dict(self.filled_stroke), self.grouped_prims, self.page_info)
+
+    def load_data(self):
+
+        (self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst,
+         self.primitives, self.filled_stroke, self.grouped_prims, self.page_info) = (
+            utils.load_data(self.pdf_saving_path))
+
+        print('data loaded.')
+        # self.build_connected_components()
+        # print('connected components loaded.')
+
+
+
     #
     # def find_connectedComp_inRegion(self, x, y):
     #
@@ -268,29 +298,7 @@ class page():
     #
     # General plotters
 
-    # def plot_canvas(self):
-    #     plt.figure()
-    #     plt.imshow(self.cv_canvas)
-    #
-    # def plot_two_full_figures(self):
-    #     self.plot_graph_nx(self.G)
-    #     self.plot_canvas()
-    #     plt.show()
-    #
-    #
-    # def plot_paths_by_pathsIDs(self, paths_idx):
-    #     paths_lst = {k: v for k, v in self.paths_lst.items() if k in paths_idx}
-    #
-    #     plt.figure()
-    #     for k, v in paths_lst.items():
-    #         _, p1, _, p2 = v
-    #
-    #         plt.plot([p1[0], p2[0]], [p1[1], p2[1]], color='black')
-    #
-    #     plt.gca().invert_yaxis()
-    #
-    #
-    #
+
     # def plot_connected_components(self):
     #     # /TODO check function name and behavior.
     #
@@ -330,45 +338,10 @@ class page():
     #
     #     plt.show()
     #
-    # def plot_txtblocks_regions(self):
-    #     fig, ax = plt.subplots()
-    #     ax.imshow(self.e_canvas)
-    #
-    #     paths_lst = {k: v for k, v in self.paths_lst.items() if k in self.nodes_LUT}
-    #
-    #     for k, v in paths_lst.items():
-    #         _, p1, _, p2 = v
-    #
-    #         ax.plot([p1[0], p2[0]], [p1[1], p2[1]], color='white')
-    #
-    #     # plt.gca().invert_yaxis()
-    #
-    #     for k, tbl in self.words_lst.items():
-    #         for tb in tbl:
-    #             print(tb)
-    #             lam = 1.2
-    #             w = (tb[2]-tb[0]) + 2
-    #             h = (tb[3]-tb[1]) + 2
-    #
-    #             rect = patches.Rectangle((tb[0]-1, tb[1]-1), width=w, height=h, linewidth=1, edgecolor='r', facecolor='none')
-    #             ax.add_patch(rect)
-    #
-    #     plt.show()
+
 
 
     # General Utils.
-    def save_data(self):
-        utils.save_data(f'{Saving_path}/{self.fname}',
-                        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst,
-                        self.primitives, dict(self.filled_stroke), self.grouped_prims, self.page_info)
-
-    def load_data(self):
-
-        (self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst,
-         self.primitives, self.filled_stroke, self.grouped_prims, self.page_info) = (
-            utils.load_data(f'{Saving_path}/{self.fname}'))
-
-        self.build_connected_components()
 
 
 
