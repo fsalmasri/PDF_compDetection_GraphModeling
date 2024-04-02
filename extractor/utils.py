@@ -189,6 +189,25 @@ def get_bezier_cPoints(nodes, num_points=10):
     curve_points = curve.evaluate_multi(np.linspace(0, 1, num_points))
     return np.array(curve_points).T
 
+
+def is_point_inside_bbox(point, bbox, normalized=False, p_info=None):
+    '''
+    Check if a point is falls in one of the bounding boxes.
+    if bbxs are normalized, points must be normalized to the page size
+    :param point: [x,y]
+    :param bbox: [x0,y0,x1,y1]
+    :param normalized: flag when boxs are normalized
+    :return: True if point is inside the bounding
+    '''
+
+    x, y = point
+    if normalized:
+        pw, ph = p_info
+        x, y = x / pw, y / ph
+
+    x0, y0, x1, y1 = bbox
+    return x0 <= x <= x1 and y0 <= y <= y1
+
 def prepare_loaded_G(G):
     nodes_list = [int(x) for x in G.nodes]
     G.nodes = nodes_list

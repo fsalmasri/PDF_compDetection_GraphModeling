@@ -32,6 +32,8 @@ from .cleaning_grouping import find_boundingBoxes
 
 from .logic_modules.detection_methods import detect_logic_components
 
+from .PID_functions import detect_rectangles
+
 
 from . import plotter
 

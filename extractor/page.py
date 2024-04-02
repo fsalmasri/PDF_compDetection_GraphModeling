@@ -108,6 +108,25 @@ class page():
 
         drawings = self.single_page.get_drawings()
 
+        def add_to_main(p1, p2, item_t):
+
+            if AOI is not None:
+                if not (utils.is_point_inside_bbox(p1, AOI, normalized=False) and utils.is_point_inside_bbox(p2, AOI,
+                                                                                                             normalized=False)):
+                    return
+
+            adding_flag = True
+            if OCR_cleaner:
+                for bbx in OCR_bbx:
+                    if (utils.is_point_inside_bbox(p1, bbx, normalized=True, p_info=[self.pw, self.ph])
+                            and utils.is_point_inside_bbox(p2, bbx, normalized=True, p_info=[self.pw, self.ph])):
+                        adding_flag = False
+                        break
+
+            if adding_flag:
+                item_paths.append({'p1': [p1[0], p1[1]], 'p2': [p2[0], p2[1]],
+                                   'item_type': item_t, 'path_type': dwg_type})
+
 
         print(f'found {len(drawings)} drawings')
         for dwg_idx, dwg in enumerate(drawings[:]):
@@ -117,47 +136,10 @@ class page():
             dwg_rect = dwg['rect']
             flag = False
 
-
             item_paths = []
             item_types = []
 
-            def is_point_inside_bbox(point, bbox, normalized=False):
-                '''
-                Check if a point is falls in one of the bounding boxes.
-                if bbxs are normalized, points must be normalized to the page size
-                :param point: [x,y]
-                :param bbox: [x0,y0,x1,y1]
-                :param normalized: flag when boxs are normalized
-                :return: True if point is inside the bounding
-                '''
-
-                x, y = point
-                if normalized:
-                    x, y = x/self.pw, y/self.ph
-
-                x0, y0, x1, y1 = bbox
-                return x0 <= x <= x1 and y0 <= y <= y1
-
-            def add_to_main(p1, p2, item_t):
-
-                if AOI is not None:
-                    if not(is_point_inside_bbox(p1, AOI, normalized=False) and is_point_inside_bbox(p2, AOI, normalized=False)):
-                        return
-
-                adding_flag = True
-                if OCR_cleaner:
-                    for bbx in OCR_bbx:
-                        if is_point_inside_bbox(p1, bbx, normalized=True) and is_point_inside_bbox(p2, bbx, normalized=True):
-                            adding_flag = False
-                            break
-
-                if adding_flag:
-                    item_paths.append({'p1': [p1[0], p1[1]], 'p2': [p2[0], p2[1]],
-                                       'item_type': item_t, 'path_type': dwg_type})
-
-
             for idx, item in enumerate(dwg_items):
-
                 item_types.append(item[0])
                 # print(dwg_idx, idx)
                 if item[0] == 'l':
@@ -187,6 +169,7 @@ class page():
                                                                            item[0])
 
             if len(item_paths) > 0 and (dwg_type == 'f' or dwg_type == 'fs'):
+                # print(dwg_type, dwg_items)
                 #//TODO loop to check if all are l instead of last item item_paths[-1]['item_type'] == 'l'
                 if all(item == 'l' for item in item_types):
                     item_paths.append({'p1': [item_paths[-1]['p2'][0], item_paths[-1]['p2'][1]],
@@ -240,6 +223,8 @@ class page():
     def extract_page_info(self):
         self.page_info = {'width': self.pw, 'height': self.ph}
 
+        Path(f"{self.pdf_saving_path}").mkdir(parents=True, exist_ok=True)
+
     def save_images(self, pdfpath, dpi=150):
         pixmap = self.single_page.get_pixmap(dpi=dpi)
         self.im = utils.pixmap_to_image(pixmap)
@@ -253,8 +238,6 @@ class page():
         #     svg_file.write(self.svg)
 
     def save_data(self):
-
-        Path(f"{self.pdf_saving_path}").mkdir(parents=True, exist_ok=True)
 
         utils.save_data(self.pdf_saving_path,
                         self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst,

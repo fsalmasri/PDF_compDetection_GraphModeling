@@ -30,6 +30,7 @@ import cv2
 # from esig import tosig
 # import esig
 
+
 def normalize_coords(coords, image_width, image_height):
     x = coords[0] / image_width
     y = coords[1] / image_height
