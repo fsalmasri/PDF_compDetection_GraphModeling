@@ -16,7 +16,7 @@ import json
 from extractor.utils import keystoint
 from extractor.OCR_detector import save_OCR_bbx
 
-from extractor import detect_rectangles
+from extractor import detect_rectangles, detect_rectangles2
 
 from PyQt5.QtCore import QLibraryInfo
 os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
@@ -85,7 +85,8 @@ for p in flst[0:]:
     sp.load_data()
     # plotter.plot_full_dwg(paths=False, connected_com=True, OCR_boxs=False)
 
-    detect_rectangles()
+    logic_circuit_k_primes = detect_rectangles()
+    # logic_circuit_k_primes = detect_rectangles2()
 
 
     exit()

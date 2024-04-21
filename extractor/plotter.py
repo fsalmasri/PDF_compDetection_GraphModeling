@@ -18,7 +18,7 @@ color_mapping = {'s': 'white', 'f': 'yellow', 'fs': 'blue',
 
 def plot_items(items, coloring = 'standard'):
 
-    path_color = get_colors(random.randint(0, 129))
+    path_color = get_colors(random.randint(0, 128))
     for path in items:
         if coloring == 'standard':
             path_color = color_mapping[path['path_type']] if path['item_type'] == 'l' else color_mapping[
@@ -154,7 +154,7 @@ def plot_txtblocks_regions():
 
 def get_colors(i):
 
-    colors = ['aliceblue', 'beige', 'bisque', 'black', 'blanchedalmond', 'blue', 'blueviolet',
+    colors = ['aliceblue', 'beige', 'bisque', 'blanchedalmond', 'blue', 'blueviolet',
           'brown', 'burlywood', 'cadetblue', 'chartreuse', 'chocolate', 'coral', 'cornflowerblue',
           'cornsilk', 'crimson', 'cyan', 'darkblue', 'darkcyan', 'darkgoldenrod', 'darkgray',
           'darkgreen', 'darkkhaki', 'darkmagenta', 'darkolivegreen', 'darkorange', 'darkorchid',

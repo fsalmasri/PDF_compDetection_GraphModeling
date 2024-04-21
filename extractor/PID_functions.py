@@ -26,20 +26,55 @@ from .utils import return_nodes_by_region, prepare_region, check_PointRange
 def remove_duplicates(paths):
 
     clean_paths = []
+    clean_paths_idx = []
+    clean_paths_idx.append(0)
     clean_paths.append(paths[0])
     for idx, path in enumerate(paths[1:]):
         flag = True
-        for cpath in clean_paths:
+        # for cpath in clean_paths:
             # if path['p1'] == cpath['p1'] and path['p2'] == cpath['p2']:
             #     # print('found it')
             #     flag = False
-            if path['p1'] == path['p2']:
-                flag = False
+        if path['p1'] == path['p2']:
+            flag = False
 
         if flag:
            clean_paths.append(path)
+           clean_paths_idx.append(idx+1)
 
-    return clean_paths
+    return clean_paths, clean_paths_idx
+
+def filter_overlapped_polygons(polygons_list):
+    '''
+    Check if polygons overlap with each other and remove the small ones if founded.
+    :param polygons_list:
+    :return:
+    '''
+    marked_for_removal = set()
+
+    for i, poly1 in enumerate(polygons_list):
+        for j, poly2 in enumerate(polygons_list):
+
+            buffer1 = poly1.buffer(0)
+            buffer2 = poly2.buffer(0)
+
+            if i != j:  # Avoid comparing the polygon with itself
+                # print(i, buffer1.is_valid, j, buffer2.is_valid)
+                if buffer1.intersects(buffer2): #and poly1.contains(poly2):
+
+                    if poly1.area > poly2.area:
+                        marked_for_removal.add(j)
+                    else:
+                        marked_for_removal.add(i)
+
+    # print(list(marked_for_removal))
+    # print(list(marked_to_keep))
+    # exit()
+    # Remove marked polygons from the list
+    filtered_polygons = [poly for i, poly in enumerate(polygons_list) if i not in marked_for_removal]
+    # filtered_polygons = [poly for i, poly in enumerate(polygons_list) if i in marked_to_keep]
+
+    return filtered_polygons, marked_for_removal
 
 def calculate_angles(multipolygon):
     """
@@ -75,129 +110,168 @@ def calculate_angles(multipolygon):
 
     return [abs(ang) for ang in line_angles]
 
+
+def find_polygons_in_paths_lst(paths):
+    # # TODO maybe you change it to check the end to check a sequence of paths instead of closed shape.
+    # # TODO then check if it is closed.
+
+    multi_polygons = []
+    path_geometries = []
+
+    poly_idxs = []
+    multipoly_idxs = []
+
+    new_poly_flag = False
+    l = LineString([tuple(paths[0]['p1']), tuple(paths[0]['p2'])])
+    path_geometries.append(l)
+    poly_idxs.append(0)
+
+    start_point = l.coords[0]
+    ending_point = l.coords[-1]
+
+    for idx, path in enumerate(paths[1:]):
+        l = LineString([tuple(path['p1']), tuple(path['p2'])])
+
+        if new_poly_flag == True:
+            start_point = l.coords[0]
+            ending_point = l.coords[-1]
+            path_geometries.append(l)
+            poly_idxs.append(idx + 1)
+            new_poly_flag = False
+
+        else:
+            if l.coords[0] == ending_point:
+                ending_point = l.coords[-1]
+                path_geometries.append(l)
+                poly_idxs.append(idx+1)
+                connected_flag = True
+            else:
+                connected_flag = False
+
+            if l.coords[-1] == start_point and connected_flag:
+                multi_polygons.append(path_geometries.copy())
+                multipoly_idxs.append(poly_idxs)
+
+                path_geometries = []
+                poly_idxs = []
+                new_poly_flag = True
+
+    return multi_polygons, multipoly_idxs
+
 def detect_rectangles():
-    from skimage.feature import hog
-    from skimage import measure
 
     sp = doc.get_current_page()
     parea = sp.ph * sp.pw
 
-    fig, ax = plt.subplots()
-    plt.imshow(sp.e_canvas)
+    # fig, ax = plt.subplots()
+    # plt.imshow(sp.e_canvas)
 
+    selected_prims = {k:v for k, v in sp.primitives.items() if len(v) > 3}
     main_angles = []
     main_areas = []
     all_multipoly = []
-    for k_prime, v_prime in sp.primitives.items():
+    k_component = []
+    nonCyclic_k_component = []
+    for k_prime, v_prime in selected_prims.items():
 
-        if True: #k_prime == 41:
+        final_flag = False
+
+        if True: #k_prime == 110:
             paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+            paths_dic = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=False, lst=False)
             paths2 = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=False)
-            # TODO Track removed paths and remove them from DB. Paths, Nodes, Primes.
-            paths = remove_duplicates(paths)
 
-            multi_polygons = []
-            path_geometries = []
+            # TODO Track removed paths and remove them from DB. Paths, Nodes, Primes.
+            _, clean_paths_idx = remove_duplicates(paths)
+            paths = [x for idx, x in enumerate(paths) if idx in clean_paths_idx]
+            paths2 = [x for idx, x in enumerate(paths2) if idx in clean_paths_idx]
 
             G = nx.Graph()
             for p in paths2:
                 G.add_edge(p['p1'], p['p2'])
 
-            # check if there is cycle
             if list(nx.simple_cycles(G)):
                 # This function is supposed to check closed polygons and add them to the list
-                # TODO maybe you change it to check the end to check a sequence of paths instead of closed shape.
-                # TODO then check if it is closed.
-                new_poly_flag = False
-                l = LineString([tuple(paths[0]['p1']), tuple(paths[0]['p2'])])
-                path_geometries.append(l)
-                start_point = l.coords[0]
-                ending_point = l.coords[-1]
-
-                for path in paths[1:]:
-                    l = LineString([tuple(path['p1']), tuple(path['p2'])])
-
-                    if new_poly_flag == True:
-                        start_point = l.coords[0]
-                        new_poly_flag = False
-
-                    if l.coords[0] == ending_point:
-                        ending_point = l.coords[-1]
-                        path_geometries.append(l)
-                        connected_flag = True
-                    else:
-                        connected_flag = False
-
-                    if l.coords[-1] == start_point and connected_flag:
-                        multi_polygons.append(path_geometries.copy())
-                        path_geometries = []
-                        new_poly_flag = True
-
-                # print(len(multi_polygons), multi_polygons, '\n')
+                multi_polygons, multipoly_idxs = find_polygons_in_paths_lst(paths)
 
                 poly = Polygon()
                 polygons = []
                 if len(multi_polygons) > 0:
-                    for mploy in multi_polygons:
+                    duplicates_idxs = []
+                    for midx, mploy in enumerate(multi_polygons):
 
-                        test = []
-                        test.append(mploy[0].coords[0])
+                        # creat polygon using coords
+                        mpoly_coords = []
+                        mpoly_coords.append(mploy[0].coords[0])
                         for l in mploy:
-                            test.append(l.coords[-1])
+                            mpoly_coords.append(l.coords[-1])
 
-                        if len(test) > 2:
-                            cpoly = Polygon(test)
+                        # find similar polygons for removal
+                        cpoly = Polygon(mpoly_coords)
+                        if cpoly.equals(poly):
+                            duplicates_idxs.append(midx)
+                        else:
+                            poly = poly.union(cpoly)
+                            polygons.append(cpoly)
 
-                            if cpoly.equals(poly):
-                                new_poly_flag = True # TODO remove paths from DS.
-                            else:
-                                poly = poly.union(cpoly)
-                                polygons.append(cpoly)
+                    cleaned_paths_idxs = [x for midx, x in enumerate(multipoly_idxs) if midx not in duplicates_idxs]
+                    duplicates_paths_idxs = [x for midx, x in enumerate(multipoly_idxs) if midx in duplicates_idxs]
+                    duplicates_paths_idxs = [item for sublist in duplicates_paths_idxs for item in sublist]
 
-                    # exit()
+                    paths_dic_lst = list(paths_dic.items())
+
+                    for p in duplicates_paths_idxs:
+                        del sp.paths_lst[paths_dic_lst[p][0]]
+
                     multi_polygon = MultiPolygon(polygons)
-
-                    angles = calculate_angles(multi_polygon)
-                    main_angles.append(angles)
-
-                    # plt.figure()
-                    # plt.imshow(sp.e_canvas)
-
-                    main_areas.append(multi_polygon.area / parea)
-                    if True: #multi_polygon.area/parea > 0.0005: #np.mean(angles) > 20 and
-                        # plotter.plot_items(paths, coloring='group')
-                        # plt.text(paths[0]['p1'][0], paths[0]['p1'][1], k_prime, fontsize=10, color='white')
+                #
+                #     # polygon characteristics
+                #     angles = calculate_angles(multi_polygon)
+                #     main_angles.append(angles)
+                #     main_areas.append(multi_polygon.area / parea)
+                #
+                #     # TODO temporarly checking the area. must be changed to representative features.
+                    if multi_polygon.area/parea > 0.0005: #np.mean(angles) > 20 and
                         all_multipoly.append(multi_polygon)
+                        final_flag = True
 
+
+        if final_flag:
+            k_component.append(k_prime)
+        else:
+            nonCyclic_k_component.append(k_prime)
+
+    final_poly, marked_for_removal = filter_overlapped_polygons(all_multipoly)
+    filtered_k_components = [k for i, k in enumerate(k_component) if i not in marked_for_removal]
+
+
+
+    fig, ax = plt.subplots()
+    plt.imshow(sp.e_canvas)
+    for k in filtered_k_components:
+        v_prime = sp.primitives[k]
+        paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+        plotter.plot_items(paths, coloring='group')
+
+        # plt.text(paths[0]['p1'][0], paths[0]['p1'][1], k, fontsize=10, color='white')
+
+    # for k in nonCyclic_k_component:
+    #     v_prime = sp.primitives[k]
+    #     paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+    #     plotter.plot_items(paths, coloring='test')
+    #
+    #     plt.text(paths[0]['p1'][0], paths[0]['p1'][1], k, fontsize=10, color='white')
+    plt.show()
+
+    return filtered_k_components
+
+    # for f in final_poly:
+    #     shapely.plotting.plot_polygon(f)
     # plt.show()
-                    # else:
-                    #     plotter.plot_items(paths, coloring='test')
-
-                    # fig, ax = plt.subplots()
-                    # for geom in multi_polygon.geoms:
-                    #     xs, ys = geom.exterior.xy
-                    #     ax.fill(xs, ys, alpha=0.3, fc='r', ec='none')
-                    #
-                    # # shapely.plotting.plot_polygon(multi_polygon)
-
-                    # plt.show()
-
-    # exit()
-    # sum_angles = [sum(x) for x in main_angles]
-    # mean_angles = [np.mean(x) for x in main_angles]
-    #
-    # plt.figure()
-    # plt.hist(sum_angles, bins=30)
-    #
-    # plt.figure()
-    # plt.hist(mean_angles, bins=30)
-    #
-    # plt.figure()
-    # plt.hist(main_areas, bins=30)
-    # plt.show()
 
 
-    #         # exit()
+
+
     #         # import shapely.plotting
     #         # shapely.plotting.plot_polygon(poly)
     #
@@ -205,38 +279,76 @@ def detect_rectangles():
     #         # if math.isclose(poly.minimum_rotated_rectangle.area, poly.area):
     #
     #         # if poly.boundary.is_ring:
-#             # print(poly.boundary.is_closed)
-#             # if poly.boundary.is_ring:
-#                 shapely.plotting.plot_polygon(poly)
-#                 # plotter.plot_items(paths, coloring='group')
+    #             # print(poly.boundary.is_closed)
+    #             # if poly.boundary.is_ring:
+    #                 shapely.plotting.plot_polygon(poly)
+    #                 # plotter.plot_items(paths, coloring='group')
     # plt.show()
 
-    def filter_polygons(polygons_list):
-        marked_for_removal = set()
 
-        for i, poly1 in enumerate(polygons_list):
-            for j, poly2 in enumerate(polygons_list):
+def detect_rectangles2():
 
-                buffer1 = poly1.buffer(0)
-                buffer2 = poly2.buffer(0)
+    sp = doc.get_current_page()
+    parea = sp.ph * sp.pw
 
-                if i != j:  # Avoid comparing the polygon with itself
-                    # print(i, buffer1.is_valid, j, buffer2.is_valid)
-                    if buffer1.intersects(buffer2): #and poly1.contains(poly2):
+    # fig, ax = plt.subplots()
+    # plt.imshow(sp.e_canvas)
 
-                        if poly1.area > poly2.area:
-                            marked_for_removal.add(j)
-                        else:
-                            marked_for_removal.add(i)
+    cyclic_k_component = []
+    nonCyclic_k_component = []
+    for k_prime, v_prime in sp.primitives.items():
+        final_flag = False
 
-        # Remove marked polygons from the list
-        filtered_polygons = [poly for i, poly in enumerate(polygons_list) if i not in marked_for_removal]
+        if k_prime == 41:
+            paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+            paths2 = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=False)
 
-        return filtered_polygons
+            _, clean_paths_idx = remove_duplicates(paths)
+            print(clean_paths_idx)
+            paths = [x for idx, x in enumerate(paths) if idx in clean_paths_idx]
+            paths2 = [x for idx, x in enumerate(paths2) if idx in clean_paths_idx]
 
-    final_poly = filter_polygons(all_multipoly)
-    print(len(all_multipoly), len(final_poly))
 
-    for f in final_poly:
-        shapely.plotting.plot_polygon(f)
-    plt.show()
+            # print(paths)
+            # exit()
+            G = nx.Graph()
+            for idx, p in enumerate(paths2):
+                G.add_node(p['p1'], pos=paths[idx]['p1'])
+                G.add_node(p['p2'], pos=paths[idx]['p2'])
+                G.add_edge(p['p1'], p['p2'])
+
+            pos = nx.get_node_attributes(G, 'pos')
+
+            # check if there is cycle
+            if True: #list(nx.simple_cycles(G)):
+                cyclic_k_component.append(k_prime)
+
+                plt.figure()
+                nx.draw(G, pos, with_labels=True)
+
+        # import pickle
+        # pickle.dump(G, open(f'graph_set/{k_prime}.pickle', 'wb'))
+
+            fig, ax = plt.subplots()
+            plt.imshow(sp.e_canvas)
+
+            plotter.plot_items(paths, coloring='random')
+            plt.text(paths[0]['p1'][0], paths[0]['p1'][1], k_prime, fontsize=10, color='white')
+
+            plt.show()
+
+    # for k in cyclic_k_component:
+    #     v_prime = sp.primitives[k]
+    #     paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+    #     plotter.plot_items(paths, coloring='group')
+    #     plt.text(paths[0]['p1'][0], paths[0]['p1'][1], k, fontsize=10, color='white')
+
+    # for k in nonCyclic_k_component:
+    #     v_prime = sp.primitives[k]
+    #     paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+    #     plotter.plot_items(paths, coloring='test')
+
+    # plt.show()
+
+    return 0
+
