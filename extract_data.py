@@ -114,13 +114,13 @@ def process_data():
             # plot full drawing in groups.
             # plotter.plot_full_dwg(paths=False, connected_com=True, OCR_boxs=False)
 
-            # clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
-            # detect_LC_rectangles(save_LUTs=False, plot=False)
-            # detect_connections(save_LUTs=True, plot=False)
-            # detect_LC_connectors(save_LUTs=True, plot=False)
+            clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
+            detect_LC_rectangles(save_LUTs=False, plot=False)
+            detect_connections(save_LUTs=True, plot=False)
+            detect_LC_connectors(save_LUTs=True, plot=False)
             tags_dictionary = assign_tags(plot=False)
             convert_tags_to_graphs(tags_dictionary)
-            # Convert_to_LS_data(include_text=True)
+            Convert_to_LS_data(include_text=True)
 
 
             # plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=False, bbx=False)
