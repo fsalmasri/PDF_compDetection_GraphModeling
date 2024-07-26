@@ -1,7 +1,10 @@
 import json
+
+import matplotlib.pyplot as plt
 import networkx as nx
 import functools
 
+from . import utils
 
 def save_as_json(filename_attr):
     """
@@ -35,7 +38,7 @@ def load_from_json(filename_attr):
             filepath = f"{self.pdf_saving_path}/{filename_attr}.json"
             try:
                 with open(filepath, "r") as jf:
-                    data = json.load(jf)
+                    data = json.load(jf, object_hook=utils.keystoint)
                     method(self, data)
             except FileNotFoundError:
                 print(f"File {filepath} not found.")
@@ -127,6 +130,16 @@ class PageDefaultMixin:
 
     def save_G(self):
         nx.write_graphml_lxml(self.G, f"{self.pdf_saving_path}/graph.graphml")
+
+
+
+    def save_images(self, dpi=150):
+        pixmap = self.single_page.get_pixmap(dpi=dpi)
+        im = utils.pixmap_to_image(pixmap)
+        # svg = self.single_page.get_svg_image()
+        im.save(f'{self.pdf_saving_path}/img.png', quality=100, compression=0)
+
+
 
     def load_data(self):
         print('Loading all data ...')

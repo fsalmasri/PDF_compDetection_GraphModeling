@@ -227,18 +227,6 @@ class page(PageDefaultMixin):
 
         Path(f"{self.pdf_saving_path}").mkdir(parents=True, exist_ok=True)
 
-    def save_images(self, pdfpath, dpi=150):
-        pixmap = self.single_page.get_pixmap(dpi=dpi)
-        self.im = utils.pixmap_to_image(pixmap)
-        self.svg = self.single_page.get_svg_image()
-
-        path_to_load = f'{Saving_path}/{pdfpath.split("/")[-2]}/{pdfpath.split("/")[-1][:-4]}'
-
-
-        self.im.save(f'{path_to_load}/img.png', quality=100, compression=0)
-        # with open(f'{Saving_path}/{self.fname}/{self.fname}.svg', 'w', encoding='utf-8') as svg_file:
-        #     svg_file.write(self.svg)
-
 
 
     #

@@ -83,8 +83,6 @@ def plot_full_dwg(region=False, paths=True, connected_com= True, OCR_boxs=False)
 
         for k, v in sp.paths_lst.items():
             path = v.copy()
-            # if path['path_type'] == 'fs':
-            #     print(path['item_type'])
             if path['p1'] in selected_nodes or path['p2'] in selected_nodes:
                 path['p1'] = sp.nodes_LUT[path['p1']]
                 path['p2'] = sp.nodes_LUT[path['p2']]
