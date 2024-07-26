@@ -56,7 +56,7 @@ def extract_data():
             sp.extract_page_info()
             print(f'parsing page {page_number} info {sp.page_info}')
 
-            sp.save_images(pdfpath=f'{current_path}/{p}', dpi=300)
+            sp.save_images(dpi=300)
 
             start_time = time.time()
             sp.extract_text()
@@ -104,7 +104,7 @@ def process_data():
         current_path = f'{extractor.Data_load_path}/{folder}'
         flst = np.sort(os.listdir(current_path))
 
-        for p in flst[0:]:
+        for p in flst[1:]:
             page_number= int(p[:-4])
             print(f'parsing page {page_number}')
 
@@ -117,7 +117,7 @@ def process_data():
 
 
             # plot full drawing in groups.
-            # plotter.plot_full_dwg(paths=False, connected_com=True, OCR_boxs=False)
+            # plotter.plot_full_dwg(paths=True, connected_com=False, OCR_boxs=True)
 
             clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
             # detect_LC_rectangles(save_LUTs=False, plot=False)

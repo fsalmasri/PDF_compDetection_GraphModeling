@@ -9,6 +9,7 @@ import math
 
 from collections import defaultdict
 import networkx as nx
+import json
 
 from shapely.geometry import LineString, Point, Polygon, MultiLineString, MultiPolygon
 from shapely.ops import cascaded_union
@@ -22,10 +23,21 @@ from . import tables_utils
 from .utils import return_primitives_by_node, return_pathsIDX_given_nodes, return_paths_given_nodes, return_paths_by_primID
 from .utils import return_nodes_by_region, prepare_region, check_PointRange
 
-from .PID_utils import remove_duplicates
+from . import utils
+
+from .PID_utils import remove_duplicates, bbox_to_polygon, is_point_inside_polygon, get_bounding_box_of_points
 
 def clean_text_by_OCR_bbxs(save_LUTs, plot):
+    '''
 
+    Parse all connected points in primitives dictionary and check if they are contained in OCR bounding boxes
+    if yes they mark them as char and save them in save_grouped_prims dictionary
+
+    Args:
+        save_LUTs: save save_grouped_prims dictionary
+        plot: plot detected chars
+
+    '''
     sp = doc.get_current_page()
     parea = sp.ph * sp.pw
 
@@ -33,10 +45,33 @@ def clean_text_by_OCR_bbxs(save_LUTs, plot):
         fig, ax = plt.subplots()
         plt.imshow(sp.e_canvas)
 
-    selected_prims = {k: v for k, v in sp.primitives.items()}
-    print(selected_prims)
+    with open(f'{sp.pdf_saving_path}/OCRbox.json') as jf:
+        OCR_dict = json.load(jf, object_hook=utils.keystoint)
 
-    pass
+    OCR_bbx = [[k[0][0]*sp.pw,k[0][1]*sp.ph,k[0][2]*sp.pw,k[0][3]*sp.ph] for v, k in OCR_dict.items()]
+    OCR_bbx_polygon = [bbox_to_polygon(x) for x in OCR_bbx]
+
+    selected_prims = {k: v for k, v in sp.primitives.items()}
+    for k_prime, v_prime in selected_prims.items():
+        coords = [sp.nodes_LUT[x] for x in v_prime]
+        nodes_containing = [is_point_inside_polygon(OCR_bbx_polygon, x) for x in coords]
+        bbx_id = nodes_containing[0][0]
+        all_node_inside = all([elem[1] for elem in nodes_containing])
+
+        if all_node_inside:
+            v_bbx = get_bounding_box_of_points(coords)
+            sp.grouped_prims[k_prime] = {"nodes": v_prime, 'bbx': v_bbx, "cls": "char", "OCR": OCR_dict[bbx_id][0][4]}
+
+            if plot:
+                paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+                plotter.plot_items(paths, coloring='group')
+
+    if plot:
+        plt.show()
+
+    if save_LUTs:
+        sp.save_grouped_prims()
+
 
 
 
