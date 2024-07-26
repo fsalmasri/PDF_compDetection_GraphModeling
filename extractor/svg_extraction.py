@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 from svg.path import parse_path
 from svg.path.path import Line, CubicBezier
-import svgwrite
 from xml.dom import minidom
 import numpy as np
 

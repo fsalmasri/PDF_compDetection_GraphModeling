@@ -224,6 +224,7 @@ def load_data(path_to_save):
     # G = pickle.load(open(f'{path_to_save}/graph.txt'))
     # G = prepare_loaded_G(G)
 
+    # exit()
 
     with open(f'{path_to_save}/nodes_LUT.json') as jf:
         nodes_LUT = json.load(jf, object_hook=keystoint)
@@ -266,36 +267,43 @@ def pixmap_to_image(pixmap):
     img = Image.frombytes("RGB", [pixmap.width, pixmap.height], pixmap.samples)
     return img
 
-def save_data(path_to_save, G, nodes_LUT, paths_lst, words_lst, blocks_lst,
-              primitives, filled_stroke, grouped_prims, page_info):
 
-    print('Saving all Lists ...')
-    # Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
-
+def save_G(path_to_save, G):
     nx.write_graphml_lxml(G, f"{path_to_save}/graph.graphml")
-    # pickle.dump(G, open(f'{path_to_save}/graph.xml', 'wb'))
 
+def save_nodes_LUT(path_to_save, nodes_LUT):
     with open(f"{path_to_save}/nodes_LUT.json", "w") as jf:
         json.dump(nodes_LUT, jf, indent=4)
 
+def save_paths_lst(path_to_save, paths_lst):
     with open(f"{path_to_save}/paths_LUT.json", "w") as jf:
         json.dump(paths_lst, jf, indent=4)
 
+def save_words_lst(path_to_save, words_lst):
     with open(f"{path_to_save}/textBox.json", "w") as jf:
         json.dump(words_lst, jf, indent=4)
 
+def save_blocks_lst(path_to_save, blocks_lst):
     with open(f"{path_to_save}/blockBox.json", "w") as jf:
         json.dump(blocks_lst, jf, indent=4)
 
+def save_primitives(path_to_save, primitives):
     with open(f"{path_to_save}/primitives.json", "w") as jf:
         json.dump(primitives, jf, indent=4)
 
+def save_filled_stroke(path_to_save, filled_stroke):
     with open(f"{path_to_save}/filled_stroke.json", "w") as jf:
         json.dump(filled_stroke, jf, indent=4)
 
-    with open(f"{path_to_save}/grouped_prims.json", "w") as jf:
-        json.dump(grouped_prims, jf, indent=4)
 
-    with open(f"{path_to_save}/info.json", "w") as jf:
-        json.dump(page_info, jf, indent=4)
+class savings():
+    def save_info(self):
+        self.save_json('info', self.page_info)
 
+    def save_grouped_prims(self):
+        self.save_json('grouped_prims', self.grouped_prims)
+
+
+    def save_json(self, fname, fobject):
+        with open(f"{self.path_to_save}/{fname}.json", "w") as jf:
+            json.dump(fobject, jf, indent=4)

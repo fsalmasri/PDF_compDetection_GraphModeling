@@ -18,18 +18,20 @@ import json
 from extractor.utils import keystoint
 from extractor.OCR_detector import save_OCR_bbx
 
-from extractor import (detect_LC_rectangles,
-                       clean_text_by_OCR_bbxs,
-                       detect_connections,
-                       Convert_to_LS_data,
-                       assign_tags,
-                       detect_LC_connectors,
-                       convert_tags_to_graphs)
+from extractor import (
+    # detect_LC_rectangles,
+   clean_text_by_OCR_bbxs,
+   # detect_connections,
+   # Convert_to_LS_data,
+   # assign_tags,
+   # detect_LC_connectors,
+   # convert_tags_to_graphs
+                        )
 
-from PyQt5.QtCore import QLibraryInfo
-os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
-    QLibraryInfo.PluginsPath
-)
+# from PyQt5.QtCore import QLibraryInfo
+# os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
+#     QLibraryInfo.PluginsPath
+# )
 #     if sp.pw == 2837.0 and sp.ph == 1965.0:
 
 
@@ -39,7 +41,7 @@ def extract_data():
 
     for folder in folders_lst[:1]:
 
-        folder = '1007_EFF01_10HHJ43CT002'
+        print(folder)
         current_path = f'{extractor.Data_load_path}/{folder}'
         flst = np.sort(os.listdir(current_path))
 
@@ -66,7 +68,8 @@ def extract_data():
 
             start_time = time.time()
             # TODO find AOI
-            sp.extract_paths(OCR_cleaner=False, AOI=AOI, update_primitives=False)
+            #TODO check what was update_primitives
+            sp.extract_paths(OCR_cleaner=False, AOI=AOI)
             print(f"Paths --- minutes --- {(time.time() - start_time) / 60}")
 
             start_time = time.time()
@@ -85,12 +88,13 @@ def extract_data():
             # plotter.plot_full_dwg(paths=True, connected_com=False)
 
 
+            # exit()
 
 def process_data():
     # TODO Move this somewhere else
     from pathlib import Path
-    Path(extractor.folder_to_save_annots).mkdir(parents=True, exist_ok=True)
-    Path(extractor.folder_to_save_images).mkdir(parents=True, exist_ok=True)
+    # Path(extractor.folder_to_save_annots).mkdir(parents=True, exist_ok=True)
+    # Path(extractor.folder_to_save_images).mkdir(parents=True, exist_ok=True)
 
     folders_lst = np.sort(os.listdir(extractor.Saving_path))
     print(len(folders_lst))
@@ -115,17 +119,17 @@ def process_data():
             # plotter.plot_full_dwg(paths=False, connected_com=True, OCR_boxs=False)
 
             clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
-            detect_LC_rectangles(save_LUTs=False, plot=False)
-            detect_connections(save_LUTs=True, plot=False)
-            detect_LC_connectors(save_LUTs=True, plot=False)
-            tags_dictionary = assign_tags(plot=False)
-            convert_tags_to_graphs(tags_dictionary)
-            Convert_to_LS_data(include_text=True)
+            # detect_LC_rectangles(save_LUTs=False, plot=False)
+            # detect_connections(save_LUTs=True, plot=False)
+            # detect_LC_connectors(save_LUTs=True, plot=False)
+            # tags_dictionary = assign_tags(plot=False)
+            # convert_tags_to_graphs(tags_dictionary)
+            # Convert_to_LS_data(include_text=True)
 
 
             # plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=False, bbx=False)
 
-            # exit()
+            exit()
 
 
 # group_feX = []

@@ -9,8 +9,6 @@ import os
 class pdf():
     def __init__(self):
 
-        print(fitz.__doc__)
-
         self.pdfpath = None
         self.pages = []
         self.pages_count = 0

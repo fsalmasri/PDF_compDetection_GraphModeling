@@ -11,8 +11,9 @@ from . import utils
 from . import Saving_path
 # from .plotter import plot_items
 
+from .utils import savings
 
-class page():
+class page(savings):
     def __init__(self, p, i, pdf_path):
         self.single_page = p
         self.fname = i
@@ -191,7 +192,7 @@ class page():
 
         print('finished parsing the paths.')
 
-        self.update_primitives_tables()
+        # self.update_primitives_tables()
 
 
         # plt.show()
@@ -201,15 +202,15 @@ class page():
 
 
     def update_primitives_tables(self, connected_components= None):
-        # print(len(self.connected_components))
-
         if connected_components is None:
             connected_components = self.build_connected_components()
 
         subgraphs_nodes_lst = [x for x in connected_components if len(x) > 1]
         print(f'found {len(subgraphs_nodes_lst)} subGraphs')
+
         for idx, subgraph in enumerate(subgraphs_nodes_lst):
-            # add to primitives list
+            # Generate primitive id and add to the list
+
             p_id = utils.get_key_id(self.primitives)
             self.primitives[p_id] = list(subgraph)
 
@@ -219,6 +220,7 @@ class page():
             # update the paths LUT with the p_id
             for p in paths_idx:
                 self.paths_lst[p]['p_id'] = p_id
+
 
     def extract_page_info(self):
         self.page_info = {'width': self.pw, 'height': self.ph}
@@ -239,9 +241,19 @@ class page():
 
     def save_data(self):
 
-        utils.save_data(self.pdf_saving_path,
-                        self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst,
-                        self.primitives, dict(self.filled_stroke), self.grouped_prims, self.page_info)
+        print('Saving all Lists ...')
+        # Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
+
+        utils.save_G(self.pdf_saving_path, self.G)
+        utils.save_nodes_LUT(self.pdf_saving_path, self.nodes_LUT)
+        utils.save_paths_lst(self.pdf_saving_path, self.paths_lst)
+        utils.save_words_lst(self.pdf_saving_path, self.words_lst)
+        utils.save_blocks_lst(self.pdf_saving_path, self.blocks_lst)
+        utils.save_primitives(self.pdf_saving_path, self.primitives)
+        utils.save_filled_stroke(self.pdf_saving_path, self.filled_stroke)
+        utils.save_grouped_prims(self.pdf_saving_path, self.grouped_prims)
+        utils.save_info(self.pdf_saving_path, self.page_info)
+
 
     def load_data(self):
 

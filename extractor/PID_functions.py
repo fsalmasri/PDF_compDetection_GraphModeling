@@ -22,27 +22,23 @@ from . import tables_utils
 from .utils import return_primitives_by_node, return_pathsIDX_given_nodes, return_paths_given_nodes, return_paths_by_primID
 from .utils import return_nodes_by_region, prepare_region, check_PointRange
 
+from .PID_utils import remove_duplicates
 
-def remove_duplicates(paths):
+def clean_text_by_OCR_bbxs(save_LUTs, plot):
 
-    clean_paths = []
-    clean_paths_idx = []
-    clean_paths_idx.append(0)
-    clean_paths.append(paths[0])
-    for idx, path in enumerate(paths[1:]):
-        flag = True
-        # for cpath in clean_paths:
-            # if path['p1'] == cpath['p1'] and path['p2'] == cpath['p2']:
-            #     # print('found it')
-            #     flag = False
-        if path['p1'] == path['p2']:
-            flag = False
+    sp = doc.get_current_page()
+    parea = sp.ph * sp.pw
 
-        if flag:
-           clean_paths.append(path)
-           clean_paths_idx.append(idx+1)
+    if plot:
+        fig, ax = plt.subplots()
+        plt.imshow(sp.e_canvas)
 
-    return clean_paths, clean_paths_idx
+    selected_prims = {k: v for k, v in sp.primitives.items()}
+    print(selected_prims)
+
+    pass
+
+
 
 def filter_overlapped_polygons(polygons_list):
     '''
