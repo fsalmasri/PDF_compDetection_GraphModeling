@@ -115,6 +115,7 @@ def process_data():
             sp.extract_page_info()
             sp.load_data()
 
+
             # plot full drawing in groups.
             # plotter.plot_full_dwg(paths=False, connected_com=True, OCR_boxs=False)
 

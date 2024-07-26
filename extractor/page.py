@@ -11,9 +11,9 @@ from . import utils
 from . import Saving_path
 # from .plotter import plot_items
 
-from .utils import savings
+from .page_mixins import PageDefaultMixin
 
-class page(savings):
+class page(PageDefaultMixin):
     def __init__(self, p, i, pdf_path):
         self.single_page = p
         self.fname = i
@@ -238,32 +238,6 @@ class page(savings):
         self.im.save(f'{path_to_load}/img.png', quality=100, compression=0)
         # with open(f'{Saving_path}/{self.fname}/{self.fname}.svg', 'w', encoding='utf-8') as svg_file:
         #     svg_file.write(self.svg)
-
-    def save_data(self):
-
-        print('Saving all Lists ...')
-        # Path(f"{path_to_save}").mkdir(parents=True, exist_ok=True)
-
-        utils.save_G(self.pdf_saving_path, self.G)
-        utils.save_nodes_LUT(self.pdf_saving_path, self.nodes_LUT)
-        utils.save_paths_lst(self.pdf_saving_path, self.paths_lst)
-        utils.save_words_lst(self.pdf_saving_path, self.words_lst)
-        utils.save_blocks_lst(self.pdf_saving_path, self.blocks_lst)
-        utils.save_primitives(self.pdf_saving_path, self.primitives)
-        utils.save_filled_stroke(self.pdf_saving_path, self.filled_stroke)
-        utils.save_grouped_prims(self.pdf_saving_path, self.grouped_prims)
-        utils.save_info(self.pdf_saving_path, self.page_info)
-
-
-    def load_data(self):
-
-        (self.G, self.nodes_LUT, self.paths_lst, self.words_lst, self.blocks_lst,
-         self.primitives, self.filled_stroke, self.grouped_prims, self.page_info) = (
-            utils.load_data(self.pdf_saving_path))
-
-        print('data loaded.')
-        # self.build_connected_components()
-        # print('connected components loaded.')
 
 
 

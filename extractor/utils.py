@@ -2,11 +2,7 @@ import json
 from pathlib import Path
 import bezier
 import numpy as np
-import pickle
-import networkx as nx
-import shapely
 from PIL import Image
-
 
 def find_index_by_valueRange(LUT, rng: list):
 
@@ -218,41 +214,6 @@ def prepare_loaded_G(G):
 
     return G
 
-def load_data(path_to_save):
-
-    G = nx.read_graphml(f"{path_to_save}/graph.graphml", node_type=int, edge_key_type=int)
-    # G = pickle.load(open(f'{path_to_save}/graph.txt'))
-    # G = prepare_loaded_G(G)
-
-    # exit()
-
-    with open(f'{path_to_save}/nodes_LUT.json') as jf:
-        nodes_LUT = json.load(jf, object_hook=keystoint)
-
-    with open(f'{path_to_save}/paths_LUT.json') as jf:
-        paths_lst = json.load(jf, object_hook=keystoint)
-
-    with open(f'{path_to_save}/textBox.json') as jf:
-        words_lst = json.load(jf, object_hook=keystoint)
-
-    with open(f'{path_to_save}/blockBox.json') as jf:
-        blocks_lst = json.load(jf, object_hook=keystoint)
-
-    with open(f'{path_to_save}/primitives.json') as jf:
-        primitives = json.load(jf, object_hook=keystoint)
-
-    with open(f'{path_to_save}/filled_stroke.json') as jf:
-        filled_stroke = json.load(jf, object_hook=keystoint)
-
-    with open(f'{path_to_save}/grouped_prims.json') as jf:
-        grouped_prims = json.load(jf, object_hook=keystoint)
-
-    with open(f'{path_to_save}/info.json') as jf:
-        page_info = json.load(jf, object_hook=keystoint)
-
-
-
-    return G, nodes_LUT, paths_lst, words_lst, blocks_lst, primitives, filled_stroke, grouped_prims, page_info
 
 def save_svg(filename, svg):
     with open('{filename}.svg', 'w') as f:
@@ -268,42 +229,5 @@ def pixmap_to_image(pixmap):
     return img
 
 
-def save_G(path_to_save, G):
-    nx.write_graphml_lxml(G, f"{path_to_save}/graph.graphml")
-
-def save_nodes_LUT(path_to_save, nodes_LUT):
-    with open(f"{path_to_save}/nodes_LUT.json", "w") as jf:
-        json.dump(nodes_LUT, jf, indent=4)
-
-def save_paths_lst(path_to_save, paths_lst):
-    with open(f"{path_to_save}/paths_LUT.json", "w") as jf:
-        json.dump(paths_lst, jf, indent=4)
-
-def save_words_lst(path_to_save, words_lst):
-    with open(f"{path_to_save}/textBox.json", "w") as jf:
-        json.dump(words_lst, jf, indent=4)
-
-def save_blocks_lst(path_to_save, blocks_lst):
-    with open(f"{path_to_save}/blockBox.json", "w") as jf:
-        json.dump(blocks_lst, jf, indent=4)
-
-def save_primitives(path_to_save, primitives):
-    with open(f"{path_to_save}/primitives.json", "w") as jf:
-        json.dump(primitives, jf, indent=4)
-
-def save_filled_stroke(path_to_save, filled_stroke):
-    with open(f"{path_to_save}/filled_stroke.json", "w") as jf:
-        json.dump(filled_stroke, jf, indent=4)
 
 
-class savings():
-    def save_info(self):
-        self.save_json('info', self.page_info)
-
-    def save_grouped_prims(self):
-        self.save_json('grouped_prims', self.grouped_prims)
-
-
-    def save_json(self, fname, fobject):
-        with open(f"{self.path_to_save}/{fname}.json", "w") as jf:
-            json.dump(fobject, jf, indent=4)
