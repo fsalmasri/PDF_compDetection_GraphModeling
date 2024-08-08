@@ -25,7 +25,81 @@ from .utils import return_nodes_by_region, prepare_region, check_PointRange
 
 from . import utils
 
-from .PID_utils import remove_duplicates, bbox_to_polygon, is_point_inside_polygon, get_bounding_box_of_points
+from .PID_utils import (remove_duplicates, bbox_to_polygon, is_point_inside_polygon,
+                        get_bounding_box_of_points, create_graph_from_paths, paths_to_polygon,
+                        detect_self_loop_path, detect_overlaped_rectangles)
+
+
+def detect_LC_rectangles(save_LUTs, plot):
+    sp = doc.get_current_page()
+    parea = sp.ph * sp.pw
+
+    if plot:
+        fig, ax = plt.subplots()
+        plt.imshow(sp.e_canvas)
+
+    selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
+
+    for k_prime, v_prime in selected_prims.items():
+
+        nodes_coords = [sp.nodes_LUT[x] for x in v_prime]
+        paths_lst = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=False, lst=False)
+        paths_lst_with_coords = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True, lst=False)
+
+        # detect selfLoop path and remove it.
+        selfloop_path_id = detect_self_loop_path(paths_lst)
+        if selfloop_path_id is not None:
+            del paths_lst[selfloop_path_id]
+            del sp.paths_lst[selfloop_path_id]
+            del paths_lst_with_coords[selfloop_path_id]
+
+        # detect overlapped rectangle paths and remove them.
+        overlapped_paths_id = detect_overlaped_rectangles(paths_lst_with_coords)
+        if overlapped_paths_id is not None:
+
+            for key in overlapped_paths_id:
+                del paths_lst[key]
+                del sp.paths_lst[key]
+                del paths_lst_with_coords[key]
+
+        # primeG = create_graph_from_paths(paths_lst)
+        # cycles = list(nx.simple_cycles(primeG.to_directed()))
+        #
+        # print(cycles)
+
+        polygon, is_closed = paths_to_polygon(paths_lst_with_coords)
+        if polygon is not None and is_closed:
+            area = polygon.area / parea
+        else:
+            area = 0
+
+        # plt.figure()
+        # plt.plot(*polygon.exterior.xy)
+        # plt.show()
+
+        # print(area)
+        # exit()
+
+
+        # primeG = create_graph_from_paths(paths_lst)
+        #
+        # pos = nx.spring_layout(primeG)
+        # nx.draw(primeG, pos, with_labels=True, node_size=500, node_color='lightblue', edge_color='gray', font_size=10,
+        #         font_weight='bold')
+        # plt.show()
+        # #
+        # exit()
+        if plot:
+            if area > 0.0002 and len(paths_lst) < 15 and is_closed:
+                paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+                plotter.plot_items(paths, coloring='group')
+
+
+    if plot:
+        plt.show()
+
+    if save_LUTs:
+        sp.save_grouped_prims()
 
 def clean_text_by_OCR_bbxs(save_LUTs, plot):
     '''
