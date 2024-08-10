@@ -27,7 +27,8 @@ from . import utils
 
 from .PID_utils import (remove_duplicates, bbox_to_polygon, is_point_inside_polygon,
                         get_bounding_box_of_points, create_graph_from_paths, paths_to_polygon,
-                        detect_self_loop_path, detect_overlaped_rectangles)
+                        detect_self_loop_path, detect_overlaped_rectangles,
+                        split_bimodal_distribution)
 
 
 def detect_LC_rectangles(save_LUTs, plot):
@@ -40,6 +41,8 @@ def detect_LC_rectangles(save_LUTs, plot):
 
     selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
 
+    temp_grouped_primes = {}
+    temp_LC_areas= []
     for k_prime, v_prime in selected_prims.items():
 
         nodes_coords = [sp.nodes_LUT[x] for x in v_prime]
@@ -62,10 +65,6 @@ def detect_LC_rectangles(save_LUTs, plot):
                 del sp.paths_lst[key]
                 del paths_lst_with_coords[key]
 
-        # primeG = create_graph_from_paths(paths_lst)
-        # cycles = list(nx.simple_cycles(primeG.to_directed()))
-        #
-        # print(cycles)
 
         polygon, is_closed = paths_to_polygon(paths_lst_with_coords)
         if polygon is not None and is_closed:
@@ -73,33 +72,38 @@ def detect_LC_rectangles(save_LUTs, plot):
         else:
             area = 0
 
-        # plt.figure()
-        # plt.plot(*polygon.exterior.xy)
-        # plt.show()
+        if area > 0.0002 and len(paths_lst) < 15 and is_closed:
+            temp_LC_areas.append(area)
+            v_bbx = polygon.bounds
+            temp_grouped_primes[k_prime] = {"nodes": v_prime, 'bbx': list(v_bbx), "cls": "LC", 'area': area}
 
-        # print(area)
-        # exit()
-
-
-        # primeG = create_graph_from_paths(paths_lst)
-        #
-        # pos = nx.spring_layout(primeG)
-        # nx.draw(primeG, pos, with_labels=True, node_size=500, node_color='lightblue', edge_color='gray', font_size=10,
-        #         font_weight='bold')
-        # plt.show()
-        # #
-        # exit()
-        if plot:
-            if area > 0.0002 and len(paths_lst) < 15 and is_closed:
+            if plot:
                 paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
                 plotter.plot_items(paths, coloring='group')
 
+                x0, y0, xn, yn = v_bbx
+                width = xn - x0
+                height = yn - y0
+                rect = patches.Rectangle((x0, y0), width, height, linewidth=2, edgecolor='r', facecolor='none')
+                ax.add_patch(rect)
+
+    # Split grouped_primes into two groups by area, LC and LC_INPUT
+    LC_INPUT, LC = split_bimodal_distribution(temp_grouped_primes)
+
+    for k_tmp, v_tmp in temp_grouped_primes.items():
+        if k_tmp in LC_INPUT:
+            sp.grouped_prims[k_tmp] = {"nodes": v_tmp['nodes'], 'bbx': v_tmp['bbx'], "cls": "LC_input"}
+        elif k_tmp in LC:
+            sp.grouped_prims[k_tmp] = {"nodes": v_tmp['nodes'], 'bbx': v_tmp['bbx'], "cls": "LC"}
+        else:
+            raise NotImplementedError("The data contains corrupted value.")
 
     if plot:
         plt.show()
 
     if save_LUTs:
         sp.save_grouped_prims()
+        sp.save_paths_lst()
 
 def clean_text_by_OCR_bbxs(save_LUTs, plot):
     '''

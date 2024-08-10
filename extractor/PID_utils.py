@@ -1,7 +1,35 @@
 import math
 from shapely.geometry import LineString, Polygon, Point, MultiPoint
 import networkx as nx
+from sklearn.mixture import GaussianMixture
+import numpy as np
 
+def split_bimodal_distribution(data):
+    """
+    Splits a dictionary of data into two based on the bimodal distribution of the 'area' key.
+
+    Parameters:
+    - data_dict: Dictionary where each value is another dictionary containing an 'area' key
+
+    Returns:
+    - lower_dist: list of dictionary keys of the first group of data (lower mode)
+    - upper_dist: list of dictionary keys of the second group of data (upper mode)
+    """
+
+    areas_dist = np.array([item['area'] for item in data.values()])
+
+    # Fit a Gaussian Mixture Model with 2 components
+    gmm = GaussianMixture(n_components=2)
+    gmm.fit(areas_dist.reshape(-1, 1))
+    # Get the means and covariances of the fitted distributions
+    means = gmm.means_.flatten()
+    # The threshold is typically the midpoint between the means
+    threshold = np.mean(means)
+
+    lower_dist = [k for k, v in data.items() if v['area'] < threshold]
+    upper_dist = [k for k, v in data.items() if v['area'] >= threshold]
+
+    return lower_dist, upper_dist
 
 def detect_overlaped_rectangles(paths):
 
