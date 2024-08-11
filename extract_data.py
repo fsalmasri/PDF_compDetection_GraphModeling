@@ -21,10 +21,11 @@ from extractor.OCR_detector import save_OCR_bbx
 from extractor import (
     detect_LC_rectangles,
    clean_text_by_OCR_bbxs,
-   # detect_connections,
+    detect_LC_connectors,
+   detect_connections,
    # Convert_to_LS_data,
    # assign_tags,
-   # detect_LC_connectors,
+
    # convert_tags_to_graphs
                         )
 
@@ -120,9 +121,9 @@ def process_data():
             # plotter.plot_full_dwg(paths=True, connected_com=False, OCR_boxs=True)
 
             # clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
-            detect_LC_rectangles(save_LUTs=True, plot=False)
-            # detect_connections(save_LUTs=True, plot=False)
+            # detect_LC_rectangles(save_LUTs=True, plot=False)
             # detect_LC_connectors(save_LUTs=True, plot=False)
+            detect_connections(save_LUTs=False, plot=True)
             # tags_dictionary = assign_tags(plot=False)
             # convert_tags_to_graphs(tags_dictionary)
             # Convert_to_LS_data(include_text=True)

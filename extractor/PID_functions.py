@@ -31,6 +31,37 @@ from .PID_utils import (remove_duplicates, bbox_to_polygon, is_point_inside_poly
                         split_bimodal_distribution)
 
 
+
+
+def detect_connections(save_LUTs, plot):
+    pass
+def detect_LC_connectors(save_LUTs, plot):
+    sp = doc.get_current_page()
+
+    if plot:
+        fig, ax = plt.subplots()
+        plt.imshow(sp.e_canvas)
+
+    selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
+
+    for k_prime, v_prime in selected_prims.items():
+
+        paths_lst_with_coords = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True,
+                                                         lst=False)
+        polygon, is_closed = paths_to_polygon(paths_lst_with_coords)
+        if is_closed and len(v_prime) == 36:
+            v_bbx = polygon.bounds
+            sp.grouped_prims[k_prime] = {"nodes": v_prime, 'bbx': v_bbx, "cls": "LC_con"}
+            if plot:
+                paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+                plotter.plot_items(paths, coloring='group')
+
+    if plot:
+        plt.show()
+
+    if save_LUTs:
+        sp.save_grouped_prims()
+
 def detect_LC_rectangles(save_LUTs, plot):
     sp = doc.get_current_page()
     parea = sp.ph * sp.pw
