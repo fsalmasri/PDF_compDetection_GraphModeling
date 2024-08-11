@@ -34,7 +34,21 @@ from .PID_utils import (remove_duplicates, bbox_to_polygon, is_point_inside_poly
 
 
 def detect_connections(save_LUTs, plot):
-    pass
+    sp = doc.get_current_page()
+
+    if plot:
+        fig, ax = plt.subplots()
+        plt.imshow(sp.e_canvas)
+
+    selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
+    LCs = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == "LC_input" or v['cls'] == "LC"}
+
+    # TODO Build polygons with buffer for both conn and LCs. Find intersection !
+
+    print(len(LCs))
+
+
+
 def detect_LC_connectors(save_LUTs, plot):
     sp = doc.get_current_page()
 
