@@ -4,6 +4,26 @@ import networkx as nx
 from sklearn.mixture import GaussianMixture
 import numpy as np
 
+
+
+
+def find_the_closest_point_to_polygon(polygon, points):
+    closest_point = None
+    min_distance = float('inf')
+    closest_index = -1
+
+    for i, point_coords in enumerate(points):
+        point = Point(point_coords)
+
+        distance = point.distance(polygon)
+
+        if distance < min_distance:
+            min_distance = distance
+            closest_point = point_coords
+            closest_index = i
+
+    return closest_point, closest_index
+
 def split_bimodal_distribution(data):
     """
     Splits a dictionary of data into two based on the bimodal distribution of the 'area' key.
@@ -67,7 +87,14 @@ def create_graph_from_paths(paths):
     return G
 
 def bbox_to_polygon(bbx):
-    x0, y0, xn, yn  = bbx
+    """
+    Args:
+        bbx: bounding box if the shape x0, y0, xn, yn
+
+    Returns: return a polygon of the input bounding box
+    """
+
+    x0, y0, xn, yn = bbx
     # Define the corners of the bounding box
     corners = [(x0, y0), (xn, y0), (xn, yn), (x0, yn), (x0, y0)]
 

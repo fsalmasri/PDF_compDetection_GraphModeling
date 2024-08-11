@@ -105,7 +105,7 @@ def process_data():
         current_path = f'{extractor.Data_load_path}/{folder}'
         flst = np.sort(os.listdir(current_path))
 
-        for p in flst[1:]:
+        for p in flst[:]:
             page_number= int(p[:-4])
             print(f'parsing page {page_number}')
 
@@ -120,18 +120,19 @@ def process_data():
             # plot full drawing in groups.
             # plotter.plot_full_dwg(paths=True, connected_com=False, OCR_boxs=True)
 
-            # clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
-            # detect_LC_rectangles(save_LUTs=True, plot=False)
-            # detect_LC_connectors(save_LUTs=True, plot=False)
-            detect_connections(save_LUTs=False, plot=True)
+            clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
+            detect_LC_rectangles(save_LUTs=True, plot=False)
+            detect_LC_connectors(save_LUTs=True, plot=False)
+            detect_connections(save_LUTs=True, plot=False)
+
             # tags_dictionary = assign_tags(plot=False)
             # convert_tags_to_graphs(tags_dictionary)
             # Convert_to_LS_data(include_text=True)
 
 
-            # plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=False, bbx=False)
+            plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=False, bbx=False)
 
-            exit()
+            # exit()
 
 
 # group_feX = []

@@ -28,7 +28,8 @@ from . import utils
 from .PID_utils import (remove_duplicates, bbox_to_polygon, is_point_inside_polygon,
                         get_bounding_box_of_points, create_graph_from_paths, paths_to_polygon,
                         detect_self_loop_path, detect_overlaped_rectangles,
-                        split_bimodal_distribution)
+                        split_bimodal_distribution,
+                        find_the_closest_point_to_polygon)
 
 
 
@@ -43,10 +44,58 @@ def detect_connections(save_LUTs, plot):
     selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
     LCs = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == "LC_input" or v['cls'] == "LC"}
 
-    # TODO Build polygons with buffer for both conn and LCs. Find intersection !
+    buffer_distance = 1
 
-    print(len(LCs))
+    # Build temporary dictionary of polygons from the selected primes to avoid repeating this procedure in next loop.
+    tmp_selc_poly = {}
+    for k_prime, v_prime in selected_prims.items():
+        paths_lst_with_coords = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True,
+                                                         lst=False)
+        prime_poly, is_closed = paths_to_polygon(paths_lst_with_coords)
+        if prime_poly is not None and not is_closed:
+            buffered_con_poly = prime_poly.buffer(buffer_distance)
+            tmp_selc_poly[k_prime] = buffered_con_poly
 
+
+    founded_intersect = {}
+    for k_prime, v_prime in tmp_selc_poly.items():
+
+        for k_LC, v_LC in LCs.items():
+            lc_bbx_poly = bbox_to_polygon(v_LC['bbx'])
+            buffered_LC_poly = lc_bbx_poly.buffer(buffer_distance)
+
+            if plot:
+                x_buffered, y_buffered = buffered_LC_poly.exterior.xy
+                plt.plot(x_buffered, y_buffered, color='red', linestyle='--',
+                         label=f'Buffered Polygon (+{buffer_distance})')
+
+            if buffered_LC_poly.intersects(v_prime):
+                points_list = [sp.nodes_LUT[x] for x in selected_prims[k_prime]]
+                intersect_coords, idx = find_the_closest_point_to_polygon(lc_bbx_poly, points_list)
+                closest_node = selected_prims[k_prime][idx]
+
+                if k_prime not in founded_intersect:
+                    founded_intersect[k_prime] = {'nodes': selected_prims[k_prime], 'bbx': list(v_prime.bounds),
+                                                  "cls": "con", "intersect_node": [closest_node], "intersect_coords": [intersect_coords]}
+                else:
+                    founded_intersect[k_prime]['intersect_node'].append(closest_node)
+                    founded_intersect[k_prime]['intersect_coords'].append(intersect_coords)
+
+
+    for k, v in founded_intersect.items():
+        if len(v['intersect_node']) == 2:
+            sp.grouped_prims[k] = v
+
+            if plot:
+                paths = return_paths_given_nodes(v['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+                plotter.plot_items(paths, coloring='group')
+
+
+    if plot:
+        plt.show()
+
+    if save_LUTs:
+        sp.save_grouped_prims()
 
 
 def detect_LC_connectors(save_LUTs, plot):
