@@ -150,6 +150,34 @@ def plot_txtblocks_regions():
 
     # plt.show()
 
+
+def plot_grouped_primes(LC=False, LC_input=False, LC_con=False, Con=False, bbx=False):
+    sp = doc.get_current_page()
+
+    fig, ax = plt.subplots()
+    ax.imshow(sp.e_canvas)
+
+    selected_prims = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == 'LC'}
+    for k_prime, v_prime in selected_prims.items():
+        # print(k_prime)
+        # print(v_prime)
+        paths = return_paths_given_nodes(v_prime['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+        plot_items(paths, coloring='group')
+        # print(paths)
+        # exit()
+
+    selected_prims = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == 'LC_input'}
+    for k_prime, v_prime in selected_prims.items():
+        # print(k_prime)
+        # print(v_prime)
+        paths = return_paths_given_nodes(v_prime['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+        plot_items(paths, coloring='group')
+        # print(paths)
+        # exit()
+
+    plt.show()
+    exit()
+
 def get_colors(i):
 
     colors = ['aliceblue', 'beige', 'bisque', 'blanchedalmond', 'blue', 'blueviolet',

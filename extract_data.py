@@ -120,10 +120,10 @@ def process_data():
             # plot full drawing in groups.
             # plotter.plot_full_dwg(paths=True, connected_com=False, OCR_boxs=True)
 
-            clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
-            detect_LC_rectangles(save_LUTs=True, plot=False)
-            detect_LC_connectors(save_LUTs=True, plot=False)
-            detect_connections(save_LUTs=True, plot=False)
+            # clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
+            # detect_LC_rectangles(save_LUTs=True, plot=False)
+            # detect_LC_connectors(save_LUTs=True, plot=False)
+            # detect_connections(save_LUTs=True, plot=False)
 
             # tags_dictionary = assign_tags(plot=False)
             # convert_tags_to_graphs(tags_dictionary)
