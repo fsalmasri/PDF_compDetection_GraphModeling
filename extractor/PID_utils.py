@@ -1,4 +1,6 @@
 import math
+
+import matplotlib.pyplot as plt
 from shapely.geometry import LineString, Polygon, Point, MultiPoint
 import networkx as nx
 from sklearn.mixture import GaussianMixture
@@ -50,6 +52,35 @@ def split_bimodal_distribution(data):
     upper_dist = [k for k, v in data.items() if v['area'] >= threshold]
 
     return lower_dist, upper_dist
+
+def detect_Adjacent_primes(paths):
+
+    from . import plotter
+
+    if 6910 in paths:
+
+        fig, ax = plt.subplots()
+        plt.imshow(np.zeros((595, 842)))
+
+        paths = []
+        for q, v in paths.items():
+            print(v)
+            paths.append(v)
+
+        plotter.plot_items(paths, coloring='group')
+
+        # print('======================')
+        # fig, ax = plt.subplots()
+        # plt.imshow(np.zeros((595, 842)))
+        # paths = []
+        # for l, v in lTypes.items():
+        #     paths.append(v)
+        #
+        # plotter.plot_items(paths, coloring='group')
+
+        plt.show()
+
+        exit()
 
 def detect_overlaped_rectangles(paths):
 

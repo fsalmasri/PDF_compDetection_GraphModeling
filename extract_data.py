@@ -36,13 +36,16 @@ from extractor import (
 #     if sp.pw == 2837.0 and sp.ph == 1965.0:
 
 
-def extract_data():
-    folders_lst = np.sort(os.listdir(extractor.Data_load_path))
+def extract_data(pdffolder=None):
+
     AOI = [60, 60, 780, 500]  # x0,y0,x1,y1
 
-    for folder in folders_lst[:1]:
+    folders_lst = np.sort(os.listdir(extractor.Data_load_path))
+    if pdffolder is not None:
+        folders_lst = [x for x in folders_lst if pdffolder in x]
 
-        print(folder)
+    for folder in folders_lst[:]:
+
         current_path = f'{extractor.Data_load_path}/{folder}'
         flst = np.sort(os.listdir(current_path))
 
@@ -91,14 +94,16 @@ def extract_data():
 
             # exit()
 
-def process_data():
+def process_data(pdffolder=None):
     # TODO Move this somewhere else
     from pathlib import Path
     # Path(extractor.folder_to_save_annots).mkdir(parents=True, exist_ok=True)
     # Path(extractor.folder_to_save_images).mkdir(parents=True, exist_ok=True)
 
     folders_lst = np.sort(os.listdir(extractor.Saving_path))
-    print(len(folders_lst))
+    if pdffolder is not None:
+        folders_lst = [x for x in folders_lst if pdffolder in x]
+
     for folder in folders_lst[:]:
         print(f'Processing folder: {folder}')
 
@@ -120,8 +125,9 @@ def process_data():
             # plot full drawing in groups.
             # plotter.plot_full_dwg(paths=True, connected_com=False, OCR_boxs=True)
 
+            correct_grouped_primes(save_LUTs=True, plot=False)
             # clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
-            # detect_LC_rectangles(save_LUTs=True, plot=False)
+            detect_LC_rectangles(save_LUTs=True, plot=False)
             # detect_LC_connectors(save_LUTs=True, plot=False)
             # detect_connections(save_LUTs=True, plot=False)
 

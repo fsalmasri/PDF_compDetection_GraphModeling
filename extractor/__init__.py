@@ -34,6 +34,7 @@ from .logic_modules.detection_methods import detect_logic_components
 
 
 
+from .PID_functions import correct_grouped_primes
 from .PID_functions import clean_text_by_OCR_bbxs
 from .PID_functions import detect_LC_rectangles
 from .PID_functions import detect_LC_connectors
