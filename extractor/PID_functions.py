@@ -54,13 +54,15 @@ def correct_grouped_primes(save_LUTs, plot):
                                                          lst=False)
 
         # detect selfLoop path and remove it.
-        selfloop_path_id = detect_self_loop_path(paths_lst)
-        if selfloop_path_id is not None:
-            del paths_lst[selfloop_path_id]
-            del sp.paths_lst[selfloop_path_id]
-            del paths_lst_with_coords[selfloop_path_id]
+        selfloop_path_ids_to_delete = detect_self_loop_path(paths_lst)
 
-        adjacent_primes_id = detect_Adjacent_primes(paths_lst_with_coords)
+        if len(selfloop_path_ids_to_delete) > 0:
+            for id_to_delete in selfloop_path_ids_to_delete:
+                del paths_lst[id_to_delete]
+                del sp.paths_lst[id_to_delete]
+                del paths_lst_with_coords[id_to_delete]
+
+        adjacent_primes_id = detect_Adjacent_primes(paths_lst, paths_lst_with_coords)
 
     if plot:
         plt.show()

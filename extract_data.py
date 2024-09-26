@@ -19,13 +19,13 @@ from extractor.utils import keystoint
 from extractor.OCR_detector import save_OCR_bbx
 
 from extractor import (
+    correct_grouped_primes,
     detect_LC_rectangles,
-   clean_text_by_OCR_bbxs,
+    clean_text_by_OCR_bbxs,
     detect_LC_connectors,
-   detect_connections,
+    detect_connections,
    # Convert_to_LS_data,
    # assign_tags,
-
    # convert_tags_to_graphs
                         )
 
@@ -127,7 +127,7 @@ def process_data(pdffolder=None):
 
             correct_grouped_primes(save_LUTs=True, plot=False)
             # clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
-            detect_LC_rectangles(save_LUTs=True, plot=False)
+            # detect_LC_rectangles(save_LUTs=True, plot=False)
             # detect_LC_connectors(save_LUTs=True, plot=False)
             # detect_connections(save_LUTs=True, plot=False)
 
@@ -136,7 +136,7 @@ def process_data(pdffolder=None):
             # Convert_to_LS_data(include_text=True)
 
 
-            plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=False, bbx=False)
+            # plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=False, bbx=False)
 
             # exit()
 

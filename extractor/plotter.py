@@ -16,23 +16,23 @@ from .utils import keystoint
 color_mapping = {'s': 'white', 'f': 'yellow', 'fs': 'blue',
                  'qu': 'purple', 're': 'red', 'c': 'orange', 'test': 'yellow'}
 
-def plot_items(items, coloring = 'standard'):
+def plot_items(items, coloring = 'standard', alpha=1):
 
     path_color = get_colors(random.randint(0, 128))
     for path in items:
         if coloring == 'standard':
             path_color = color_mapping[path['path_type']] if path['item_type'] == 'l' else color_mapping[
                 path['item_type']]
-            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c=path_color)
+            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c=path_color, alpha=alpha)
 
         elif coloring == 'random':
-            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]])
+            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], alpha=alpha)
 
         elif coloring == 'group':
-            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c=path_color)
+            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c=path_color, alpha=alpha)
 
         elif coloring == 'test':
-            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c=color_mapping['test'])
+            plt.plot([path['p1'][0], path['p2'][0]], [path['p1'][1], path['p2'][1]], c=color_mapping['test'], alpha=alpha)
 
 
 

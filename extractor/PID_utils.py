@@ -53,21 +53,90 @@ def split_bimodal_distribution(data):
 
     return lower_dist, upper_dist
 
-def detect_Adjacent_primes(paths):
+
+# Step 2: Find closed loops using DFS (Depth-First Search)
+def find_closed_loops(start_point, adj_list, visited):
+    stack = [(start_point, [start_point])]
+    loops = []
+
+    while stack:
+        point, path = stack.pop()
+
+        if len(path) > 1 and point == path[0]:
+            loops.append(path)  # Found a loop
+            continue
+
+        if point not in visited:
+            visited.add(point)
+            for neighbor in adj_list[point]:
+                if neighbor not in path or (neighbor == path[0] and len(path) > 2):
+                    stack.append((neighbor, path + [neighbor]))
+
+    return loops
+
+def detect_Adjacent_primes(paths_nodes, paths_coords):
 
     from . import plotter
 
-    if 6910 in paths:
+    if 6910 in paths_coords:
+        # print(paths_nodes)
+        # print(paths_coords)
+
+        from collections import defaultdict
+
+        pTypes = [v['item_type'] for k, v in paths_nodes.items()]
+        if 'l' in pTypes and 'qu' in pTypes:
+            lTypes = {k: v for k, v in paths_nodes.items() if v['item_type'] == 'l'}
+            lTypes_coords = {k: v for k, v in paths_coords.items() if v['item_type'] == 'l'}
+            quTypes = {k: v for k, v in paths_nodes.items() if v['item_type'] == 'qu'}
+
+            for p in lTypes.values():
+                print(p)
+            exit()
+
+            print(lTypes)
+            paths_lst = []
+            for q, v in lTypes_coords.items():
+                paths_lst.append(v)
+
+            plotter.plot_items(paths_lst, coloring='random', alpha=0.3)
+
+            # Populate the graph with connections based on paths
+            graph = defaultdict(set)
+            for path, v in lTypes.items():
+                p1, p2 = v['p1'], v['p2']
+                graph[p1].add(path)
+                graph[p2].add(path)
+
+            print(graph)
+
+            plt.show()
+            exit()
+
+            # Step 3: Traverse all points to find all closed loops (rectangles)
+            visited_points = set()
+            all_rectangles = []
+            for point in adj_list:
+                if point not in visited_points:
+                    loops = find_closed_loops(point, adj_list, visited_points)
+                    all_rectangles.extend(loops)
+
+            print(all_rectangles)
+            exit()
+
+        else:
+            # TODO WORK on one dictionary not two.
+            pass
 
         fig, ax = plt.subplots()
         plt.imshow(np.zeros((595, 842)))
 
-        paths = []
-        for q, v in paths.items():
+        paths_lst = []
+        for q, v in paths_coords.items():
             print(v)
-            paths.append(v)
+            paths_lst.append(v)
 
-        plotter.plot_items(paths, coloring='group')
+        plotter.plot_items(paths_lst, coloring='random', alpha=0.3)
 
         # print('======================')
         # fig, ax = plt.subplots()
@@ -161,11 +230,12 @@ def is_point_inside_polygon(bbx_polygons, point):
     return None, False
 
 def detect_self_loop_path(paths):
+    keys_to_delete = []
     for k, v in paths.items():
         if v['p1'] == v['p2']:
-            return k
+            keys_to_delete.append(k)
 
-    return None
+    return keys_to_delete
 
 def get_bounding_box_of_points(points):
     """
