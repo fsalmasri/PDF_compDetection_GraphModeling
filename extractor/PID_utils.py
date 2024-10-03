@@ -6,7 +6,7 @@ import networkx as nx
 from sklearn.mixture import GaussianMixture
 import numpy as np
 
-
+from collections import defaultdict
 
 
 def find_the_closest_point_to_polygon(polygon, points):
@@ -54,128 +54,176 @@ def split_bimodal_distribution(data):
     return lower_dist, upper_dist
 
 
-# Step 2: Find closed loops using DFS (Depth-First Search)
-def find_closed_loops(start_point, adj_list, visited):
-    stack = [(start_point, [start_point])]
-    loops = []
+# Function to find the index of a tuple in the list
+def find_index_of_pair(pairs_list, pair):
+    try:
+        return pairs_list.index(pair)  # Return the index directly
+    except ValueError:
+        return -1  # Return -1 if the pair is not found
 
-    while stack:
-        point, path = stack.pop()
+def split_ltype_shared_edges(paths_lst, new_key):
+    '''
+    # TODO this function created issues when edges are nor ordered the same way in sequence. primes where cut into half.
+    where there is ltype shapes that share the same edge, we split them into two primes.
+    Args:
+        paths_lst:
+        new_key:
 
-        if len(path) > 1 and point == path[0]:
-            loops.append(path)  # Found a loop
-            continue
+    Returns:
 
-        if point not in visited:
-            visited.add(point)
-            for neighbor in adj_list[point]:
-                if neighbor not in path or (neighbor == path[0] and len(path) > 2):
-                    stack.append((neighbor, path + [neighbor]))
+    '''
+    sides = []
+    for p in paths_lst.values():
+        sides.append([p['p1'], p['p2']])
 
-    return loops
+    # find duplicates pairs/side and set the founded duplicates.
+    seen_pairs = set()
+    duplicates = []
+    for pair in sides:
+        # Normalize the pair by sorting it
+        normalized_pair = tuple(sorted(pair))
 
-def detect_Adjacent_primes(paths_nodes, paths_coords):
-
-    from . import plotter
-
-    if 6910 in paths_coords:
-        # print(paths_nodes)
-        # print(paths_coords)
-
-        from collections import defaultdict
-
-        pTypes = [v['item_type'] for k, v in paths_nodes.items()]
-        if 'l' in pTypes and 'qu' in pTypes:
-            lTypes = {k: v for k, v in paths_nodes.items() if v['item_type'] == 'l'}
-            lTypes_coords = {k: v for k, v in paths_coords.items() if v['item_type'] == 'l'}
-            quTypes = {k: v for k, v in paths_nodes.items() if v['item_type'] == 'qu'}
-
-            for p in lTypes.values():
-                print(p)
-            exit()
-
-            print(lTypes)
-            paths_lst = []
-            for q, v in lTypes_coords.items():
-                paths_lst.append(v)
-
-            plotter.plot_items(paths_lst, coloring='random', alpha=0.3)
-
-            # Populate the graph with connections based on paths
-            graph = defaultdict(set)
-            for path, v in lTypes.items():
-                p1, p2 = v['p1'], v['p2']
-                graph[p1].add(path)
-                graph[p2].add(path)
-
-            print(graph)
-
-            plt.show()
-            exit()
-
-            # Step 3: Traverse all points to find all closed loops (rectangles)
-            visited_points = set()
-            all_rectangles = []
-            for point in adj_list:
-                if point not in visited_points:
-                    loops = find_closed_loops(point, adj_list, visited_points)
-                    all_rectangles.extend(loops)
-
-            print(all_rectangles)
-            exit()
-
+        # Check if the normalized pair is already in the seen set
+        if normalized_pair in seen_pairs:
+            duplicates.append(normalized_pair)
         else:
-            # TODO WORK on one dictionary not two.
-            pass
+            seen_pairs.add(normalized_pair)
 
-        fig, ax = plt.subplots()
-        plt.imshow(np.zeros((595, 842)))
+    if len(duplicates) > 0:
+        duplicates_counter = [0] * len(duplicates)
+        p_id = new_key  # set a new p_id value # TODO must return the p_id value to delete.
 
-        paths_lst = []
-        for q, v in paths_coords.items():
-            print(v)
-            paths_lst.append(v)
+        new_primes = {}
+        dic = {}
+        for k, p in paths_lst.items():
+            dic[k] = p
+            new_primes[p_id] = dic
 
-        plotter.plot_items(paths_lst, coloring='random', alpha=0.3)
+            pair = [p['p1'], p['p2']]
+            normalized_pair = tuple(sorted(pair))
+            d_idx = find_index_of_pair(duplicates, normalized_pair)
 
-        # print('======================')
-        # fig, ax = plt.subplots()
-        # plt.imshow(np.zeros((595, 842)))
-        # paths = []
-        # for l, v in lTypes.items():
-        #     paths.append(v)
-        #
-        # plotter.plot_items(paths, coloring='group')
+            if d_idx != -1:
+                duplicates_counter[d_idx] += 1
+                if duplicates_counter[d_idx] > 1:
+                    p_id += 1
+                    dic = {}
 
-        plt.show()
+        return new_primes, True, p_id
 
-        exit()
+    else:
+        return paths_lst, False, None
 
-def detect_overlaped_rectangles(paths):
+def split_primes_by_closed_loop(paths_lst, new_key):
+    '''
+    Verify of quad is a composed quads. if yes split them by looping over nodes.
+    Args:
+        paths_lst: list of paths (dic)
+        new_key: new kew for the primitives xml file.
 
-    pTypes = [v['item_type'] for k, v in paths.items()]
+    Returns: a dictionary of a dictionary of paths that represent a quad.
+
+    '''
+    if len(paths_lst) > 4:
+        p_id = new_key
+        new_primes = {}
+        node = -1
+        dic = {}
+        for q, v in paths_lst.items():
+            dic[q] = v
+            new_primes[p_id] = dic
+            if node == -1:
+                node = v['p1']
+            else:
+                if node == v['p2']:
+                    node = -1
+                    p_id += 1
+                    dic = {}
+
+        return new_primes, True, p_id
+    else:
+        return paths_lst, False, None
+
+def detect_Adjacent_primes(paths_nodes, highest_key):
+
+    init_p_id = paths_nodes[list(paths_nodes.keys())[0]]['p_id']
+
+    pTypes = [v['item_type'] for k, v in paths_nodes.items()]
+
+    new_paths_nodes_lst = {}
+    if 'l' in pTypes:
+        lTypes = {k: v for k, v in paths_nodes.items() if v['item_type'] == 'l'}
+
+        # new_lTypes, lflag, nhighest_key = split_ltype_shared_edges(lTypes, highest_key + 1)
+        new_lTypes, lflag, nhighest_key = split_primes_by_closed_loop(lTypes, highest_key + 1)
+        if lflag:
+            highest_key = nhighest_key
+            new_paths_nodes_lst = new_paths_nodes_lst | new_lTypes
+        else:
+            nadjusted_dic = {init_p_id: lTypes}
+            new_paths_nodes_lst = new_paths_nodes_lst | nadjusted_dic
+
+
+    if 'qu' in pTypes:
+        quTypes = {k: v for k, v in paths_nodes.items() if v['item_type'] == 'qu'}
+        new_quTypes, qflag, nhighest_key = split_primes_by_closed_loop(quTypes, highest_key + 1)
+
+        if qflag:
+            highest_key = nhighest_key
+            new_paths_nodes_lst = new_paths_nodes_lst | new_quTypes
+        else:
+            nadjusted_dic = {init_p_id: quTypes}
+            new_paths_nodes_lst = new_paths_nodes_lst | nadjusted_dic
+
+
+    to_delete = []
     if 'l' in pTypes and 'qu' in pTypes:
-        lTypes = {k:v for k, v in paths.items() if v['item_type'] == 'l'}
-        quTypes = {k:v for k, v in paths.items() if v['item_type'] == 'qu'}
+        to_delete = detect_overlaped_rectangles(new_paths_nodes_lst, True)
 
-        ltypes_points = [v['p1'] for k, v in lTypes.items()]
-        ltypes_points.append(ltypes_points[0])
-        ltype_polygon = Polygon(ltypes_points)
 
-        qutypes_points = [v['p1'] for k, v in quTypes.items()]
-        qutypes_points.append(qutypes_points[0])
-        qutype_polygon = Polygon(qutypes_points)
+    return new_paths_nodes_lst, to_delete
 
-        # TODO this function check if qutype polygons fall enteirly inside ltype_polygon and no points is outside.
-        # TODO this is very naive way to do it and must be written with more complex conditions.
-        # TODO such as to verify edges and points overlap.
-        is_within = qutype_polygon.within(ltype_polygon)
 
-        if is_within:
-            return list(lTypes.keys())
-        else:
-            return None
 
+def detect_overlaped_rectangles(*args):
+    if len(args) == 1:
+        paths = args[0]
+
+        pTypes = [v['item_type'] for k, v in paths.items()]
+        if 'l' in pTypes and 'qu' in pTypes:
+            lTypes = {k:v for k, v in paths.items() if v['item_type'] == 'l'}
+            quTypes = {k:v for k, v in paths.items() if v['item_type'] == 'qu'}
+
+            ltypes_points = [v['p1'] for k, v in lTypes.items()]
+            ltypes_points.append(ltypes_points[0])
+            ltype_polygon = Polygon(ltypes_points)
+
+            qutypes_points = [v['p1'] for k, v in quTypes.items()]
+            qutypes_points.append(qutypes_points[0])
+            qutype_polygon = Polygon(qutypes_points)
+
+            is_within = qutype_polygon.within(ltype_polygon)
+
+            if is_within:
+                return list(lTypes.keys())
+            else:
+                return None
+
+    if len(args) == 2:
+        paths = args[0]
+
+        lTypes = {k: v for k, v in paths.items() for kk, l in v.items() if l['item_type'] == 'l'}
+        quTypes = {k: v for k, v in paths.items() for kk, l in v.items() if l['item_type'] == 'qu'}
+
+        founded = []
+        for lk, lv in lTypes.items():
+            lnodes = [xv['p1'] for x, xv in lv.items()]
+            for quk, quv in quTypes.items():
+                qunodes = [xv['p1'] for x, xv in quv.items()]
+                if tuple(sorted(lnodes)) == tuple(sorted(qunodes)):
+                    founded.append(lk)
+
+        return founded
 
 
 def create_graph_from_paths(paths):

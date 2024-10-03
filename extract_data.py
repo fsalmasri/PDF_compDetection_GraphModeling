@@ -92,7 +92,7 @@ def extract_data(pdffolder=None):
             # plotter.plot_full_dwg(paths=True, connected_com=False)
 
 
-            # exit()
+            exit()
 
 def process_data(pdffolder=None):
     # TODO Move this somewhere else
@@ -125,9 +125,10 @@ def process_data(pdffolder=None):
             # plot full drawing in groups.
             # plotter.plot_full_dwg(paths=True, connected_com=False, OCR_boxs=True)
 
-            correct_grouped_primes(save_LUTs=True, plot=False)
             # clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
-            # detect_LC_rectangles(save_LUTs=True, plot=False)
+
+            # correct_grouped_primes(save_LUTs=True, plot=True)
+            detect_LC_rectangles(save_LUTs=False, plot=True)
             # detect_LC_connectors(save_LUTs=True, plot=False)
             # detect_connections(save_LUTs=True, plot=False)
 
@@ -138,7 +139,7 @@ def process_data(pdffolder=None):
 
             # plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=False, bbx=False)
 
-            # exit()
+            exit()
 
 
 # group_feX = []

@@ -67,7 +67,13 @@ def return_pathsIDX_given_nodes(nodes, path_lst):
                 paths_idx.append(k)
     return np.unique(paths_idx)
 
-def return_paths_given_nodes(nodes, path_lst, nodes_LUT=None, replace_nID=True, test=None, lst = True):
+def check_value(arg, target):
+    if isinstance(arg, list):
+        return target in arg  # Check if target is in the list
+    else:
+        return arg == target  # Check if arg equals target
+
+def return_paths_given_nodes(p_id, nodes, path_lst, nodes_LUT=None, replace_nID=True, test=None, lst = True):
     '''
     This function return path index (key value) in the path_list dictionary given a list of nodes.
     :param nodes: list of nodes to look for in the paths list
@@ -81,12 +87,12 @@ def return_paths_given_nodes(nodes, path_lst, nodes_LUT=None, replace_nID=True, 
     else: paths = {}
 
     # this function is necessary to speed up the process when sending list of only nodes ids.
-    # But when sending dictionary the set function removes the values in the dict and ket only the keys.
+    # But when sending dictionary the set function removes the values in the dict and keep only the keys.
     if isinstance(nodes, list):
         nodes = set(nodes)
 
     for k, v in path_lst.items():
-        if v['p1'] in nodes or v['p2'] in nodes:
+        if v['p1'] in nodes and v['p2'] in nodes and check_value(p_id, v['p_id']):
             path = v.copy()
             if replace_nID:
                 path['p1'] = nodes_LUT[v['p1']]

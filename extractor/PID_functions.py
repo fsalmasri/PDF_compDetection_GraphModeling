@@ -6,6 +6,7 @@ import bezier
 import numpy as np
 from math import atan2, degrees
 import math
+from itertools import chain
 
 from collections import defaultdict
 import networkx as nx
@@ -15,6 +16,7 @@ from shapely.geometry import LineString, Point, Polygon, MultiLineString, MultiP
 from shapely.ops import cascaded_union
 from shapely.ops import polygonize
 import shapely.plotting
+from shapely.ops import unary_union
 
 from . import doc
 from . import plotter
@@ -24,6 +26,7 @@ from .utils import return_primitives_by_node, return_pathsIDX_given_nodes, retur
 from .utils import return_nodes_by_region, prepare_region, check_PointRange
 
 from . import utils
+from . import bbx_margin
 
 from .PID_utils import (remove_duplicates,
                         bbox_to_polygon,
@@ -37,6 +40,7 @@ from .PID_utils import (remove_duplicates,
                         find_the_closest_point_to_polygon,
                         detect_Adjacent_primes)
 
+from .bbx_utils import adjust_bbx_margin
 
 
 def correct_grouped_primes(save_LUTs, plot):
@@ -62,14 +66,49 @@ def correct_grouped_primes(save_LUTs, plot):
                 del sp.paths_lst[id_to_delete]
                 del paths_lst_with_coords[id_to_delete]
 
-        adjacent_primes_id = detect_Adjacent_primes(paths_lst, paths_lst_with_coords)
+        new_paths_lst, to_delete = (
+            detect_Adjacent_primes(paths_lst, highest_key=max(sp.primitives.keys())))
+
+        # if the returned new_paths is bigger than one, means there was a split.
+        if len(new_paths_lst) > 1:
+
+            # update p_id in paths in the returned new_paths
+            for p, v in new_paths_lst.items():
+                for t, tt in v.items():
+                    tt['p_id'] = p
+                    # Update sp.paths_lst with new path value
+                    sp.paths_lst[t] = tt
+
+            # delete primes and its paths
+            if len(to_delete) > 0:
+                for k_delete in to_delete:
+                    for p_delete in new_paths_lst[k_delete].keys():
+                        del sp.paths_lst[p_delete]
+                        del paths_lst_with_coords[p_delete]
+
+                    del new_paths_lst[k_delete]
+
+            del sp.primitives[k_prime]
+
+            for k_nprime, v_nprime in new_paths_lst.items():
+                nodes = [xv['p1'] for xk, xv in v_nprime.items()]
+                sp.primitives[k_nprime] = nodes
+
+    if save_LUTs:
+        sp.save_primitives()
+        sp.save_paths_lst()
+
+
+    sp.load_primitives()
+    sp.load_paths_lst()
 
     if plot:
-        plt.show()
+        selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
+        for k_prime, v_prime in selected_prims.items():
+            paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+            plotter.plot_items(paths, coloring='group')
 
-    # if save_LUTs:
-    #     sp.save_grouped_prims()
-    #     sp.save_paths_lst()
+        plt.show()
 
 def detect_connections(save_LUTs, plot):
     sp = doc.get_current_page()
@@ -172,63 +211,168 @@ def detect_LC_rectangles(save_LUTs, plot):
 
     selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
 
-    temp_grouped_primes = {}
-    temp_LC_areas= []
+    tmp_polygons = {}
     for k_prime, v_prime in selected_prims.items():
+        paths_lst_with_coords = return_paths_given_nodes(k_prime, v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True,
+                                                         lst=False)
 
-        nodes_coords = [sp.nodes_LUT[x] for x in v_prime]
-        paths_lst = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=False, lst=False)
-        paths_lst_with_coords = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True, lst=False)
-
-
-        # detect overlapped rectangle paths and remove them.
-        overlapped_paths_id = detect_overlaped_rectangles(paths_lst_with_coords)
-        if overlapped_paths_id is not None:
-
-            for key in overlapped_paths_id:
-                del paths_lst[key]
-                del sp.paths_lst[key]
-                del paths_lst_with_coords[key]
+        if len(paths_lst_with_coords) > 3:
+            polygon, is_closed = paths_to_polygon(paths_lst_with_coords)
+            if polygon is not None and is_closed:
+                area = polygon.area / parea
+                if area > 0.0002 and len(paths_lst_with_coords) < 15:
+                    v_bbx = polygon.bounds
+                    v_bbx = adjust_bbx_margin(v_bbx, bbx_margin)
+                    tmp_polygons[k_prime] = {"nodes": v_prime, 'polygon': polygon, 'bbx': list(v_bbx), "cls": "LC", 'area': area}
 
 
-        polygon, is_closed = paths_to_polygon(paths_lst_with_coords)
-        if polygon is not None and is_closed:
-            area = polygon.area / parea
-        else:
-            area = 0
+    threshold = 1.1
+    touching_or_inside_pairs  = []
+    for poly_key1, v in tmp_polygons.items():
+        polygon1 = v['polygon']
+        area1 = v['area']
+        for poly_key2, v in tmp_polygons.items():
+            polygon2 = v['polygon']
+            area2 = v['area']
+            if poly_key1 != poly_key2:
+                if (polygon1.touches(polygon2) or polygon2.touches(polygon1) or
+                        polygon1.within(polygon2) or polygon2.within(polygon1)):
+                    if area2 > (area1 * threshold) or area1 > (area2 * threshold):
+                        pair = tuple(sorted((poly_key1, poly_key2)))
+                        if pair not in touching_or_inside_pairs:
+                            touching_or_inside_pairs.append(pair)
 
-        if area > 0.0002 and len(paths_lst) < 15 and is_closed:
-            temp_LC_areas.append(area)
-            v_bbx = polygon.bounds
-            temp_grouped_primes[k_prime] = {"nodes": v_prime, 'bbx': list(v_bbx), "cls": "LC", 'area': area}
+    def merge_shared_pairssets(pairs):
+        merged = []
 
-            if plot:
-                paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+        # Loop through the pairs and merge groups with shared items
+        for pair in pairs:
+            set_pair = set(pair)
+            merged_with_existing = False
+
+            # Check if the current pair shares any polygon with an existing group
+            for group in merged:
+                if not set_pair.isdisjoint(group):  # If they share any polygon
+                    group.update(set_pair)  # Merge the pair into the group
+                    merged_with_existing = True
+                    break
+
+            # If no existing group contains any polygon from the current pair, add a new group
+            if not merged_with_existing:
+                merged.append(set_pair)
+
+        # Optional: Convert sets to sorted lists for easier readability
+        return [sorted(group) for group in merged]
+
+    # TODO we need to check if there is any shared polygon id between pairs, we need to merge them.
+    merged_pairs = merge_shared_pairssets(touching_or_inside_pairs)
+
+
+    merged_tmp_polygons = {}
+    visited_pairs = set()
+    for poly_key1, v in tmp_polygons.items():
+        if poly_key1 not in visited_pairs:
+            connected_polys = [x for x in merged_pairs if poly_key1 in x]
+            if len(connected_polys) > 0:
+                visited_pairs.update(connected_polys[0])
+                merged_nodes = list(chain.from_iterable([tmp_polygons[x]['nodes'] for x in connected_polys[0]]))
+                polys = [tmp_polygons[x]['polygon'] for x in connected_polys[0]]
+                merged_polygon = unary_union(polys)
+                v_bbx = merged_polygon.bounds
+                v_bbx = adjust_bbx_margin(v_bbx, bbx_margin)
+                new_v = {"nodes": merged_nodes, 'bbx': list(v_bbx), "cls": "LC", 'area': merged_polygon.area, 'p_ids':connected_polys[0]}
+                merged_tmp_polygons[poly_key1] = new_v
+            else:
+                v['cls'] = "LC_input"
+                merged_tmp_polygons[poly_key1] = v
+
+    for k_prime, v_prime in merged_tmp_polygons.items():
+        sp.grouped_prims[k_prime] = v_prime
+
+        if plot:
+            if 'p_ids' in v_prime:
+                paths = return_paths_given_nodes(v_prime['p_ids'], v_prime['nodes'], sp.paths_lst, sp.nodes_LUT,
+                                                replace_nID=True)
                 plotter.plot_items(paths, coloring='group')
 
-                x0, y0, xn, yn = v_bbx
-                width = xn - x0
-                height = yn - y0
-                rect = patches.Rectangle((x0, y0), width, height, linewidth=2, edgecolor='r', facecolor='none')
-                ax.add_patch(rect)
-
-    # Split grouped_primes into two groups by area, LC and LC_INPUT
-    LC_INPUT, LC = split_bimodal_distribution(temp_grouped_primes)
-
-    for k_tmp, v_tmp in temp_grouped_primes.items():
-        if k_tmp in LC_INPUT:
-            sp.grouped_prims[k_tmp] = {"nodes": v_tmp['nodes'], 'bbx': v_tmp['bbx'], "cls": "LC_input"}
-        elif k_tmp in LC:
-            sp.grouped_prims[k_tmp] = {"nodes": v_tmp['nodes'], 'bbx': v_tmp['bbx'], "cls": "LC"}
-        else:
-            raise NotImplementedError("The data contains corrupted value.")
+            else:
+                paths = return_paths_given_nodes(k_prime, selected_prims[k_prime], sp.paths_lst, sp.nodes_LUT,
+                                                 replace_nID=True)
+                plotter.plot_items(paths, coloring='test')
+                # plt.text(paths[0]['p1'][0], paths[0]['p1'][1], k_prime, c='white', fontsize='small')
+                # x0, y0, xn, yn = v_prime['bbx']
+                # width = xn - x0
+                # height = yn - y0
+                # rect = patches.Rectangle((x0, y0), width, height,
+                #                          linewidth=2, linestyle='dashed', edgecolor='r', facecolor='none')
+                # ax.add_patch(rect)
 
     if plot:
         plt.show()
 
     if save_LUTs:
         sp.save_grouped_prims()
-        sp.save_paths_lst()
+
+
+# def detect_LC_rectangles2(save_LUTs, plot):
+#     sp = doc.get_current_page()
+#     parea = sp.ph * sp.pw
+#
+#     if plot:
+#         fig, ax = plt.subplots()
+#         plt.imshow(sp.e_canvas)
+#
+#     selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
+#
+#     temp_grouped_primes = {}
+#     temp_LC_areas= []
+#     for k_prime, v_prime in selected_prims.items():
+#
+#         nodes_coords = [sp.nodes_LUT[x] for x in v_prime]
+#         paths_lst = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=False, lst=False)
+#         paths_lst_with_coords = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True, lst=False)
+#
+#
+#         polygon, is_closed = paths_to_polygon(paths_lst_with_coords)
+#         if polygon is not None and is_closed:
+#             area = polygon.area / parea
+#         else:
+#             area = 0
+#
+#
+#         if area > 0.0002 and len(paths_lst) < 15 and is_closed:
+#             temp_LC_areas.append(area)
+#             v_bbx = polygon.bounds
+#             v_bbx= adjust_bbx_margin(v_bbx, bbx_margin)
+#             temp_grouped_primes[k_prime] = {"nodes": v_prime, 'bbx': list(v_bbx), "cls": "LC", 'area': area}
+#
+#             if plot:
+#                 paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+#                 plotter.plot_items(paths, coloring='group')
+#
+#                 x0, y0, xn, yn = v_bbx
+#                 width = xn - x0
+#                 height = yn - y0
+#                 rect = patches.Rectangle((x0, y0), width, height,
+#                                          linewidth=2, linestyle = 'dashed', edgecolor='r', facecolor='none')
+#                 ax.add_patch(rect)
+#
+#     # Split grouped_primes into two groups by area, LC and LC_INPUT
+#     LC_INPUT, LC = split_bimodal_distribution(temp_grouped_primes)
+#
+#     for k_tmp, v_tmp in temp_grouped_primes.items():
+#         if k_tmp in LC_INPUT:
+#             sp.grouped_prims[k_tmp] = {"nodes": v_tmp['nodes'], 'bbx': v_tmp['bbx'], "cls": "LC_input"}
+#         elif k_tmp in LC:
+#             sp.grouped_prims[k_tmp] = {"nodes": v_tmp['nodes'], 'bbx': v_tmp['bbx'], "cls": "LC"}
+#         else:
+#             raise NotImplementedError("The data contains corrupted value.")
+#
+#     if plot:
+#         plt.show()
+#
+#     if save_LUTs:
+#         sp.save_grouped_prims()
 
 def clean_text_by_OCR_bbxs(save_LUTs, plot):
     '''

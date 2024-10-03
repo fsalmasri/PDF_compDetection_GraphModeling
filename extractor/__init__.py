@@ -11,6 +11,9 @@ Data_load_path = Data_logic_load_path
 Saving_path = 'data/LOGIC'
 LS_path = 'LS'
 
+# Configuration
+bbx_margin = 0.15
+
 from .pdf import pdf
 doc = pdf()
 
