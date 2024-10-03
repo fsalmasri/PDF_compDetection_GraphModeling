@@ -110,7 +110,7 @@ def process_data(pdffolder=None):
         current_path = f'{extractor.Data_load_path}/{folder}'
         flst = np.sort(os.listdir(current_path))
 
-        for p in flst[:]:
+        for p in flst[6:]:
             page_number= int(p[:-4])
             print(f'parsing page {page_number}')
 
@@ -125,10 +125,10 @@ def process_data(pdffolder=None):
             # plot full drawing in groups.
             # plotter.plot_full_dwg(paths=True, connected_com=False, OCR_boxs=True)
 
-            # clean_text_by_OCR_bbxs(save_LUTs=True, plot=False)
-            # correct_grouped_primes(save_LUTs=True, plot=True)
-            # detect_LC_rectangles(save_LUTs=True, plot=True)
-            # detect_LC_connectors(save_LUTs=True, plot=True)
+            clean_text_by_OCR_bbxs(save_LUTs=True, plot=False, tag='OCR_detected')
+            correct_grouped_primes(save_LUTs=True, plot=False, tag='cleaned')
+            detect_LC_rectangles(save_LUTs=True, plot=False, tag='LC_detected')
+            detect_LC_connectors(save_LUTs=True, plot=False, tag='LCCON_detected')
             # TODO needs more work to detect connections
             # detect_connections(save_LUTs=False, plot=True)
 
@@ -139,7 +139,7 @@ def process_data(pdffolder=None):
 
             plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=False, bbx=False)
 
-            exit()
+            # exit()
 
 
 # group_feX = []

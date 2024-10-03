@@ -43,8 +43,12 @@ from .PID_utils import (remove_duplicates,
 from .bbx_utils import adjust_bbx_margin
 
 
-def correct_grouped_primes(save_LUTs, plot):
+def correct_grouped_primes(save_LUTs, plot, tag):
     sp = doc.get_current_page()
+
+    info = sp.page_info
+    if tag in info and info[tag]:
+        return 0
 
     if plot:
         fig, ax = plt.subplots()
@@ -97,6 +101,9 @@ def correct_grouped_primes(save_LUTs, plot):
     if save_LUTs:
         sp.save_primitives()
         sp.save_paths_lst()
+
+        sp.page_info[tag] = True
+        sp.save_info()
 
 
     sp.load_primitives()
@@ -174,8 +181,12 @@ def detect_connections(save_LUTs, plot):
         sp.save_grouped_prims()
 
 
-def detect_LC_connectors(save_LUTs, plot):
+def detect_LC_connectors(save_LUTs, plot, tag):
     sp = doc.get_current_page()
+
+    info = sp.page_info
+    if tag in info and info[tag]:
+        return 0
 
     if plot:
         fig, ax = plt.subplots()
@@ -202,9 +213,16 @@ def detect_LC_connectors(save_LUTs, plot):
     if save_LUTs:
         sp.save_grouped_prims()
 
-def detect_LC_rectangles(save_LUTs, plot):
+        sp.page_info[tag] = True
+        sp.save_info()
+
+def detect_LC_rectangles(save_LUTs, plot, tag):
     sp = doc.get_current_page()
     parea = sp.ph * sp.pw
+
+    info = sp.page_info
+    if tag in info and info[tag]:
+        return 0
 
     if plot:
         fig, ax = plt.subplots()
@@ -318,6 +336,9 @@ def detect_LC_rectangles(save_LUTs, plot):
     if save_LUTs:
         sp.save_grouped_prims()
 
+        sp.page_info[tag] = True
+        sp.save_info()
+
 
 # def detect_LC_rectangles2(save_LUTs, plot):
 #     sp = doc.get_current_page()
@@ -379,7 +400,7 @@ def detect_LC_rectangles(save_LUTs, plot):
 #     if save_LUTs:
 #         sp.save_grouped_prims()
 
-def clean_text_by_OCR_bbxs(save_LUTs, plot):
+def clean_text_by_OCR_bbxs(save_LUTs, plot, tag):
     '''
 
     Parse all connected points in primitives dictionary and check if they are contained in OCR bounding boxes
@@ -392,6 +413,10 @@ def clean_text_by_OCR_bbxs(save_LUTs, plot):
     '''
     sp = doc.get_current_page()
     parea = sp.ph * sp.pw
+
+    info = sp.page_info
+    if tag in info and info[tag]:
+        return 0
 
     if plot:
         fig, ax = plt.subplots()
@@ -423,6 +448,9 @@ def clean_text_by_OCR_bbxs(save_LUTs, plot):
 
     if save_LUTs:
         sp.save_grouped_prims()
+
+        sp.page_info[tag] = True
+        sp.save_info()
 
 
 
