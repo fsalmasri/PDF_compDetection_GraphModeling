@@ -160,13 +160,28 @@ def plot_grouped_primes(LC=False, LC_input=False, LC_con=False, Con=False, bbx=F
     if LC:
         selected_prims = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == 'LC'}
         for k_prime, v_prime in selected_prims.items():
-            paths = return_paths_given_nodes(v_prime['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
-            plot_items(paths, coloring='group')
+            if 'p_ids' in v_prime:
+                paths = return_paths_given_nodes(v_prime['p_ids'], v_prime['nodes'], sp.paths_lst, sp.nodes_LUT,
+                                                 replace_nID=True)
+                plot_items(paths, coloring='test')
+
+            else:
+                paths = return_paths_given_nodes(k_prime, selected_prims[k_prime], sp.paths_lst, sp.nodes_LUT,
+                                                 replace_nID=True)
+                plot_items(paths, coloring='group')
+
 
     if LC_input:
         selected_prims = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == 'LC_input'}
         for k_prime, v_prime in selected_prims.items():
-            paths = return_paths_given_nodes(v_prime['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+            paths = return_paths_given_nodes(k_prime, v_prime['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+            plot_items(paths, coloring='group')
+
+
+    if LC_con:
+        selected_prims = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == 'LC_con'}
+        for k_prime, v_prime in selected_prims.items():
+            paths = return_paths_given_nodes(k_prime, v_prime['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
             plot_items(paths, coloring='group')
 
     plt.show()

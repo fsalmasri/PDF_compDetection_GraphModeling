@@ -53,8 +53,8 @@ def correct_grouped_primes(save_LUTs, plot):
     selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
     for k_prime, v_prime in selected_prims.items():
         nodes_coords = [sp.nodes_LUT[x] for x in v_prime]
-        paths_lst = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=False, lst=False)
-        paths_lst_with_coords = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True,
+        paths_lst = return_paths_given_nodes(k_prime, v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=False, lst=False)
+        paths_lst_with_coords = return_paths_given_nodes(k_prime, v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True,
                                                          lst=False)
 
         # detect selfLoop path and remove it.
@@ -105,7 +105,7 @@ def correct_grouped_primes(save_LUTs, plot):
     if plot:
         selected_prims = {k: v for k, v in sp.primitives.items() if k not in sp.grouped_prims}
         for k_prime, v_prime in selected_prims.items():
-            paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+            paths = return_paths_given_nodes(k_prime, v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
             plotter.plot_items(paths, coloring='group')
 
         plt.show()
@@ -125,7 +125,7 @@ def detect_connections(save_LUTs, plot):
     # Build temporary dictionary of polygons from the selected primes to avoid repeating this procedure in next loop.
     tmp_selc_poly = {}
     for k_prime, v_prime in selected_prims.items():
-        paths_lst_with_coords = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True,
+        paths_lst_with_coords = return_paths_given_nodes(k_prime, v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True,
                                                          lst=False)
         prime_poly, is_closed = paths_to_polygon(paths_lst_with_coords)
         if prime_poly is not None and not is_closed:
@@ -163,7 +163,7 @@ def detect_connections(save_LUTs, plot):
             sp.grouped_prims[k] = v
 
             if plot:
-                paths = return_paths_given_nodes(v['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+                paths = return_paths_given_nodes(k, v['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
                 plotter.plot_items(paths, coloring='group')
 
 
@@ -185,14 +185,15 @@ def detect_LC_connectors(save_LUTs, plot):
 
     for k_prime, v_prime in selected_prims.items():
 
-        paths_lst_with_coords = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True,
+        paths_lst_with_coords = return_paths_given_nodes(k_prime, v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True,
                                                          lst=False)
         polygon, is_closed = paths_to_polygon(paths_lst_with_coords)
         if is_closed and len(v_prime) == 36:
             v_bbx = polygon.bounds
+            v_bbx = adjust_bbx_margin(v_bbx, bbx_margin)
             sp.grouped_prims[k_prime] = {"nodes": v_prime, 'bbx': v_bbx, "cls": "LC_con"}
             if plot:
-                paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+                paths = return_paths_given_nodes(k_prime, v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
                 plotter.plot_items(paths, coloring='group')
 
     if plot:
@@ -271,6 +272,7 @@ def detect_LC_rectangles(save_LUTs, plot):
     merged_tmp_polygons = {}
     visited_pairs = set()
     for poly_key1, v in tmp_polygons.items():
+
         if poly_key1 not in visited_pairs:
             connected_polys = [x for x in merged_pairs if poly_key1 in x]
             if len(connected_polys) > 0:
@@ -287,6 +289,9 @@ def detect_LC_rectangles(save_LUTs, plot):
                 merged_tmp_polygons[poly_key1] = v
 
     for k_prime, v_prime in merged_tmp_polygons.items():
+        if 'polygon' in v_prime:
+            del v_prime['polygon']
+
         sp.grouped_prims[k_prime] = v_prime
 
         if plot:
@@ -410,7 +415,7 @@ def clean_text_by_OCR_bbxs(save_LUTs, plot):
             sp.grouped_prims[k_prime] = {"nodes": v_prime, 'bbx': v_bbx, "cls": "char", "OCR": OCR_dict[bbx_id][0][4]}
 
             if plot:
-                paths = return_paths_given_nodes(v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+                paths = return_paths_given_nodes(k_prime, v_prime, sp.paths_lst, sp.nodes_LUT, replace_nID=True)
                 plotter.plot_items(paths, coloring='group')
 
     if plot:
