@@ -244,7 +244,30 @@ def detect_LC_rectangles(save_LUTs, plot, tag):
                     v_bbx = adjust_bbx_margin(v_bbx, bbx_margin)
                     tmp_polygons[k_prime] = {"nodes": v_prime, 'polygon': polygon, 'bbx': list(v_bbx), "cls": "LC", 'area': area}
 
-
+    # # 1440
+    # # 1445
+    # def get_coords(polygon):
+    #     x, y = polygon.exterior.xy
+    #     return x, y
+    #
+    # x1, y1 = get_coords(tmp_polygons[1440]['polygon'])
+    # x2, y2 = get_coords(tmp_polygons[1445]['polygon'])
+    #
+    # # Step 3: Plot the polygons
+    # fig, ax = plt.subplots()
+    # plt.imshow(sp.e_canvas)
+    #
+    # plt.plot(x1, y1, label='Polygon 1', color='blue')
+    # plt.plot(x2, y2, label='Polygon 2', color='green')
+    #
+    # # Optional: Add labels, legend, and grid
+    # plt.fill(x1, y1, alpha=0.5, color='blue')
+    # plt.fill(x2, y2, alpha=0.5, color='green')
+    #
+    #
+    # plt.show()
+    #
+    # exit()
     threshold = 1.1
     touching_or_inside_pairs  = []
     for poly_key1, v in tmp_polygons.items():
@@ -254,6 +277,7 @@ def detect_LC_rectangles(save_LUTs, plot, tag):
             polygon2 = v['polygon']
             area2 = v['area']
             if poly_key1 != poly_key2:
+                print(poly_key1, poly_key2)
                 if (polygon1.touches(polygon2) or polygon2.touches(polygon1) or
                         polygon1.within(polygon2) or polygon2.within(polygon1)):
                     if area2 > (area1 * threshold) or area1 > (area2 * threshold):

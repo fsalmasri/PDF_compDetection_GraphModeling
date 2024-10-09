@@ -104,13 +104,14 @@ def process_data(pdffolder=None):
     if pdffolder is not None:
         folders_lst = [x for x in folders_lst if pdffolder in x]
 
+
     for folder in folders_lst[:]:
         print(f'Processing folder: {folder}')
 
         current_path = f'{extractor.Data_load_path}/{folder}'
         flst = np.sort(os.listdir(current_path))
 
-        for p in flst[6:]:
+        for p in flst[0:]:
             page_number= int(p[:-4])
             print(f'parsing page {page_number}')
 
@@ -120,6 +121,8 @@ def process_data(pdffolder=None):
             sp = doc.get_current_page()
             sp.extract_page_info()
             sp.load_data()
+
+            sp.grouped_prims = {}
 
 
             # plot full drawing in groups.
@@ -137,7 +140,7 @@ def process_data(pdffolder=None):
             # Convert_to_LS_data(include_text=True)
 
 
-            plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=False, bbx=False)
+            # plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=True, bbx=False)
 
             # exit()
 
