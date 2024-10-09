@@ -122,7 +122,7 @@ def process_data(pdffolder=None):
             sp.extract_page_info()
             sp.load_data()
 
-            sp.grouped_prims = {}
+            # sp.grouped_prims = {}
 
 
             # plot full drawing in groups.
@@ -140,7 +140,7 @@ def process_data(pdffolder=None):
             # Convert_to_LS_data(include_text=True)
 
 
-            # plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=True, bbx=False)
+            plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=True, bbx=False)
 
             # exit()
 

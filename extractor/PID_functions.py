@@ -277,7 +277,7 @@ def detect_LC_rectangles(save_LUTs, plot, tag):
             polygon2 = v['polygon']
             area2 = v['area']
             if poly_key1 != poly_key2:
-                print(poly_key1, poly_key2)
+                # print(poly_key1, poly_key2)
                 if (polygon1.touches(polygon2) or polygon2.touches(polygon1) or
                         polygon1.within(polygon2) or polygon2.within(polygon1)):
                     if area2 > (area1 * threshold) or area1 > (area2 * threshold):
