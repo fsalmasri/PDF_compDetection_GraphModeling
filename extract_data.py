@@ -92,7 +92,7 @@ def extract_data(pdffolder=None):
             # plotter.plot_full_dwg(paths=True, connected_com=False)
 
 
-            exit()
+            # exit()
 
 def process_data(pdffolder=None):
     # TODO Move this somewhere else
