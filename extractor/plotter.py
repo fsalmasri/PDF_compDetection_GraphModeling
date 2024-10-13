@@ -156,6 +156,8 @@ def plot_grouped_primes(LC=False, LC_input=False, LC_con=False, Con=False, bbx=F
 
     fig, ax = plt.subplots()
     ax.imshow(sp.e_canvas)
+    # Hide the axes
+    ax.axis('off')
 
     if LC:
         selected_prims = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == 'LC'}
@@ -185,6 +187,73 @@ def plot_grouped_primes(LC=False, LC_input=False, LC_con=False, Con=False, bbx=F
             plot_items(paths, coloring='group')
 
     plt.show()
+
+
+
+import cv2
+def draw_paths_on_image(image, paths, color=(255, 255, 255), thickness=1):
+    """Draw paths on the image using OpenCV"""
+    for path in paths:
+        start_point = (int(path['p1'][0]), int(path['p1'][1]))
+        end_point = (int(path['p2'][0]), int(path['p2'][1]))
+
+        cv2.line(image, start_point, end_point, color, thickness)
+
+def rester_grouped_primes(LC=False, LC_input=False, LC_con=False, Con=False, bbx=False):
+    sp = doc.get_current_page()
+    image = sp.e_canvas.copy()
+    image = np.repeat(image[:, :, None], 3, axis=2)
+
+
+    if LC:
+        selected_prims = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == 'LC'}
+        primes = sp.primitives
+        for k_prime, v_prime in primes.items():
+            paths = return_paths_given_nodes(k_prime, v_prime, sp.paths_lst, sp.nodes_LUT,
+                                             replace_nID=True)
+            draw_paths_on_image(image, paths)  # Green color for example
+
+        # for k_prime, v_prime in selected_prims.items():
+        #     if 'p_ids' in v_prime:
+        #         paths = return_paths_given_nodes(v_prime['p_ids'], v_prime['nodes'], sp.paths_lst, sp.nodes_LUT,
+        #                                          replace_nID=True)
+        #         draw_paths_on_image(image, paths)  # Green color for example
+        #     else:
+        #         paths = return_paths_given_nodes(k_prime, selected_prims[k_prime], sp.paths_lst, sp.nodes_LUT,
+        #                                          replace_nID=True)
+        #         draw_paths_on_image(image, paths)
+
+    # if LC_input:
+    #     selected_prims = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == 'LC_input'}
+    #     for k_prime, v_prime in selected_prims.items():
+    #         paths = return_paths_given_nodes(k_prime, v_prime['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+    #         draw_paths_on_image(image, paths)
+    #
+    # if LC_con:
+    #     selected_prims = {k: v for k, v in sp.grouped_prims.items() if v['cls'] == 'LC_con'}
+    #     for k_prime, v_prime in selected_prims.items():
+    #         paths = return_paths_given_nodes(k_prime, v_prime['nodes'], sp.paths_lst, sp.nodes_LUT, replace_nID=True)
+    #         draw_paths_on_image(image, paths)
+
+    plt.imshow(image)
+    plt.show()
+
+def clean_images(dpi=300):
+    AOI = [170, 170, 2200, 3330]
+
+    from . import utils
+    from PIL import Image
+
+    sp = doc.get_current_page()
+    pixmap = sp.single_page.get_pixmap(dpi=dpi)
+    im = utils.pixmap_to_image(pixmap)
+    im = np.array(im)
+    im[0:AOI[0], :, :] = (255, 255, 255)
+    im[:, 0:AOI[1], :] = (255, 255, 255)
+    im[AOI[2]:, :, :] = (255, 255, 255)
+    im[:, AOI[3]:, :] = (255, 255, 255)
+
+    return Image.fromarray(im)
 
 
 def get_colors(i):

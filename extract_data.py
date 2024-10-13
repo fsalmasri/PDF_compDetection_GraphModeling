@@ -128,10 +128,10 @@ def process_data(pdffolder=None):
             # plot full drawing in groups.
             # plotter.plot_full_dwg(paths=True, connected_com=False, OCR_boxs=True)
 
-            clean_text_by_OCR_bbxs(save_LUTs=True, plot=False, tag='OCR_detected')
-            correct_grouped_primes(save_LUTs=True, plot=False, tag='cleaned')
-            detect_LC_rectangles(save_LUTs=True, plot=False, tag='LC_detected')
-            detect_LC_connectors(save_LUTs=True, plot=False, tag='LCCON_detected')
+            # clean_text_by_OCR_bbxs(save_LUTs=True, plot=False, tag='OCR_detected')
+            # correct_grouped_primes(save_LUTs=True, plot=False, tag='cleaned')
+            # detect_LC_rectangles(save_LUTs=True, plot=False, tag='LC_detected')
+            # detect_LC_connectors(save_LUTs=True, plot=False, tag='LCCON_detected')
             # TODO needs more work to detect connections
             # detect_connections(save_LUTs=False, plot=True)
 
@@ -140,9 +140,11 @@ def process_data(pdffolder=None):
             # Convert_to_LS_data(include_text=True)
 
 
-            plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=True, bbx=False)
+            # plotter.plot_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=True, bbx=False)
+            # plotter.rester_grouped_primes(LC=True, LC_input=True, LC_con=True, Con=True, bbx=False)
 
-            # exit()
+            im = plotter.clean_images()
+            im.save(f'LS/LOGIC/clean_images/{folder}_{p}.png', quality=100, compression=0)
 
 
 # group_feX = []
