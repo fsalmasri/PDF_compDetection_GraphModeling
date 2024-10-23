@@ -168,7 +168,7 @@ def plot_grouped_primes(LC=False, LC_input=False, LC_con=False, Con=False, bbx=F
                 plot_items(paths, coloring='group')
 
             else:
-                paths = return_paths_given_nodes(k_prime, selected_prims[k_prime], sp.paths_lst, sp.nodes_LUT,
+                paths = return_paths_given_nodes(k_prime, v_prime['nodes'], sp.paths_lst, sp.nodes_LUT,
                                                  replace_nID=True)
                 plot_items(paths, coloring='group')
 

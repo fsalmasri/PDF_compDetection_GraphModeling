@@ -4,7 +4,7 @@ import shutil
 from pathlib import Path
 
 
-ds_dir = r'C:\Users\fsalm\Desktop\DISTILL\LOGIC_157_YOLO'
+ds_dir = r'../../../Distill_logics'
 imgs_lst = os.listdir(os.path.join(ds_dir, 'images'))
 
 random.shuffle(imgs_lst)

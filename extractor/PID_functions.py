@@ -237,49 +237,26 @@ def detect_LC_rectangles(save_LUTs, plot, tag):
 
         if len(paths_lst_with_coords) > 3:
             polygon, is_closed = paths_to_polygon(paths_lst_with_coords)
-            if polygon is not None and is_closed:
+            if polygon is not None and is_closed: #and polygon.is_valid
                 area = polygon.area / parea
                 if area > 0.0002 and len(paths_lst_with_coords) < 15:
                     v_bbx = polygon.bounds
                     v_bbx = adjust_bbx_margin(v_bbx, bbx_margin)
                     tmp_polygons[k_prime] = {"nodes": v_prime, 'polygon': polygon, 'bbx': list(v_bbx), "cls": "LC", 'area': area}
 
-    # # 1440
-    # # 1445
-    # def get_coords(polygon):
-    #     x, y = polygon.exterior.xy
-    #     return x, y
-    #
-    # x1, y1 = get_coords(tmp_polygons[1440]['polygon'])
-    # x2, y2 = get_coords(tmp_polygons[1445]['polygon'])
-    #
-    # # Step 3: Plot the polygons
-    # fig, ax = plt.subplots()
-    # plt.imshow(sp.e_canvas)
-    #
-    # plt.plot(x1, y1, label='Polygon 1', color='blue')
-    # plt.plot(x2, y2, label='Polygon 2', color='green')
-    #
-    # # Optional: Add labels, legend, and grid
-    # plt.fill(x1, y1, alpha=0.5, color='blue')
-    # plt.fill(x2, y2, alpha=0.5, color='green')
-    #
-    #
-    # plt.show()
-    #
-    # exit()
+
+    # print(tmp_polygons)
     threshold = 1.1
     touching_or_inside_pairs  = []
-    for poly_key1, v in tmp_polygons.items():
-        polygon1 = v['polygon']
-        area1 = v['area']
-        for poly_key2, v in tmp_polygons.items():
-            polygon2 = v['polygon']
-            area2 = v['area']
+    for poly_key1, v1 in tmp_polygons.items():
+        polygon1 = v1['polygon']
+        area1 = v1['area']
+        for poly_key2, v2 in tmp_polygons.items():
+            polygon2 = v2['polygon']
+            area2 = v2['area']
             if poly_key1 != poly_key2:
-                # print(poly_key1, poly_key2)
-                if (polygon1.touches(polygon2) or polygon2.touches(polygon1) or
-                        polygon1.within(polygon2) or polygon2.within(polygon1)):
+                if (polygon1.touches(polygon2) or polygon2.touches(polygon1)
+                        or polygon1.within(polygon2) or polygon2.within(polygon1)):
                     if area2 > (area1 * threshold) or area1 > (area2 * threshold):
                         pair = tuple(sorted((poly_key1, poly_key2)))
                         if pair not in touching_or_inside_pairs:
@@ -310,27 +287,49 @@ def detect_LC_rectangles(save_LUTs, plot, tag):
     # TODO we need to check if there is any shared polygon id between pairs, we need to merge them.
     merged_pairs = merge_shared_pairssets(touching_or_inside_pairs)
 
+    if len(merged_pairs) > 0:
+        merged_tmp_polygons = {}
+        visited_pairs = set()
+        for poly_key1, v in tmp_polygons.items():
+            if poly_key1 not in visited_pairs:
+                connected_polys = [x for x in merged_pairs if poly_key1 in x]
+                if len(connected_polys) > 0:
+                    try:
+                        visited_pairs.update(connected_polys[0])
+                        merged_nodes = list(chain.from_iterable([tmp_polygons[x]['nodes'] for x in connected_polys[0]]))
+                        polys = [tmp_polygons[x]['polygon'] for x in connected_polys[0]]
+                        merged_polygon = unary_union(polys)
+                        v_bbx = merged_polygon.bounds
+                        v_bbx = adjust_bbx_margin(v_bbx, bbx_margin)
+                        new_v = {"nodes": merged_nodes, 'bbx': list(v_bbx), "cls": "LC", 'area': merged_polygon.area, 'p_ids':connected_polys[0]}
+                        merged_tmp_polygons[poly_key1] = new_v
+                    except:
+                        print('side location conflict')
+                else:
+                    v['cls'] = "LC_input"
+                    merged_tmp_polygons[poly_key1] = v
+        final_polygons = merged_tmp_polygons
 
-    merged_tmp_polygons = {}
-    visited_pairs = set()
-    for poly_key1, v in tmp_polygons.items():
+    else:
+        areas = [v['area'] for v in tmp_polygons.values()]
+        if len(areas)>0:
+            sorted_areas = sorted(areas)
+            gaps = [sorted_areas[i + 1] - sorted_areas[i] for i in range(len(sorted_areas) - 1)]
+            threshold_index = gaps.index(max(gaps))
+            threshold = (sorted_areas[threshold_index] + sorted_areas[threshold_index + 1]) / 2
 
-        if poly_key1 not in visited_pairs:
-            connected_polys = [x for x in merged_pairs if poly_key1 in x]
-            if len(connected_polys) > 0:
-                visited_pairs.update(connected_polys[0])
-                merged_nodes = list(chain.from_iterable([tmp_polygons[x]['nodes'] for x in connected_polys[0]]))
-                polys = [tmp_polygons[x]['polygon'] for x in connected_polys[0]]
-                merged_polygon = unary_union(polys)
-                v_bbx = merged_polygon.bounds
-                v_bbx = adjust_bbx_margin(v_bbx, bbx_margin)
-                new_v = {"nodes": merged_nodes, 'bbx': list(v_bbx), "cls": "LC", 'area': merged_polygon.area, 'p_ids':connected_polys[0]}
-                merged_tmp_polygons[poly_key1] = new_v
-            else:
-                v['cls'] = "LC_input"
-                merged_tmp_polygons[poly_key1] = v
+            for poly_key1, v in tmp_polygons.items():
+                if v['area'] > threshold:
+                    v['cls'] = "LC"
+                    tmp_polygons[poly_key1] = v
+                else:
+                    v['cls'] = "LC_input"
+                    tmp_polygons[poly_key1] = v
 
-    for k_prime, v_prime in merged_tmp_polygons.items():
+
+        final_polygons = tmp_polygons
+
+    for k_prime, v_prime in final_polygons.items():
         if 'polygon' in v_prime:
             del v_prime['polygon']
 
@@ -345,7 +344,10 @@ def detect_LC_rectangles(save_LUTs, plot, tag):
             else:
                 paths = return_paths_given_nodes(k_prime, selected_prims[k_prime], sp.paths_lst, sp.nodes_LUT,
                                                  replace_nID=True)
-                plotter.plot_items(paths, coloring='test')
+                if v_prime['cls'] == "LC":
+                    plotter.plot_items(paths, coloring='test')
+                elif v_prime['cls'] == "LC_input":
+                    plotter.plot_items(paths, coloring='group')
                 # plt.text(paths[0]['p1'][0], paths[0]['p1'][1], k_prime, c='white', fontsize='small')
                 # x0, y0, xn, yn = v_prime['bbx']
                 # width = xn - x0

@@ -11,7 +11,7 @@ from bbxs_utils import convert_xcycwh_xyxy, convert_xyxy_xcycwh
 import matplotlib.pyplot as plt
 from matplotlib import patches
 
-ds_dir = r'C:\Users\fsalm\Desktop\DISTILL\LOGIC_157_YOLO_v2\train'
+ds_dir = r'../../../Distill_logics_splitted/valid'
 im_lst = os.listdir(os.path.join(ds_dir, 'images'))
 cim_folder='cimages'
 clbl_folder='clabels'
