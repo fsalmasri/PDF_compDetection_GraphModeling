@@ -23,12 +23,6 @@ lbl_files = os.listdir(lbl_dir)
 classes = get_classes(classes_file)
 
 
-# JSON_file = 'package1_Inserted.json'
-# with open('package1_Inserted.json', 'r') as fp:
-#     tasks_dic = json.load(fp)
-#
-# print(tasks_dic)
-
 new_proj, new_proj_id = get_project_by_name('LOGICS')
 
 def fill_annots():
