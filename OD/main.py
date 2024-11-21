@@ -101,5 +101,5 @@ def test(no):
 
 
 if __name__ == '__main__':
-    run()
-    # test(6)
+    # run()
+    test(7)
