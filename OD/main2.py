@@ -13,7 +13,7 @@ from PIL import Image
 
 def run():
     # model_name = 'yolov8n_custom1'
-    saving_model_name = 'yolov8n_custom7'
+    saving_model_name = 'yolov8n_custom12'
 
     settings.update({
         'runs_dir': '/runs',
@@ -28,25 +28,25 @@ def run():
     # model = YOLO('yolo11n.pt', task='detect')
     model = YOLO('yolo11-obb.yaml', task='detect')
 
-    exit()
-
     results = model.train(
         data='/home/feras/Desktop/DISTILL/Distill/OD/ds.yaml',
         imgsz=1280,
-        epochs=500,
-        batch=8,
+        epochs=1000,
+        batch=24,
         workers=8,
         device=[0, 1],
 
         pose=0,
         kobj=0,
         cls=1,
+        box= 10,
+        dfl= 0.5,
 
         lr0=0.001,
 
         dropout=0.4,
-        scale=0.9,
-        mosaic=0,
+        scale=0.2,
+        mosaic=1,
         fliplr=False,
         show_labels=False,
         show_conf = True,
@@ -67,7 +67,7 @@ def test(no):
     test_dir = f'../../Distill_logics_cropped/test/images/'
 
     for test_im in os.listdir(test_dir):
-        results = model.predict(os.path.join(test_dir, test_im), save=True, line_width=1, conf=.4)
+        results = model.predict(os.path.join(test_dir, test_im), save=False, line_width=1, conf=.1)
         result = results[0]
         boxes = result.boxes.xyxy.cpu().numpy()
         confidences = results[0].boxes.conf.cpu().numpy()
@@ -75,8 +75,9 @@ def test(no):
         names = result.names
 
         #
-        # print(names)
-        # exit()
+        print(names)
+        print(classes)
+        exit()
 
         # predicted_LC_bbxs = boxes[classes == 0]
         # predicted_LC_conf = confidences[classes == 0]
@@ -102,5 +103,5 @@ def test(no):
 
 
 if __name__ == '__main__':
-    run()
-    # test(6)
+    # run()
+    test(126)
