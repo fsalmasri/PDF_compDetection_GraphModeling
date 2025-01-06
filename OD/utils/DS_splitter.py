@@ -4,8 +4,9 @@ import shutil
 from pathlib import Path
 
 
-ds_dir = r'../../../Distill_logics'
+ds_dir = r'../../../LOGICS/LOGIC 295_v2/project-11-at-2024-11-25-12-02-27e3dba2'
 imgs_lst = os.listdir(os.path.join(ds_dir, 'images'))
+
 
 random.shuffle(imgs_lst)
 train_lst = imgs_lst[:int(len(imgs_lst)*.7)]
