@@ -1,0 +1,1732 @@
+{
+    "id": 1,
+    "data": {
+        "image": "/data/local-files/?d=images/69_cleaned.svg"
+    },
+    "annotations": [
+        {
+            "result": [
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 31.61694875458241,
+                        "y": 78.75882430997152,
+                        "width": 0.852885318067956,
+                        "height": 1.9526345583330365,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "1071"
+                        ]
+                    },
+                    "id": 274,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 24.972470231959186,
+                        "y": 76.23435069836486,
+                        "width": 1.352451387894728,
+                        "height": 1.231296366867616,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_0"
+                        ]
+                    },
+                    "id": 292,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 48.153335876809,
+                        "y": 34.688557677166486,
+                        "width": 1.3521211986092656,
+                        "height": 1.231030866643493,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "37"
+                        ]
+                    },
+                    "id": 188,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 73.88368215954299,
+                        "y": 44.933335787165234,
+                        "width": 1.0489882320243509,
+                        "height": 1.5144996545976481,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_3"
+                        ]
+                    },
+                    "id": 152,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 46.916989907018305,
+                        "y": 44.14936405405137,
+                        "width": 0.5995752108025643,
+                        "height": 0.8656462458253817,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_3"
+                        ]
+                    },
+                    "id": 101,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 20.16715263884231,
+                        "y": 44.14937026641476,
+                        "width": 0.5995321826608151,
+                        "height": 0.8656338210985915,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_3"
+                        ]
+                    },
+                    "id": 107,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 19.569605853370184,
+                        "y": 75.06965568312435,
+                        "width": 3.465407757454865,
+                        "height": 3.5606429117411222,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "1003"
+                        ]
+                    },
+                    "id": 297,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 14.564956266218504,
+                        "y": 42.67133872033844,
+                        "width": 3.253168462011355,
+                        "height": 2.5764057833212224,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 237,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 14.564956266218504,
+                        "y": 38.055055720974565,
+                        "width": 3.253168462011355,
+                        "height": 2.5764057833212224,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 239,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 14.564956266218504,
+                        "y": 44.97922551860498,
+                        "width": 3.253168462011355,
+                        "height": 2.5764057833212224,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 362,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 45.868945982054356,
+                        "y": 61.713233314008,
+                        "width": 3.253292468170104,
+                        "height": 2.5762307220953358,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 255,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 45.868945982054356,
+                        "y": 64.02132511585278,
+                        "width": 3.253292468170104,
+                        "height": 2.5762307220953358,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 256,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 45.868945982054356,
+                        "y": 68.6375584173795,
+                        "width": 3.253292468170104,
+                        "height": 2.5762307220953358,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 258,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 37.076208894571984,
+                        "y": 69.79160431830189,
+                        "width": 3.253292468170104,
+                        "height": 2.5762307220953358,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 271,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 37.07621565714038,
+                        "y": 72.0997555815495,
+                        "width": 3.253278943033295,
+                        "height": 2.5761614971268236,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 270,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 45.868953589952,
+                        "y": 59.40515249618643,
+                        "width": 3.2532772523748124,
+                        "height": 2.576152843982108,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 254,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 45.868953589952,
+                        "y": 66.32947759955793,
+                        "width": 3.2532772523748124,
+                        "height": 2.576152843982108,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 257,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 37.07621650246963,
+                        "y": 67.48352350048033,
+                        "width": 3.2532772523748124,
+                        "height": 2.576152843982108,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 272,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.46782874861006,
+                        "y": 9.780773985986254,
+                        "width": 3.25292577461192,
+                        "height": 2.57636601101095,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 198,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 35.07797883984903,
+                        "y": 10.357878668644316,
+                        "width": 3.2529265778528274,
+                        "height": 2.5763578523583157,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 214,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 35.07797883984903,
+                        "y": 8.049482467546987,
+                        "width": 3.2529265778528274,
+                        "height": 2.5763578523583157,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 215,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 35.07797883984903,
+                        "y": 12.665765466910855,
+                        "width": 3.2529265778528274,
+                        "height": 2.5763578523583144,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 213,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.963002016930133,
+                        "y": 68.63757472236776,
+                        "width": 3.253127889165823,
+                        "height": 2.57619811211881,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 259,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.963002016930133,
+                        "y": 64.02134142084104,
+                        "width": 3.253127889165823,
+                        "height": 2.57619811211881,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 261,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.963002016930133,
+                        "y": 61.71324961899626,
+                        "width": 3.253127889165823,
+                        "height": 2.57619811211881,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 262,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.963002016930133,
+                        "y": 70.94566652421254,
+                        "width": 3.253127889165823,
+                        "height": 2.57619811211881,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 291,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.46782959381882,
+                        "y": 21.321234215493767,
+                        "width": 3.2529240841944036,
+                        "height": 2.576357358214122,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 190,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.46782959381882,
+                        "y": 16.7049512161299,
+                        "width": 3.2529240841944036,
+                        "height": 2.576357358214122,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 194,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.46782959381882,
+                        "y": 14.397064417863358,
+                        "width": 3.2529240841944036,
+                        "height": 2.576357358214122,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 195,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.46782959381882,
+                        "y": 5.1644922069059795,
+                        "width": 3.2529240841944036,
+                        "height": 2.576357358214122,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 200,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 49.86578191058169,
+                        "y": 38.05507993352812,
+                        "width": 3.2529240841944036,
+                        "height": 2.576357358214122,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 227,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 49.86578191058169,
+                        "y": 42.67136293289199,
+                        "width": 3.2529240841944036,
+                        "height": 2.576357358214122,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 229,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 49.86578191058169,
+                        "y": 44.97924973115852,
+                        "width": 3.2529240841944036,
+                        "height": 2.576357358214122,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 361,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.963009624608933,
+                        "y": 66.32949390423025,
+                        "width": 3.2531126738082214,
+                        "height": 2.5761202346374845,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 260,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.963009624608933,
+                        "y": 59.405168800858746,
+                        "width": 3.2531126738082214,
+                        "height": 2.5761202346374845,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 263,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 14.56502558249129,
+                        "y": 40.36355199854309,
+                        "width": 3.2530298294657825,
+                        "height": 2.575696227548053,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 238,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.4678980617727,
+                        "y": 12.089270259064449,
+                        "width": 3.252787148286645,
+                        "height": 2.575656464218432,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "600"
+                        ]
+                    },
+                    "id": 196,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.46789890713071,
+                        "y": 19.013447489423573,
+                        "width": 3.252785457570617,
+                        "height": 2.575647810990637,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 193,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.46789890713071,
+                        "y": 7.472988480199658,
+                        "width": 3.252785457570617,
+                        "height": 2.5756478109906342,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 199,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 49.86585122389358,
+                        "y": 40.3635762068218,
+                        "width": 3.252785457570617,
+                        "height": 2.575647810990631,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "603"
+                        ]
+                    },
+                    "id": 228,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 8.869922716198555,
+                        "y": 2.4599325693562277,
+                        "width": 2.8830313530909715,
+                        "height": 2.8282264643409794,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "1"
+                        ]
+                    },
+                    "id": 179,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 39.54451679682091,
+                        "y": 88.43709680753165,
+                        "width": 2.883121810944884,
+                        "height": 2.828048005881367,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "1"
+                        ]
+                    },
+                    "id": 285,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 39.64426850830091,
+                        "y": 91.3222364087562,
+                        "width": 2.883121810944884,
+                        "height": 2.828048005881367,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "1"
+                        ]
+                    },
+                    "id": 286,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 17.163028451013936,
+                        "y": 88.43710639148932,
+                        "width": 2.8830375384847757,
+                        "height": 2.828028837965999,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "1"
+                        ]
+                    },
+                    "id": 358,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 27.679315742748233,
+                        "y": 85.94870898063223,
+                        "width": 1.9587802417902829,
+                        "height": 4.162375991502699,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "1"
+                        ]
+                    },
+                    "id": 355,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 17.26296097193946,
+                        "y": 91.32225078475352,
+                        "width": 2.882995402170497,
+                        "height": 2.828019253886714,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "1"
+                        ]
+                    },
+                    "id": 357,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 40.52238552293517,
+                        "y": 15.845302269229425,
+                        "width": 0.6274149601990143,
+                        "height": 5.918047358010618,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "arrow"
+                        ]
+                    },
+                    "id": 64,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 34.64123521219231,
+                        "y": 17.12777834273484,
+                        "width": 0.799341641205132,
+                        "height": 2.8848980994380833,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_12"
+                        ]
+                    },
+                    "id": 96,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 37.8114656153076,
+                        "y": 35.0484106738245,
+                        "width": 1.3555673553140488,
+                        "height": 1.2324404903758164,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_141"
+                        ]
+                    },
+                    "id": 171,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 39.01062033970837,
+                        "y": 35.0484106738245,
+                        "width": 1.3555673553140488,
+                        "height": 1.2324404903758164,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_141"
+                        ]
+                    },
+                    "id": 173,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 40.20942223486611,
+                        "y": 35.0484106738245,
+                        "width": 1.3555673553140488,
+                        "height": 1.2324404903758164,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_141"
+                        ]
+                    },
+                    "id": 175,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 41.40857733918304,
+                        "y": 35.048411222334494,
+                        "width": 1.3555622926860864,
+                        "height": 1.2324393933558153,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_141"
+                        ]
+                    },
+                    "id": 176,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 27.717429552092305,
+                        "y": 35.04841972439007,
+                        "width": 1.355483821743972,
+                        "height": 1.2324223892446684,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_12"
+                        ]
+                    },
+                    "id": 163,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 26.518417009912582,
+                        "y": 35.04841999865464,
+                        "width": 1.3554812904167346,
+                        "height": 1.232421840715535,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_12"
+                        ]
+                    },
+                    "id": 161,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 25.31944173959641,
+                        "y": 35.04842438692781,
+                        "width": 1.3554407891253817,
+                        "height": 1.23241306416919,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_12"
+                        ]
+                    },
+                    "id": 159,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 28.91644551366453,
+                        "y": 35.04842438692781,
+                        "width": 1.3554407891253817,
+                        "height": 1.23241306416919,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_12"
+                        ]
+                    },
+                    "id": 165,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 30.115458245808963,
+                        "y": 35.04842438692781,
+                        "width": 1.3554407891253817,
+                        "height": 1.23241306416919,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_12"
+                        ]
+                    },
+                    "id": 167,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 36.61269487598498,
+                        "y": 35.048455655556936,
+                        "width": 1.3551522144007706,
+                        "height": 1.2323505269109347,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_141"
+                        ]
+                    },
+                    "id": 169,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 16.579450046755948,
+                        "y": 76.23435083563442,
+                        "width": 1.3524501220409553,
+                        "height": 1.2312960923284944,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_14"
+                        ]
+                    },
+                    "id": 306,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 72.9959015883003,
+                        "y": 57.319891436740676,
+                        "width": 0.4265927549512223,
+                        "height": 0.9764019726541312,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 344,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 75.39385820785881,
+                        "y": 57.319891436740676,
+                        "width": 0.4265927549512223,
+                        "height": 0.9764019726541312,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 347,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 67.80027660524749,
+                        "y": 56.165846633759344,
+                        "width": 0.4265869312150233,
+                        "height": 0.9763997767720208,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 338,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 80.58949407792029,
+                        "y": 56.16584773170985,
+                        "width": 0.4265811074657124,
+                        "height": 0.9763975808710033,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 335,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 83.38716453398767,
+                        "y": 50.972615145770305,
+                        "width": 0.42658704885141474,
+                        "height": 0.9763471426594481,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 332,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 65.00260603151261,
+                        "y": 50.97261624367591,
+                        "width": 0.42658122516432895,
+                        "height": 0.9763449468482576,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 341,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 84.18660746899634,
+                        "y": 35.39308659296063,
+                        "width": 0.42656840764091036,
+                        "height": 0.9761680294890533,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 320,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 64.20317667447307,
+                        "y": 35.39308659296063,
+                        "width": 0.42656840764091036,
+                        "height": 0.9761680294890533,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 323,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 68.20000520608784,
+                        "y": 30.199706645666,
+                        "width": 0.4265676467333907,
+                        "height": 0.9761607186870772,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 314,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 76.99277779807814,
+                        "y": 28.468452989753917,
+                        "width": 0.4261524140657862,
+                        "height": 0.9765800255812277,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 311,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 71.39743170572592,
+                        "y": 28.46845408870264,
+                        "width": 0.4261465889336875,
+                        "height": 0.9765778276837768,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 308,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 80.19019920178195,
+                        "y": 30.199796695444864,
+                        "width": 0.42609007458201564,
+                        "height": 0.9759806191293529,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 317,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 63.00443753122327,
+                        "y": 44.048651905766114,
+                        "width": 0.42609007458201564,
+                        "height": 0.9759806191293529,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 326,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 85.38582494530505,
+                        "y": 44.048651905766114,
+                        "width": 0.42609007458201564,
+                        "height": 0.9759806191293529,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 329,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 27.88817053757726,
+                        "y": 15.888927605493228,
+                        "width": 0.3170672828711148,
+                        "height": 0.5661681271178698,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "arrow"
+                        ]
+                    },
+                    "id": 154,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 38.67916257216844,
+                        "y": 59.92340123969051,
+                        "width": 0.3170370133671298,
+                        "height": 0.5659194214618561,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "arrow"
+                        ]
+                    },
+                    "id": 156,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 8.329466106423295,
+                        "y": 4.49251403078137,
+                        "width": 0.3919314356900436,
+                        "height": 0.4577163027025272,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "arrow"
+                        ]
+                    },
+                    "id": 365,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 13.525136251069519,
+                        "y": 76.62117998635647,
+                        "width": 0.3919200837654163,
+                        "height": 0.4576440031140255,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "arrow"
+                        ]
+                    },
+                    "id": 367,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 13.000568564349487,
+                        "y": 90.46983035865385,
+                        "width": 0.3919187787296455,
+                        "height": 0.457643672005282,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "arrow"
+                        ]
+                    },
+                    "id": 157,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.37217610235073,
+                        "y": 90.46985718274186,
+                        "width": 0.3917073570054535,
+                        "height": 0.4575900238292477,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "arrow"
+                        ]
+                    },
+                    "id": 369,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 47.49695763492971,
+                        "y": 93.35499744639725,
+                        "width": 0.3917021365668243,
+                        "height": 0.45758869896759813,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "arrow"
+                        ]
+                    },
+                    "id": 371,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 31.874780180928035,
+                        "y": 93.34032713912008,
+                        "width": 0.33722246537669476,
+                        "height": 0.48687340345513014,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_23"
+                        ]
+                    },
+                    "id": 353,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 29.077107292017274,
+                        "y": 90.45519452665387,
+                        "width": 0.33722138967778303,
+                        "height": 0.48686563816807543,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_23"
+                        ]
+                    },
+                    "id": 351,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 69.06247654976373,
+                        "y": 29.317175013418417,
+                        "width": 0.29979083249801725,
+                        "height": 0.4328277820849237,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 146,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 79.4540900094966,
+                        "y": 29.3171757899513,
+                        "width": 0.2997854539976562,
+                        "height": 0.43282622901915835,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 147,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 69.06248139064334,
+                        "y": 61.63092693333595,
+                        "width": 0.2997811507387987,
+                        "height": 0.43275789382428587,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 148,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 79.45409485032408,
+                        "y": 61.630927709793596,
+                        "width": 0.2997757723426592,
+                        "height": 0.4327563409089921,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_64"
+                        ]
+                    },
+                    "id": 149,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                }
+            ]
+        }
+    ]
+}

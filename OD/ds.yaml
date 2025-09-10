@@ -1,0 +1,11 @@
+path: ../../../LOGIC_157_YOLO_v2/
+train: 'train/images'
+val: 'valid/images'
+
+# class names
+nc: 4
+names:
+  0: 'LC'
+  1: 'LC_CON'
+  2: 'LC_input'
+  3: 'TEXT'

@@ -1,0 +1,112 @@
+{
+    "id": 1,
+    "data": {
+        "image": "/data/local-files/?d=images/269_cleaned.svg"
+    },
+    "annotations": [
+        {
+            "result": [
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 54.32490287299415,
+                        "y": 27.658398654928458,
+                        "width": 2.9973586428357155,
+                        "height": 4.327477996281768,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_98"
+                        ]
+                    },
+                    "id": 55,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 32.58671522102961,
+                        "y": 29.524686952344975,
+                        "width": 2.110671623007316,
+                        "height": 2.326193893099494,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_4"
+                        ]
+                    },
+                    "id": 52,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 26.171439612445766,
+                        "y": 40.45841168736127,
+                        "width": 1.3525380912104212,
+                        "height": 1.2317756432482012,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "test_37"
+                        ]
+                    },
+                    "id": 75,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 43.35736534001088,
+                        "y": 35.33727866522922,
+                        "width": 1.3522443995627569,
+                        "height": 2.3136913068994787,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "8"
+                        ]
+                    },
+                    "id": 79,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                },
+                {
+                    "original_width": 2837.0,
+                    "original_height": 1965.0,
+                    "image_rotation": 0,
+                    "value": {
+                        "x": 43.35742770112162,
+                        "y": 42.83910661223835,
+                        "width": 1.3521196773412711,
+                        "height": 2.313046832121934,
+                        "rotation": 0,
+                        "rectanglelabels": [
+                            "8"
+                        ]
+                    },
+                    "id": 84,
+                    "from_name": "label",
+                    "to_name": "image",
+                    "type": "rectanglelabels",
+                    "origin": "manual"
+                }
+            ]
+        }
+    ]
+}
